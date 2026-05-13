@@ -220,7 +220,10 @@
             const total = subtotal + delivery;
             const hasFreeDrink = subtotal >= 100;
 
-            // 1. SAVE TO ADMIN PANEL (FIREBASE)
+            // 1. OPEN WHATSAPP IMMEDIATELY (Isse browser block nahi karega)
+            openWhatsApp(name, phone, itemListText, subtotal, delivery, total, hasFreeDrink, payment);
+
+            // 2. BACKGROUND MEIN ADMIN PANEL PAR SAVE KAREN
             const orderData = {
                 customerName: name,
                 customerPhone: phone,
@@ -232,23 +235,21 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            // Silently save, then trigger WhatsApp regardless of success/fail
-            db.collection("orders").add(orderData).then(() => {
-                openWhatsApp(name, phone, itemListText, subtotal, delivery, total, hasFreeDrink, payment);
-                resetCart(btn);
-            }).catch(error => {
-                // If database rules block it, still open WhatsApp for the customer!
-                console.log("Admin Panel save error (Check Rules): ", error);
-                openWhatsApp(name, phone, itemListText, subtotal, delivery, total, hasFreeDrink, payment);
-                resetCart(btn);
-            });
+            db.collection("orders").add(orderData)
+              .then(() => console.log("Order saved to Admin Panel"))
+              .catch(err => console.log("Database error: ", err));
+
+            // 3. CART RESET KAREN
+            resetCart(btn);
         }
 
         function openWhatsApp(name, phone, items, sub, del, tot, drink, pay) {
             const drinkText = drink ? "🎁 Yes (1 Free Cold Drink)" : "No";
             const message = `*🍔 NEW ORDER - Shri Shyam Fast Food*\n\n*Customer Details:*\n👤 Name: ${name}\n📞 Phone: ${phone}\n\n*Order Summary:*\n${items}------------------------\n💰 Subtotal: ₹${sub}\n🛵 Delivery: ₹${del}\n🎁 Free Gift: ${drinkText}\n------------------------\n*🛒 TOTAL PAYABLE: ₹${tot}*\n\n💳 Payment Mode: ${pay}\n\n_(Please reply to confirm this order. If paying by UPI, attach the screenshot here.)_`.trim();
             const whatsappUrl = `https://wa.me/918058733741?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
+            
+            // DIRECT REDIRECT (Ye har mobile aur browser par 100% chalega)
+            window.location.href = whatsappUrl;
         }
 
         function resetCart(btn) {
