@@ -1,389 +1,173 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Shri Shyam Fast Food</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
-<style>
-  body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    color: #333;
-  }
+// Sample product data
+let products = [
+  { id: 1, name: "Product 1", price: 29.99, image: "https://via.placeholder.com/150" },
+  { id: 2, name: "Product 2", price: 49.99, image: "https://via.placeholder.com/150" },
+  { id: 3, name: "Product 3", price: 19.99, image: "https://via.placeholder.com/150" },
+  { id: 4, name: "Product 4", price: 99.99, image: "https://via.placeholder.com/150" }
+];
 
-  header {
-    background-color: #ffcc00;
-    padding: 20px;
-    text-align: center;
-    position: relative;
-  }
+let cart = [];
+let adminAuthenticated = false;
 
-  header h1 {
-    margin: 0;
-    font-size: 2em;
-  }
+// Load products on page load
+window.onload = () => {
+  displayProducts();
+  document.getElementById('admin-login-btn').onclick = showAdminLogin;
+  document.getElementById('close-admin').onclick = closeAdminLogin;
+  document.getElementById('admin-login-submit').onclick = adminLogin;
+  document.getElementById('add-product-btn').onclick = showAddProduct;
+  document.getElementById('close-add').onclick = closeAddProduct;
+  document.getElementById('save-product').onclick = saveProduct;
+  document.getElementById('logout-admin').onclick = logoutAdmin;
+  document.getElementById('checkout-btn').onclick = checkout;
+};
 
-  nav {
-    margin-top: 10px;
-  }
+// Display products
+function displayProducts() {
+  const container = document.getElementById('products-container');
+  container.innerHTML = '';
 
-  nav button {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 8px 12px;
-    margin: 0 5px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-  }
+  products.forEach(product => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
 
-  nav button:hover {
-    background-color: #e6e6e6;
-  }
+    card.innerHTML = `
+      <img src="${product.image}" alt="${product.name}" />
+      <h3>${product.name}</h3>
+      <p>$${product.price.toFixed(2)}</p>
+      <button onclick="addToCart(${product.id})">Add to Cart</button>
+    `;
+    container.appendChild(card);
+  });
+}
 
-  .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 20px;
-  }
-
-  /* Cart */
-  #cart {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    width: 300px;
-    background-color: #fff;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    z-index: 1000;
-  }
-
-  #cart h3 {
-    margin-top: 0;
-  }
-
-  #cart-items {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-
-  .cart-item span {
-    flex: 1;
-  }
-
-  /* Menu and sections */
- .menu-section {
-    margin-top: 40px;
-  }
-
-  .menu-category {
-    margin-top: 30px;
-  }
-
-  .menu-category h2 {
-    background-color: #ffe066;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    font-size: 1.8em;
-  }
-
-  .menu-items {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-  }
-
-  .item-card {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
-  }
-
-  .item-card:hover {
-    transform: translateY(-3px);
-  }
-
-  .item-image {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-
-  .item-name {
-    font-size: 1.2em;
-    margin: 10px 0 5px 0;
-    font-weight: 600;
-  }
-
-  .item-price {
-    font-size: 1em;
-    color: #555;
-  }
-
-  /* Offer */
-  .offer {
-    background-color: #d1e7dd;
-    color: #0f5132;
-    padding: 15px;
-    text-align: center;
-    border-radius: 8px;
-    font-weight: bold;
-    margin: 30px 0;
-    font-size: 1.2em;
-  }
-
-  /* Order and admin login forms */
- .section {
-    margin-top: 50px;
-    background-color: #fff;
-    padding: 30px 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  }
-
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-  }
-
-  label {
-    margin-top: 15px;
-    font-weight: 600;
-  }
-
-  input[type="text"], input[type="password"], input[type="file"] {
-    margin-top: 8px;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 1em;
-  }
-
-  button {
-    margin-top: 25px;
-    padding: 12px;
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1em;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #218838;
-  }
-
-  /* Responsive */
-  @media(max-width: 600px) {
-    #cart {
-      width: 90%;
-      right: 5%;
-    }
-    header h1 {
-      font-size: 1.8em;
-    }
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <h1>Shri Shyam Fast Food</h1>
-  <nav>
-    <button onclick="showSection('menu')">Menu</button>
-    <button onclick="showSection('order')">Order</button>
-    <button onclick="showSection('admin')">Admin Login</button>
-  </nav>
-</header>
-
-<!-- Cart -->
-<div id="cart">
-  <h3>🛒 Your Cart</h3>
-  <div id="cart-items"></div>
-  <p>Total: ₹<span id="total-price">0</span></p>
-  <button onclick="checkout()">Checkout</button>
-</div>
-
-<div class="container">
-  <!-- Menu Section -->
-  <div id="menu" class="section">
-    <h2>Menu</h2>
-    <!-- Repeat menu categories as before -->
-    <!-- Example: Sandwiches & Burgers -->
-    <div class="menu-category">
-      <h2>🥪 Sandwiches & Burgers</h2>
-      <div class="menu-items" id="menu-sandwich">
-        <!-- Items will be dynamically inserted here -->
-      </div>
-    </div>
-    <!-- Add other categories similarly -->
-    <!-- Momos, Pav Bhaji, Chowmein, Bhel Puri -->
-  </div>
-
-  <!-- Order Section -->
-  <div id="order" class="section" style="display:none;">
-    <h2>Place Your Order</h2>
-    <form id="orderForm">
-      <label for="item">Select Item:</label>
-      <select id="item" required>
-        <option value="">--Select an Item--</option>
-        <!-- options will be populated dynamically -->
-      </select>
-
-      <label for="payment">Upload Payment Proof (QR or Screenshot):</label>
-      <input type="file" id="payment" accept="image/*" required />
-
-      <button type="submit">Place Order</button>
-    </form>
-  </div>
-
-  <!-- Admin Login -->
-  <div id="admin" class="section" style="display:none;">
-    <h2>Admin Login</h2>
-    <form id="adminLogin">
-      <label for="adminUser">Username:</label>
-      <input type="text" id="adminUser" required />
-      <label for="adminPass">Password:</label>
-      <input type="password" id="adminPass" required />
-      <button type="submit">Login</button>
-    </form>
-  </div>
-</div>
-
-<script>
-  // Sample Data
-  const menuItems = [
-    { category: 'Sandwiches & Burgers', items: [
-        { name: 'Sandwich', price: 50, image: 'https://via.placeholder.com/300x150?text=Sandwich' },
-        { name: 'Burger', price: 80, image: 'https://via.placeholder.com/300x150?text=Burger' }
-      ]
-    },
-    { category: '🥟 Momos', items: [
-        { name: 'Momos (Full)', price: 70, image: 'https://via.placeholder.com/300x150?text=Momos+Full' },
-        { name: 'Momos (Half)', price: 40, image: 'https://via.placeholder.com/300x150?text=Momos+Half' }
-      ]
-    },
-    { category: '🥘 Pav Bhaji', items: [
-        { name: 'Pav Bhaji (Full)', price: 100, image: 'https://via.placeholder.com/300x150?text=Pav+Bhaji+Full' },
-        { name: 'Pav Bhaji (Half)', price: 60, image: 'https://via.placeholder.com/300x150?text=Pav+Bhaji+Half' }
-      ]
-    },
-    { category: '🍝 Chowmein', items: [
-        { name: 'Chowmein (Full)', price: 80, image: 'https://via.placeholder.com/300x150?text=Chowmein+Full' },
-        { name: 'Chowmein (Half)', price: 50, image: 'https://via.placeholder.com/300x150?text=Chowmein+Half' }
-      ]
-    },
-    { category: '🥣 Bhel Puri', items: [
-        { name: 'Bhel Puri (Full)', price: 40, image: 'https://via.placeholder.com/300x150?text=Bhel+Puri+Full' },
-        { name: 'Bhel Puri (Half)', price: 25, image: 'https://via.placeholder.com/300x150?text=Bhel+Puri+Half' }
-      ]
-    }
-  ];
-
-  const cart = [];
-  let totalPrice = 0;
-
-  // Functions
-  function showSection(sectionId) {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display='none');
-    document.getElementById(sectionId).style.display='block';
-  }
-
-  function populateMenu() {
-    menuItems.forEach(cat => {
-      const container = document.getElementById(`menu-${cat.category.replace(/\s+/g, '').toLowerCase()}`);
-      cat.items.forEach(item => {
-        const card = document.createElement('div');
-        card.className='item-card';
-        card.innerHTML=`
-          <img src="${item.image}" alt="${item.name}" class="item-image" />
-          <div class="item-name">${item.name}</div>
-          <div class="item-price">₹${item.price}</div>
-          <button onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
-        `;
-        container.appendChild(card);
-      });
-    });
-
-    // Populate select options
-    const select = document.getElementById('item');
-    menuItems.forEach(cat => {
-      cat.items.forEach(i => {
-        const option = document.createElement('option');
-        option.value = i.name;
-        option.text = `${i.name} - ₹${i.price}`;
-        select.appendChild(option);
-      });
-    });
-  }
-
-  function addToCart(name, price) {
-    cart.push({name, price});
-    totalPrice += price;
+// Add to cart
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (product) {
+    cart.push(product);
     updateCart();
   }
+}
 
-  function updateCart() {
-    const container = document.getElementById('cart-items');
-    container.innerHTML='';
-    cart.forEach((item, index) => {
-      const div = document.createElement('div');
-      div.className='cart-item';
-      div.innerHTML=`<span>${item.name}</span><span>₹${item.price} <button onclick="removeFromCart(${index})">Remove</button></span>`;
-      container.appendChild(div);
-    });
-    document.getElementById('total-price').innerText=totalPrice;
+// Update cart display
+function updateCart() {
+  document.getElementById('cart-count').innerText = cart.length;
+  const cartItemsDiv = document.getElementById('cart-items');
+  cartItemsDiv.innerHTML = '';
+
+  if (cart.length === 0) {
+    cartItemsDiv.innerHTML = '<p>Your cart is empty.</p>';
+    return;
   }
 
-  function removeFromCart(index) {
-    totalPrice -= cart[index].price;
-    cart.splice(index,1);
-    updateCart();
+  let total = 0;
+  cart.forEach((item, index) => {
+    total += item.price;
+    const itemDiv = document.createElement('div');
+    itemDiv.innerHTML = `
+      <p>${item.name} - $${item.price.toFixed(2)} <button onclick="removeFromCart(${index})">Remove</button></p>
+    `;
+    cartItemsDiv.appendChild(itemDiv);
+  });
+
+  // Show total
+  const totalDiv = document.createElement('div');
+  totalDiv.innerHTML = `<strong>Total: $${total.toFixed(2)}</strong>`;
+  cartItemsDiv.appendChild(totalDiv);
+}
+
+// Remove item from cart
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  updateCart();
+}
+
+// Checkout
+function checkout() {
+  if (cart.length === 0) {
+    alert('Your cart is empty.');
+    return;
   }
+  alert('Thank you for your purchase!');
+  cart = [];
+  updateCart();
+}
 
-  document.getElementById('orderForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    alert('Order placed! Connect with backend.');
+// Admin login modal
+function showAdminLogin() {
+  document.getElementById('admin-modal').style.display = 'flex';
+}
+
+function closeAdminLogin() {
+  document.getElementById('admin-modal').style.display = 'none';
+  document.getElementById('admin-message').innerText = '';
+  document.getElementById('admin-password').value = '';
+}
+
+// Admin login validation
+function adminLogin() {
+  const password = document.getElementById('admin-password').value;
+  if (password === 'admin123') {
+    adminAuthenticated = true;
+    document.getElementById('admin-modal').style.display = 'none';
+    showAdminPanel();
+  } else {
+    document.getElementById('admin-message').innerText = 'Incorrect password!';
+  }
+}
+
+// Show admin panel
+function showAdminPanel() {
+  document.querySelector('.admin-panel').classList.remove('hidden');
+  loadAdminProducts();
+}
+
+// Load admin products
+function loadAdminProducts() {
+  const adminDiv = document.getElementById('admin-products');
+  adminDiv.innerHTML = '';
+  products.forEach(product => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <p><strong>${product.name}</strong> - $${product.price.toFixed(2)}</p>
+    `;
+    adminDiv.appendChild(div);
   });
+}
 
-  document.getElementById('adminLogin').addEventListener('submit', function(e){
-    e.preventDefault();
-    const username = document.getElementById('adminUser').value;
-    const password = document.getElementById('adminPass').value;
-    if(username==='admin' && password==='password') {
-      alert('Welcome, Admin!');
-    } else {
-      alert('Invalid credentials');
-    }
-  });
+// Logout admin
+function logoutAdmin() {
+  adminAuthenticated = false;
+  document.querySelector('.admin-panel').classList.add('hidden');
+}
 
-  // Initialize
-  populateMenu();
+// Show add product modal
+function showAddProduct() {
+  document.getElementById('add-product-modal').style.display = 'flex';
+}
 
-</script>
+function closeAddProduct() {
+  document.getElementById('add-product-modal').style.display = 'none';
+  document.getElementById('product-name').value = '';
+  document.getElementById('product-price').value = '';
+}
 
-</body>
-</html>
+// Save new product
+function saveProduct() {
+  const name = document.getElementById('product-name').value;
+  const price = parseFloat(document.getElementById('product-price').value);
+  if (name && !isNaN(price)) {
+    const newProduct = {
+      id: Date.now(),
+      name,
+      price,
+      image: "https://via.placeholder.com/150"
+    };
+    products.push(newProduct);
+    displayProducts();
+    closeAddProduct();
+  } else {
+    alert('Please enter valid product details.');
+  }
+}
