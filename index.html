@@ -6,94 +6,104 @@
     <title>Shri Shyam Fast Food Moulasar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase Libraries -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding-bottom: 120px; }
         .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
-        .closed-screen { display: none; position: fixed; inset: 0; background: white; z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
-        .item-card { transition: 0.3s; border: 1px solid transparent; }
-        .item-card:hover { border-color: #ff5722; }
-        .out-of-stock { opacity: 0.5; grayscale: 1; pointer-events: none; }
+        /* Dukan Band Parda */
+        #closed-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: white; 
+            z-index: 9999; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center;
+        }
+        .item-card { transition: 0.2s; border: 1px solid transparent; }
+        .item-card:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
-    <!-- DUKAAN BAND SCREEN -->
-    <div id="closed-screen" class="closed-screen text-center">
-        <i class="fa-solid fa-clock-rotate-left text-7xl text-red-500 mb-4"></i>
-        <h2 class="text-3xl font-black text-gray-900 uppercase italic">Dukaan Band Hai</h2>
-        <p class="text-gray-400 font-bold mt-2">Wait for the owner to open</p>
-        <button onclick="showLogin()" class="mt-20 text-gray-200 text-xs font-bold">Admin Login</button>
+    <!-- DUKAAN BAND OVERLAY -->
+    <div id="closed-screen">
+        <i class="fa-solid fa-store-slash text-8xl text-red-600 mb-6"></i>
+        <h2 class="text-3xl font-black text-gray-900 uppercase italic">Dukaan Abhi Band Hai</h2>
+        <p class="text-gray-400 font-bold mt-2 px-6">Hum jald hi wapas aayenge! Order ke liye intezar karein.</p>
+        <button onclick="showLogin()" class="mt-12 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-400 border border-dashed border-gray-300">
+            <i class="fa-solid fa-lock mr-2"></i> ADMIN LOGIN (WAPIS ON KAREIN)
+        </button>
     </div>
 
     <!-- HEADER -->
-    <header class="gradient-nav text-white shadow-lg sticky top-0 z-50">
+    <header class="gradient-nav text-white shadow-xl sticky top-0 z-[50]">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-14 h-14 rounded-full border-2 border-white shadow-md">
                 <div>
-                    <h1 class="text-xs font-black leading-none">SHRI SHYAM FAST FOOD</h1>
-                    <p class="text-[10px] font-bold mt-1 opacity-90">Moulasar | 8058733741</p>
+                    <h1 class="text-xs font-black leading-none uppercase tracking-tighter">SHRI SHYAM FAST FOOD</h1>
+                    <p class="text-[10px] font-bold mt-1 opacity-90 italic">MOULASAR | 8058733741</p>
                 </div>
             </div>
-            <button onclick="showLogin()" class="bg-white/20 p-3 rounded-xl"><i class="fa-solid fa-screwdriver-wrench"></i></button>
+            <button onclick="showLogin()" class="bg-white/20 p-3 rounded-2xl"><i class="fa-solid fa-screwdriver-wrench"></i></button>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto px-4 py-6">
+    <div class="max-w-5xl mx-auto px-4 py-6">
         
         <!-- MASTER ADMIN PANEL -->
-        <div id="admin-section" class="hidden bg-white rounded-3xl shadow-2xl p-6 mb-10 border-t-8 border-red-600">
+        <div id="admin-section" class="hidden bg-white rounded-[2.5rem] shadow-2xl p-6 mb-10 border-t-8 border-red-600">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black text-gray-800 underline">OWNER DASHBOARD</h2>
-                <button onclick="document.getElementById('admin-section').classList.add('hidden')" class="bg-gray-100 p-2 rounded-lg text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+                <h2 class="text-xl font-black text-gray-800 underline">OWNER DASHBOARD</h2>
+                <button onclick="document.getElementById('admin-section').classList.add('hidden')" class="text-gray-300 text-2xl">&times;</button>
             </div>
 
-            <!-- SHOP STATUS -->
-            <div class="bg-gray-50 p-4 rounded-2xl mb-8 flex justify-between items-center border">
-                <p class="font-bold text-gray-700">Dukaan Status:</p>
-                <button id="shop-toggle-btn" onclick="toggleShop()" class="px-8 py-3 rounded-xl font-black text-white shadow-lg"></button>
+            <div class="bg-gray-50 p-5 rounded-3xl mb-8 flex justify-between items-center border">
+                <span class="font-black text-gray-600">Dukan Status:</span>
+                <button id="shop-toggle-btn" onclick="toggleShop()" class="px-10 py-3 rounded-2xl font-black text-white shadow-lg"></button>
             </div>
 
-            <!-- ADD NEW ITEM -->
-            <div class="bg-red-50 p-4 rounded-2xl mb-8 border-2 border-dashed border-red-200">
-                <p class="font-black text-red-600 mb-3 text-sm italic">Add New Item:</p>
+            <div class="bg-red-50 p-5 rounded-3xl mb-8 border-2 border-dashed border-red-200">
+                <p class="font-black text-red-600 mb-3 text-xs uppercase tracking-widest italic">Add New Item:</p>
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="new-item-name" placeholder="Item Name" class="p-3 rounded-xl border outline-none">
-                    <input type="number" id="new-item-price" placeholder="Price (₹)" class="p-3 rounded-xl border outline-none">
-                    <input type="text" id="new-item-icon" placeholder="Icon (🍔, 🥪, 🥣)" class="p-3 rounded-xl border outline-none">
-                    <button onclick="addNewItem()" class="bg-black text-white font-black rounded-xl uppercase text-xs">Add Item</button>
+                    <input type="text" id="new-item-name" placeholder="Item Name" class="p-3 rounded-xl border outline-none text-sm">
+                    <input type="number" id="new-item-price" placeholder="Price (₹)" class="p-3 rounded-xl border outline-none text-sm">
+                    <button onclick="addNewItem()" class="col-span-2 bg-black text-white font-black py-3 rounded-xl uppercase text-xs">Add to Menu</button>
                 </div>
             </div>
 
-            <!-- ADMIN MENU CONTROL -->
-            <h3 class="font-black text-gray-500 mb-4 text-xs uppercase tracking-widest">Manage Items (Price/Stock/Delete)</h3>
+            <h3 class="font-black text-gray-400 mb-4 text-[10px] uppercase tracking-[0.2em]">Manage Price & Stock</h3>
             <div id="admin-menu-list" class="space-y-3"></div>
         </div>
 
         <!-- CUSTOMER MENU -->
-        <div class="flex flex-col md:flex-row gap-8">
-            <div class="w-full md:w-2/3">
-                <h2 class="text-3xl font-black mb-6 italic text-gray-800 flex items-center gap-3">
-                    Aaj Ka Menu <span class="h-1 w-20 bg-red-600 rounded-full"></span>
+        <div class="flex flex-col lg:flex-row gap-8">
+            <div class="w-full lg:w-2/3">
+                <h2 class="text-2xl font-black mb-6 italic text-gray-800 flex items-center gap-3">
+                    Today's Menu <span class="h-1 w-16 bg-red-600 rounded-full"></span>
                 </h2>
                 <div id="customer-menu" class="grid grid-cols-1 gap-4"></div>
             </div>
 
             <!-- CART SECTION -->
-            <div class="w-full md:w-1/3">
+            <div class="w-full lg:w-1/3">
                 <div class="bg-white rounded-[2.5rem] shadow-2xl p-6 sticky top-24 border border-gray-100">
-                    <h2 class="text-xl font-bold mb-4 flex justify-between items-center">Aapka Order <i class="fa-solid fa-basket-shopping text-red-500"></i></h2>
-                    <div id="cart-list" class="space-y-3 mb-6 min-h-[100px] text-sm">
-                        <p class="text-center text-gray-300 py-10 italic">Empty Basket</p>
+                    <h2 class="text-xl font-bold mb-4 flex justify-between items-center text-gray-800">My Basket <i class="fa-solid fa-cart-shopping text-red-500"></i></h2>
+                    <div id="cart-list" class="space-y-3 mb-6 min-h-[80px] text-sm">
+                        <p class="text-center text-gray-300 py-6 italic">Basket is empty</p>
                     </div>
                     
-                    <div class="space-y-3" id="order-form" style="display:none;">
-                        <input type="text" id="c-name" placeholder="Aapka Naam" class="w-full p-4 bg-gray-50 rounded-2xl border outline-none font-bold">
-                        <input type="tel" id="c-phone" placeholder="Mobile Number" class="w-full p-4 bg-gray-50 rounded-2xl border outline-none font-bold">
-                        <div class="flex justify-between items-center text-2xl font-black py-4 border-t">
+                    <div class="space-y-4" id="order-form" style="display:none;">
+                        <input type="text" id="cust-name" placeholder="Aapka Naam" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none font-bold text-gray-700">
+                        <input type="tel" id="cust-phone" placeholder="Mobile Number" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none font-bold text-gray-700">
+                        <div class="flex justify-between items-center text-2xl font-black py-4 border-t border-dashed">
                             <span>Total</span><span id="cart-total" class="text-red-600">₹0</span>
                         </div>
                         <button onclick="showQR()" class="w-full bg-green-600 text-white font-black py-5 rounded-[1.5rem] shadow-xl hover:bg-green-700 transition">PAY & PLACE ORDER</button>
@@ -103,17 +113,18 @@
         </div>
     </div>
 
-    <!-- PAYMENT MODAL -->
-    <div id="qr-modal" style="display:none;" class="fixed inset-0 bg-black/95 z-[300] flex items-center justify-center p-6 text-center">
+    <!-- QR MODAL -->
+    <div id="qr-modal" style="display:none;" class="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-6 text-center">
         <div class="bg-white rounded-[3rem] p-8 max-w-xs w-full">
-             <h3 class="font-black text-xl mb-4 italic">JAY SHREE SHYAM</h3>
-             <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-3xl border mb-6 shadow-md">
+             <h3 class="font-black text-xl mb-4 italic text-gray-800">JAY SHREE SHYAM</h3>
+             <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-3xl border-4 border-gray-50 mb-6 shadow-md">
              <button onclick="sendToWhatsApp()" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl shadow-lg mb-3">DONE (WHATSAPP)</button>
-             <button onclick="document.getElementById('qr-modal').style.display='none'" class="text-gray-400 font-bold text-xs">CANCEL</button>
+             <button onclick="document.getElementById('qr-modal').style.display='none'" class="text-gray-400 font-bold text-xs uppercase tracking-widest">Cancel</button>
         </div>
     </div>
 
     <script>
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
             authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -136,10 +147,10 @@
                 document.getElementById('closed-screen').style.display = shopOpen ? 'none' : 'flex';
                 const btn = document.getElementById('shop-toggle-btn');
                 btn.innerText = shopOpen ? "CLOSE SHOP" : "OPEN SHOP";
-                btn.className = shopOpen ? "px-8 py-3 rounded-xl font-black bg-red-600 text-white" : "px-8 py-3 rounded-xl font-black bg-green-600 text-white";
+                btn.className = shopOpen ? "px-10 py-3 rounded-2xl font-black bg-red-600 text-white shadow-red-200" : "px-10 py-3 rounded-2xl font-black bg-green-600 text-white shadow-green-200";
             });
 
-            // Monitor Menu (Two Lists: Customer & Admin)
+            // Monitor Menu
             rdb.ref('menu').on('value', (snap) => {
                 const data = snap.val();
                 const custBox = document.getElementById('customer-menu');
@@ -149,29 +160,26 @@
                 if(data) {
                     Object.keys(data).forEach(key => {
                         const item = data[key];
-                        // Customer Card
+                        // Customer List
                         custBox.innerHTML += `
-                            <div class="bg-white p-5 rounded-[2rem] flex justify-between items-center shadow-sm item-card ${item.available ? '' : 'out-of-stock'}">
+                            <div class="bg-white p-5 rounded-[2rem] flex justify-between items-center shadow-sm item-card ${item.available ? '' : 'opacity-40 grayscale pointer-events-none'}">
                                 <div class="flex items-center gap-4">
-                                    <span class="text-4xl">${item.icon}</span>
+                                    <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-2xl text-red-500 italic font-black">S</div>
                                     <div>
-                                        <p class="font-black text-gray-800">${item.name}</p>
+                                        <p class="font-black text-gray-800 uppercase text-sm">${item.name}</p>
                                         <p class="text-red-600 font-black italic">₹${item.price}</p>
                                     </div>
                                 </div>
-                                <button onclick="addToCart('${item.name}', ${item.price})" class="bg-black text-white font-bold px-6 py-3 rounded-2xl active:scale-90">ADD</button>
+                                <button onclick="addToCart('${item.name}', ${item.price})" class="bg-black text-white font-bold px-8 py-3 rounded-2xl text-xs active:scale-90 transition">ADD</button>
                             </div>`;
 
-                        // Admin Card
+                        // Admin List
                         adminBox.innerHTML += `
-                            <div class="bg-white p-4 rounded-2xl border flex flex-wrap justify-between items-center gap-3">
+                            <div class="bg-gray-50 p-4 rounded-2xl border flex flex-wrap justify-between items-center gap-3">
+                                <span class="font-black text-[10px] text-gray-500 uppercase">${item.name}</span>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xl">${item.icon}</span>
-                                    <span class="font-bold text-xs uppercase">${item.name}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <input type="number" value="${item.price}" onchange="updatePrice('${key}', this.value)" class="w-16 p-2 border rounded-lg text-center font-bold">
-                                    <button onclick="toggleItem('${key}', ${!item.available})" class="px-3 py-2 rounded-lg text-[10px] font-black ${item.available ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">${item.available ? 'IN STOCK' : 'OUT'}</button>
+                                    <input type="number" value="${item.price}" onchange="updatePrice('${key}', this.value)" class="w-16 p-2 border rounded-xl text-center font-bold text-xs outline-none">
+                                    <button onclick="toggleItem('${key}', ${!item.available})" class="px-4 py-2 rounded-xl text-[9px] font-black ${item.available ? 'bg-green-500 text-white shadow-green-100' : 'bg-red-500 text-white shadow-red-100'} uppercase">${item.available ? 'In' : 'Out'}</button>
                                     <button onclick="deleteItem('${key}')" class="text-red-300 px-2"><i class="fa-solid fa-trash-can"></i></button>
                                 </div>
                             </div>`;
@@ -180,46 +188,50 @@
             });
         }
 
-        // --- ADMIN FUNCTIONS ---
-        function showLogin() { if(prompt("Pass:") === "jitu8087") document.getElementById('admin-section').classList.remove('hidden'); }
+        // --- ADMIN CONTROLS ---
+        function showLogin() {
+            if(prompt("Admin Password:") === "jitu8087") {
+                // Remove closed screen immediately and show dashboard
+                document.getElementById('closed-screen').style.display = 'none';
+                document.getElementById('admin-section').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
         function toggleShop() { rdb.ref('shop_status').set(!shopOpen); }
         function updatePrice(id, val) { rdb.ref('menu/' + id).update({ price: parseInt(val) }); }
-        function toggleItem(id, status) { rdb.ref('menu/' + id).update({ available: status }); }
-        function deleteItem(id) { if(confirm("Hata dein?")) rdb.ref('menu/' + id).remove(); }
+        function toggleItem(id, s) { rdb.ref('menu/' + id).update({ available: s }); }
+        function deleteItem(id) { if(confirm("Item Delete Karein?")) rdb.ref('menu/' + id).remove(); }
         function addNewItem() {
-            const name = document.getElementById('new-item-name').value;
-            const price = document.getElementById('new-item-price').value;
-            const icon = document.getElementById('new-item-icon').value || "🍽️";
-            if(name && price) {
-                rdb.ref('menu').push({ name, price: parseInt(price), icon, available: true });
+            const n = document.getElementById('new-item-name').value;
+            const p = document.getElementById('new-item-price').value;
+            if(n && p) {
+                rdb.ref('menu').push({ name: n, price: parseInt(p), available: true });
                 document.getElementById('new-item-name').value = '';
                 document.getElementById('new-item-price').value = '';
             }
         }
 
-        // --- CART FUNCTIONS ---
+        // --- CART LOGIC ---
         function addToCart(n, p) { cart.push({name:n, price:p}); updateCart(); }
         function updateCart() {
-            let sub = cart.reduce((a, b) => a + b.price, 0);
+            let total = cart.reduce((a, b) => a + b.price, 0);
             const list = document.getElementById('cart-list');
-            list.innerHTML = cart.length === 0 ? '<p class="text-center text-gray-300 py-10 italic">Empty Basket</p>' : cart.map((i, idx) => `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl mb-1"><span>${i.name}</span><div class="flex items-center gap-3"><b>₹${i.price}</b><button onclick="cart.splice(${idx},1);updateCart();" class="text-red-300"><i class="fa-solid fa-circle-xmark"></i></button></div></div>`).join('');
-            document.getElementById('cart-total').innerText = `₹${sub}`;
-            document.getElementById('order-form').style.display = sub > 0 ? 'block' : 'none';
+            list.innerHTML = cart.length === 0 ? '<p class="text-center text-gray-300 py-6 italic">Basket is empty</p>' : cart.map((i, idx) => `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl mb-1 font-bold"><span>${i.name}</span><div class="flex items-center gap-3"><b>₹${i.price}</b><i onclick="cart.splice(${idx},1);updateCart();" class="fa-solid fa-circle-xmark text-red-300 cursor-pointer"></i></div></div>`).join('');
+            document.getElementById('cart-total').innerText = `₹${total}`;
+            document.getElementById('order-form').style.display = total > 0 ? 'block' : 'none';
         }
 
         function showQR() {
-            const n = document.getElementById('c-name').value;
-            const p = document.getElementById('c-phone').value;
-            if(!n || !p) { alert("Naam/Number bhariye!"); return; }
+            if(!document.getElementById('cust-name').value || !document.getElementById('cust-phone').value) { alert("Naam aur Number bhariye bhai!"); return; }
             document.getElementById('qr-modal').style.display = 'flex';
         }
 
         function sendToWhatsApp() {
-            const n = document.getElementById('c-name').value;
-            const p = document.getElementById('c-phone').value;
+            const n = document.getElementById('cust-name').value;
+            const p = document.getElementById('cust-phone').value;
             let list = "";
             let total = cart.reduce((a, b) => { list += `▫️ ${b.name} (₹${b.price})\n`; return a + b.price; }, 0);
-            const msg = `*JAY SHREE SHYAM FAST FOOD*%0A*Order From:* ${n}%0A*Phone:* ${p}%0A%0A*Items:*%0A${list.replace(/\n/g, '%0A')}-------------------%0A*Total Bill: ₹${total}*%0A-------------------%0A_Bhai Payment Kar Diya Hai!_`;
+            const msg = `*JAY SHREE SHYAM FAST FOOD*%0A*Grahak:* ${n}%0A*Phone:* ${p}%0A%0A*Items:*%0A${list.replace(/\n/g, '%0A')}-------------------%0A*Total Bill: ₹${total}*%0A-------------------%0A_Bhai Payment Kar Diya Hai!_`;
             window.location.href = `https://wa.me/918058733741?text=${msg}`;
         }
 
