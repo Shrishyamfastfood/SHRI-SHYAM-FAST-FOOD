@@ -13,19 +13,17 @@
         .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
         .logo-img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid white; object-fit: cover; }
         .admin-panel { display: none; background: white; border-top: 6px solid #cc0000; border-radius: 24px; padding: 24px; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
-        .closed-screen { display: none; position: fixed; inset: 0; background: white; z-index: 200; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .closed-screen { display: none; position: fixed; inset: 0; background: white; z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <!-- SHOP CLOSED OVERLAY -->
     <div id="closed-screen" class="closed-screen">
         <i class="fa-solid fa-clock-rotate-left text-7xl text-red-500 mb-4"></i>
-        <h2 class="text-3xl font-black text-gray-900">Dukaan Abhi Band Hai</h2>
+        <h2 class="text-3xl font-black text-gray-900 uppercase">Shop Closed</h2>
         <button onclick="showLogin()" class="mt-20 text-gray-300 text-xs">Admin Login</button>
     </div>
 
-    <!-- Header -->
     <header class="gradient-nav text-white shadow-md sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -35,63 +33,49 @@
                     <p class="text-[10px] font-bold mt-1 text-white/80 uppercase italic">Moulasar | 8058733741</p>
                 </div>
             </div>
-            <!-- ADMIN LOGIN BUTTON (Gear Icon) -->
-            <button onclick="showLogin()" class="bg-white/20 p-3 rounded-full">
-                <i class="fa-solid fa-user-gear text-white text-lg"></i>
-            </button>
+            <button onclick="showLogin()" class="bg-white/20 p-3 rounded-full"><i class="fa-solid fa-user-gear text-white text-lg"></i></button>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto px-4 py-8 text-gray-800">
-        
-        <!-- ADMIN PANEL -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
         <div id="admin-section" class="admin-panel max-w-2xl mx-auto">
             <div class="flex justify-between items-center mb-8 border-b pb-4">
-                <h2 class="text-2xl font-black text-red-600 uppercase">Admin Control</h2>
+                <h2 class="text-2xl font-black text-red-600 uppercase tracking-tighter">Admin Control</h2>
                 <button onclick="logout()" class="text-gray-400 font-bold text-xs uppercase">Logout</button>
             </div>
-
-            <!-- MAIN SHOP ON/OFF -->
             <div class="bg-gray-100 p-6 rounded-2xl mb-8 flex justify-between items-center border-2 border-dashed border-gray-300">
-                <p class="font-black text-gray-800 uppercase text-sm">Full Shop Online Status</p>
+                <p class="font-black text-gray-800 uppercase text-sm">Shop Status</p>
                 <button id="shop-main-toggle" onclick="toggleShopMain()" class="px-8 py-3 rounded-xl font-black transition shadow-lg"></button>
             </div>
-
-            <h3 class="font-black text-gray-400 text-xs mb-4 uppercase tracking-widest">Menu Management</h3>
             <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
 
-        <!-- MAIN UI (MENU & CART) -->
         <div class="flex flex-col md:flex-row gap-8">
             <div class="w-full md:w-2/3">
-                <h2 class="text-2xl font-black mb-6 italic">Today's Menu</h2>
+                <h2 class="text-2xl font-black mb-6 italic text-gray-800">Fresh Menu</h2>
                 <div id="menu-container" class="grid grid-cols-1 gap-4">
-                    <!-- Menu yahan load hoga -->
+                    <!-- YAHAN MENU LOAD HOGA -->
                 </div>
             </div>
-
-            <!-- CART SECTION -->
             <div class="w-full md:w-1/3">
                 <div class="bg-white rounded-3xl shadow-xl p-6 sticky top-24 border border-gray-100">
-                    <h2 class="text-xl font-bold mb-4 flex justify-between items-center">Your Cart <span id="cart-count" class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">0</span></h2>
+                    <h2 class="text-xl font-bold mb-4 flex justify-between items-center text-gray-800">Cart <span id="cart-count" class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">0</span></h2>
                     <div id="cart-items" class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2"></div>
-                    <div class="border-t pt-4 mb-6 flex justify-between items-center text-2xl font-black"><span>Total</span><span id="total" class="text-red-600">₹0</span></div>
-                    
-                    <div id="checkout-form" class="hidden space-y-4">
+                    <div class="border-t pt-4 mb-6 flex justify-between items-center text-2xl font-black text-gray-900"><span>Total</span><span id="total" class="text-red-600">₹0</span></div>
+                    <div id="checkout-form" class="hidden space-y-4 text-gray-800">
                         <input type="text" id="cust-name" class="w-full border rounded-xl p-3 bg-gray-50 outline-none" placeholder="Aapka Naam">
                         <input type="tel" id="cust-phone" class="w-full border rounded-xl p-3 bg-gray-50 outline-none" placeholder="Mobile Number">
-                        <button onclick="document.getElementById('payment-modal').style.display='flex'" class="w-full bg-green-600 text-white font-black py-4 rounded-xl shadow-lg">PROCEED TO PAY</button>
+                        <button onclick="document.getElementById('payment-modal').style.display='flex'" class="w-full bg-green-600 text-white font-black py-4 rounded-xl shadow-lg">PAY & ORDER</button>
                     </div>
-                    <p id="min-warning" class="text-orange-600 text-center font-bold text-[10px] mt-2 italic bg-orange-50 p-2 rounded-lg">Add items worth ₹100 for Online Order</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Payment QR Modal -->
+    <!-- Payment Modal -->
     <div id="payment-modal" style="display:none;" class="fixed inset-0 bg-black/95 z-[300] flex items-center justify-center p-6">
-        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl">
-             <h3 class="font-black text-xl mb-4">Scan & Pay</h3>
+        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center">
+             <h3 class="font-black text-xl mb-4 text-gray-800">Scan & Pay</h3>
              <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" alt="QR" class="w-full rounded-2xl mb-6 shadow-inner border">
              <button onclick="finalSubmit()" class="w-full bg-green-600 text-white font-black py-4 rounded-xl mb-3">DONE: SEND ON WHATSAPP</button>
              <button onclick="document.getElementById('payment-modal').style.display='none'" class="text-gray-400 font-bold text-xs uppercase">Cancel</button>
@@ -111,54 +95,63 @@
         const db = firebase.firestore();
 
         let cart = [];
-        let isShopOpenGlobal = true;
+        let isShopOpen = true;
 
-        // LOAD DATA
-        function syncData() {
-            // Shop Status Sync
+        const defaultMenu = [
+            { id: "m1", name: "Special Sandwich", price: 60, icon: "🥪", available: true },
+            { id: "m2", name: "Crispy Burger", price: 50, icon: "🍔", available: true },
+            { id: "m3", name: "Veg Momos", price: 50, icon: "🥟", available: true },
+            { id: "m4", name: "Veg Chowmein", price: 50, icon: "🍝", available: true },
+            { id: "m5", name: "Bhelpuri Premium", price: 40, icon: "🥣", available: true },
+            { id: "m6", name: "Bhelpuri Economy", price: 30, icon: "🥣", available: true }
+        ];
+
+        function startApp() {
+            // Shop Status
             db.collection("settings").doc("shop_status").onSnapshot(doc => {
                 if(doc.exists) {
-                    isShopOpenGlobal = doc.data().isOpen;
-                    document.getElementById('closed-screen').style.display = isShopOpenGlobal ? 'none' : 'flex';
+                    isShopOpen = doc.data().isOpen;
+                    document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
                     const btn = document.getElementById('shop-main-toggle');
-                    btn.innerText = isShopOpenGlobal ? "SHOP IS: OPEN" : "SHOP IS: CLOSED";
-                    btn.className = isShopOpenGlobal ? "px-8 py-3 rounded-xl font-black bg-green-100 text-green-600 border border-green-200" : "px-8 py-3 rounded-xl font-black bg-red-600 text-white shadow-xl";
+                    btn.innerText = isShopOpen ? "SHOP IS: OPEN" : "SHOP IS: CLOSED";
+                    btn.className = isShopOpen ? "px-8 py-3 rounded-xl font-black bg-green-100 text-green-600 border border-green-200" : "px-8 py-3 rounded-xl font-black bg-red-600 text-white shadow-xl";
                 } else {
-                    // Default open if no doc exists
                     db.collection("settings").doc("shop_status").set({ isOpen: true });
                 }
             });
 
-            // Menu Sync
+            // Menu Data
             db.collection("menu").onSnapshot(snapshot => {
                 const container = document.getElementById('menu-container');
                 const adminBox = document.getElementById('admin-controls');
-                container.innerHTML = ''; adminBox.innerHTML = '';
                 
+                if (snapshot.empty) {
+                    defaultMenu.forEach(item => db.collection("menu").doc(item.id).set(item));
+                    return; // Next snapshot will handle rendering
+                }
+
+                container.innerHTML = ''; adminBox.innerHTML = '';
                 snapshot.forEach(doc => {
                     const item = doc.data(); const id = doc.id;
-                    // Customer
+                    // Customer UI
                     container.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm ${!item.available ? 'opacity-40 pointer-events-none' : ''}"><div class="flex items-center gap-4"><span class="text-3xl">${item.icon}</span><div><p class="font-bold text-gray-800 text-sm">${item.name}</p><p class="text-red-600 font-black">₹${item.price}</p></div></div><button onclick="addToCart('${item.name}', ${item.price})" class="bg-red-50 text-red-600 font-bold px-6 py-2 rounded-xl active:scale-95 transition">ADD</button></div>`;
-                    // Admin
+                    // Admin UI
                     adminBox.innerHTML += `<div class="bg-gray-50 p-4 rounded-xl border border-gray-200"><div class="flex justify-between items-center mb-2"><p class="text-[10px] font-bold text-gray-400 uppercase">${item.name}</p><button onclick="db.collection('menu').doc('${id}').update({available: ${!item.available}})" class="px-3 py-1 rounded text-[9px] font-black ${item.available ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}">${item.available ? 'ON' : 'OFF'}</button></div><input type="number" value="${item.price}" onchange="db.collection('menu').doc('${id}').update({price: parseInt(this.value)})" class="w-full p-2 border rounded-lg text-sm font-bold outline-none"></div>`;
                 });
             });
         }
 
-        // Functions
         function addToCart(n, p) { cart.push({name:n, price:p}); updateCart(); }
         function removeFromCart(idx) { cart.splice(idx, 1); updateCart(); }
-        
         function updateCart() {
             let sub = cart.reduce((a, b) => a + b.price, 0);
             document.getElementById('cart-items').innerHTML = cart.length === 0 ? '<p class="text-gray-400 text-center py-4 italic text-xs">Selection is empty</p>' : cart.map((i, idx) => `<div class="flex justify-between items-center text-xs font-bold p-2 bg-gray-50 rounded"><span>${i.name}</span><div class="flex items-center gap-2"><span class="text-red-600">₹${i.price}</span><button onclick="removeFromCart(${idx})" class="text-gray-300"><i class="fa-solid fa-circle-xmark"></i></button></div></div>`).join('');
             document.getElementById('total').innerText = `₹${sub}`;
             document.getElementById('cart-count').innerText = cart.length;
             document.getElementById('checkout-form').classList.toggle('hidden', sub < 100);
-            document.getElementById('min-warning').classList.toggle('hidden', sub >= 100 || sub === 0);
         }
 
-        function toggleShopMain() { db.collection("settings").doc("shop_status").set({ isOpen: !isShopOpenGlobal }); }
+        function toggleShopMain() { db.collection("settings").doc("shop_status").set({ isOpen: !isShopOpen }); }
         function showLogin() { if(prompt("Admin Password:") === "jitu8087") { document.getElementById('admin-section').style.display = 'block'; window.scrollTo(0,0); } }
         function logout() { document.getElementById('admin-section').style.display = 'none'; }
 
@@ -171,7 +164,7 @@
             cart = []; updateCart(); document.getElementById('payment-modal').style.display='none';
         }
 
-        syncData();
+        startApp();
     </script>
 </body>
 </html>
