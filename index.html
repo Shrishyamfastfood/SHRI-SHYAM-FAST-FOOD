@@ -1,324 +1,152 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Fast Food - Premium Ordering</title>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* === PREMIUM CSS DESIGN === */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #f4f6f8; color: #333; overflow-x: hidden; }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Navbar */
-        .navbar { background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .navbar .logo { font-size: 20px; font-weight: 700; color: #e23744; display: flex; align-items: center; gap: 8px; cursor: pointer;}
-        .nav-btns button { background: #fef1f2; border: 1px solid #e23744; color: #e23744; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .nav-btns button:hover { background: #e23744; color: white; }
-
-        /* Hero Banner */
-        .hero-banner { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80') center/cover; color: white; text-align: center; padding: 50px 20px; border-radius: 0 0 30px 30px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .hero-banner h2 { font-size: 28px; margin-bottom: 10px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .hero-banner p { font-size: 14px; opacity: 0.9; }
-
-        .container { max-width: 900px; margin: 0 auto; padding: 0 20px 80px 20px; animation: slideIn 0.8s ease-out; }
-        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #2d2d2d; }
-
-        /* Menu Grid with Images */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
-        .menu-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.06); transition: 0.3s; border: 1px solid #eee; display: flex; flex-direction: column;}
-        .menu-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(226, 55, 68, 0.15); border-color: #e23744; }
-        
-        .food-img { width: 100%; height: 180px; object-fit: cover; }
-        .menu-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .menu-info h3 { font-size: 17px; color: #1a1a1a; margin-bottom: 5px; font-weight: 600; }
-        .menu-info .desc { font-size: 12px; color: #777; margin-bottom: 15px; }
-        
-        .price-row { display: flex; justify-content: space-between; align-items: center; }
-        .price { font-size: 20px; font-weight: 700; color: #2d2d2d; }
-        .add-btn { background: #fff; color: #1ba672; border: 1px solid #1ba672; padding: 6px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .add-btn:hover { background: #1ba672; color: white; box-shadow: 0 4px 10px rgba(27, 166, 114, 0.3); }
-
-        /* Premium Floating Cart */
-        .floating-cart { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #1ba672; color: white; border: none; padding: 16px 30px; border-radius: 50px; font-size: 16px; font-weight: 600; box-shadow: 0 10px 25px rgba(27, 166, 114, 0.4); z-index: 1000; display: none; width: 90%; max-width: 400px; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;}
-        .floating-cart:hover { transform: translateX(-50%) scale(1.02); }
-        
-        /* Modal Box */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: flex-end; }
-        .modal-box { background: white; padding: 30px 20px; border-radius: 25px 25px 0 0; width: 100%; max-width: 500px; animation: slideIn 0.3s; }
-        .modal-box input, .modal-box textarea { width: 100%; padding: 12px 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; outline: none; background: #f9f9f9; transition: 0.3s;}
-        .modal-box input:focus, .modal-box textarea:focus { border-color: #e23744; background: white; box-shadow: 0 0 8px rgba(226, 55, 68, 0.1); }
-        .btn-confirm { background: #e23744; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 5px 15px rgba(226, 55, 68, 0.3); transition: 0.3s;}
-        .btn-confirm:hover { background: #c82333; }
-        .btn-close { background: none; color: #777; border: none; padding: 10px; width: 100%; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 5px;}
-
-        /* Admin UI */
-        .admin-view { display: none; max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); animation: slideIn 0.4s ease-out;}
-        .admin-view input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; text-align: center;}
-        .admin-view button { background: #e23744; color: white; width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; margin-top: 15px; font-size: 16px; cursor: pointer; box-shadow: 0 5px 15px rgba(226, 55, 68, 0.2);}
-        
-        .dashboard { display: none; max-width: 1000px; margin: 30px auto; padding: 0 20px; animation: slideIn 0.4s ease-out;}
-        .table-wrap { background: white; padding: 25px; border-radius: 20px; overflow-x: auto; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #fdfdfd; color: #555; font-weight: 600; }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .badge-pending { background: #fff3cd; color: #856404; }
-        .badge-done { background: #d4edda; color: #155724; }
-        
-        /* Success Animation Box */
-        .success-box { display: none; text-align: center; padding: 40px 20px; }
-        .success-box i { font-size: 60px; color: #1ba672; margin-bottom: 15px; }
-        .success-box h2 { color: #333; margin-bottom: 10px; }
-        .success-box p { color: #777; margin-bottom: 20px; }
-        .success-btn { background: #e23744; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shri Shyam Fast Food</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    margin: 0;
+    padding: 20px;
+  }
+  header {
+    text-align: center;
+    background-color: #ffcc00;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  h1 {
+    margin: 0;
+  }
+  section {
+    margin-top: 30px;
+  }
+  h2 {
+    color: #333;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    background: #fff;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .special-offer {
+    background-color: #d1e7dd;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-weight: bold;
+    color: #0f5132;
+  }
+  form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+  }
+  select, input[type="file"], button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  button {
+    background-color: #28a745;
+    color: white;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  button:hover {
+    background-color: #218838;
+  }
+</style>
 </head>
 <body>
 
-    <!-- Header -->
-    <div class="navbar">
-        <div class="logo" onclick="showCustomer()"><i class="fa-solid fa-utensils"></i> Shri Shyam</div>
-        <div class="nav-btns">
-            <button onclick="showAdminLogin()"><i class="fa-solid fa-user-shield"></i> Admin</button>
-        </div>
-    </div>
+<header>
+<h1>Shri Shyam Fast Food</h1>
+</header>
 
-    <!-- CUSTOMER VIEW -->
-    <div id="customer-page">
-        <div class="hero-banner">
-            <h2>Swad Jo Dil Jeet Le! 😋</h2>
-            <p>Maulasar's Premium Fast Food, Delivered Hot & Fresh.</p>
-        </div>
+<section id="menu">
+<h2>🥪 Sandwiches & Burgers</h2>
+<ul>
+  <li>Sandwich ...................................... ₹___</li>
+  <li>Burger .......................................... ₹___</li>
+</ul>
 
-        <div class="container">
-            <h2 class="section-title"><i class="fa-solid fa-fire" style="color: #e23744;"></i> Recommended For You</h2>
-            <div class="menu-grid" id="menu-container">
-                <!-- Data injected by JS -->
-            </div>
-        </div>
-    </div>
+<h2>🥟 Momos</h2>
+<ul>
+  <li>Momos (Full Plate) ....................... ₹___</li>
+  <li>Momos (Half Plate) ....................... ₹___</li>
+</ul>
 
-    <!-- Floating Cart -->
-    <div class="floating-cart" id="cart-btn" onclick="openCheckout()">
-        <span><i class="fa-solid fa-bag-shopping"></i> <span id="cart-count">0</span> Items</span>
-        <span>Checkout ➔ ₹<span id="cart-total">0</span></span>
-    </div>
+<h2>🥘 Pav Bhaji</h2>
+<ul>
+  <li>Pav Bhaji (Full Plate) .................... ₹___</li>
+  <li>Pav Bhaji (Half Plate) .................... ₹___</li>
+</ul>
 
-    <!-- Checkout Modal -->
-    <div class="modal-overlay" id="checkout-modal">
-        <div class="modal-box" id="form-box">
-            <h2 style="font-size: 22px; margin-bottom: 5px;">Delivery Details</h2>
-            <p style="color: #777; font-size: 13px; margin-bottom: 20px;">Amount to pay: <strong style="color: #e23744; font-size: 16px;">₹<span id="modal-total">0</span></strong></p>
-            
-            <div style="text-align: left;">
-                <input type="text" id="cust-name" placeholder="👤 Aapka Poora Naam" required>
-                <input type="number" id="cust-phone" placeholder="📞 Mobile Number" required>
-                <textarea id="cust-address" placeholder="📍 Pura Address (Ghar / Shop ka pata)" rows="2" required></textarea>
-            </div>
-            
-            <button class="btn-confirm" onclick="placeOrder()">Place Order Now</button>
-            <button class="btn-close" onclick="closeCheckout()">Cancel</button>
-        </div>
+<h2>🍝 Chowmein</h2>
+<ul>
+  <li>Chowmein (Full Plate) ................... ₹___</li>
+  <li>Chowmein (Half Plate) .................. ₹___</li>
+</ul>
 
-        <!-- Success Animation Box -->
-        <div class="modal-box success-box" id="success-box">
-            <i class="fa-solid fa-circle-check"></i>
-            <h2>Order Placed!</h2>
-            <p>Aapka Order ID <strong id="success-order-id">#1234</strong> hai.<br>Hum jald hi aapka khana deliver karenge.</p>
-            <button class="success-btn" onclick="closeCheckout()">Back to Menu</button>
-        </div>
-    </div>
+<h2>🥣 Bhel Puri</h2>
+<ul>
+  <li>Bhel Puri (Full Plate) .................... ₹___</li>
+  <li>Bhel Puri (Half Plate) .................... ₹___</li>
+</ul>
+</section>
 
-    <!-- ADMIN LOGIN (Updated ID & Password to 12) -->
-    <div id="login-page" class="admin-view">
-        <h2 style="text-align:center; color:#e23744; margin-bottom: 20px;"><i class="fa-solid fa-lock"></i> Secure Login</h2>
-        <input type="text" id="admin-id" placeholder="Admin ID">
-        <input type="password" id="admin-pass" placeholder="Password">
-        <button onclick="loginAdmin()"><i class="fa-solid fa-right-to-bracket"></i> Login Dashboard</button>
-        <p id="error-msg" style="color:red; display:none; text-align:center; margin-top: 10px; font-size: 13px; font-weight: bold;">ID ya Password galat hai!</p>
-    </div>
+<div class="special-offer">
+  <p>And with Rs. 100+ order, 1 Cold Drink Glass Free!</p>
+</div>
 
-    <!-- ADMIN DASHBOARD -->
-    <div id="dashboard-page" class="dashboard">
-        <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> Live Orders Dashboard</h2>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order Info</th>
-                        <th>Customer</th>
-                        <th>Bill Amount</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-orders-table"></tbody>
-            </table>
-        </div>
-    </div>
+<section id="order">
+<h2>Place Your Order</h2>
+<form id="orderForm">
+<label for="item">Select Item:</label>
+<select id="item" name="item">
+  <option value="Sandwich">Sandwich</option>
+  <option value="Burger">Burger</option>
+  <option value="Momos Full">Momos (Full Plate)</option>
+  <option value="Momos Half">Momos (Half Plate)</option>
+  <option value="Pav Bhaji Full">Pav Bhaji (Full Plate)</option>
+  <option value="Pav Bhaji Half">Pav Bhaji (Half Plate)</option>
+  <option value="Chowmein Full">Chowmein (Full Plate)</option>
+  <option value="Chowmein Half">Chowmein (Half Plate)</option>
+  <option value="Bhel Puri Full">Bhel Puri (Full Plate)</option>
+  <option value="Bhel Puri Half">Bhel Puri (Half Plate)</option>
+</select>
 
-    <script>
-        // High-Quality Food Menu
-        let menuItems = [
-            { id: 1, name: "Special Aloo Tikki Burger", desc: "Crispy tikki with fresh lettuce & melting cheese", price: 50, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80" },
-            { id: 2, name: "Chatpata Masala Noodles", desc: "Spicy desi street style chowmein packed with veggies", price: 60, img: "https://images.unsplash.com/photo-1612929633738-8fe01f7c8166?w=500&q=80" },
-            { id: 3, name: "Baraf ka Gola", desc: "Kala khatta & rose syrup special summer treat", price: 20, img: "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&q=80" },
-            { id: 4, name: "Cheese Grilled Sandwich", desc: "Loaded with extra cheese & grilled to perfection", price: 80, img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500&q=80" },
-            { id: 5, name: "Pani Puri (10 Pcs)", desc: "Teekha, meetha aur chatpata pani puri", price: 30, img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&q=80" }
-        ];
+<label for="payment">Upload Phone Pay QR or Payment Screenshot:</label>
+<input type="file" id="payment" name="payment" accept="image/*" />
 
-        let cart = [];
-        let ordersDB = JSON.parse(localStorage.getItem("premiumOrders")) || []; 
+<button type="submit">Place Order</button>
+</form>
+</section>
 
-        function renderCustomerMenu() {
-            const container = document.getElementById('menu-container');
-            container.innerHTML = "";
-            menuItems.forEach(item => {
-                container.innerHTML += `
-                    <div class="menu-card">
-                        <img src="${item.img}" class="food-img" alt="${item.name}">
-                        <div class="menu-info">
-                            <div>
-                                <h3>${item.name}</h3>
-                                <p class="desc">${item.desc}</p>
-                            </div>
-                            <div class="price-row">
-                                <span class="price">₹${item.price}</span>
-                                <button class="add-btn" onclick="addToCart(${item.id}, '${item.name}', ${item.price})"><i class="fa-solid fa-plus"></i> ADD</button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        }
+<script>
+  document.getElementById('orderForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Order submitted! (Implement backend to process)');
+  });
+</script>
 
-        function addToCart(id, name, price) {
-            cart.push({ id, name, price });
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const count = cart.length;
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('cart-count').innerText = count;
-            document.getElementById('cart-total').innerText = total;
-            document.getElementById('modal-total').innerText = total;
-            document.getElementById('cart-btn').style.display = count > 0 ? 'flex' : 'none';
-        }
-
-        function openCheckout() { 
-            document.getElementById('checkout-modal').style.display = 'flex'; 
-            document.getElementById('form-box').style.display = 'block';
-            document.getElementById('success-box').style.display = 'none';
-        }
-        
-        function closeCheckout() { 
-            document.getElementById('checkout-modal').style.display = 'none'; 
-        }
-
-        function placeOrder() {
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
-            const address = document.getElementById('cust-address').value;
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-
-            if(!name || !phone || !address) { alert("Bhai, address aur details toh bharo!"); return; }
-
-            let newOrder = {
-                orderId: "ORD" + Math.floor(Math.random() * 10000),
-                customer: name, phone: phone, address: address,
-                items: cart.map(i => i.name).join(", "),
-                total: total, status: "Pending",
-                time: new Date().toLocaleTimeString()
-            };
-
-            ordersDB.push(newOrder);
-            localStorage.setItem("premiumOrders", JSON.stringify(ordersDB));
-
-            // Show Success Animation
-            document.getElementById('form-box').style.display = 'none';
-            document.getElementById('success-order-id').innerText = "#" + newOrder.orderId;
-            document.getElementById('success-box').style.display = 'block';
-            
-            // Clear inputs and cart
-            cart = []; updateCartUI(); 
-            document.getElementById('cust-name').value = "";
-            document.getElementById('cust-phone').value = "";
-            document.getElementById('cust-address').value = "";
-        }
-
-        // Admin Logic
-        function showAdminLogin() {
-            document.getElementById('customer-page').style.display = 'none';
-            document.getElementById('dashboard-page').style.display = 'none';
-            document.getElementById('cart-btn').style.display = 'none';
-            document.getElementById('login-page').style.display = 'block';
-        }
-
-        function showCustomer() {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('dashboard-page').style.display = 'none';
-            document.getElementById('customer-page').style.display = 'block';
-            updateCartUI();
-        }
-
-        function loginAdmin() {
-            let id = document.getElementById('admin-id').value;
-            let pass = document.getElementById('admin-pass').value;
-            
-            // ADMIN ID AND PASSWORD SET TO 12
-            if (id === "12" && pass === "12") {
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('dashboard-page').style.display = 'block';
-                document.getElementById('error-msg').style.display = 'none';
-                loadAdminOrders();
-            } else {
-                document.getElementById('error-msg').style.display = 'block';
-            }
-        }
-
-        function loadAdminOrders() {
-            const table = document.getElementById('admin-orders-table');
-            table.innerHTML = "";
-            let savedOrders = JSON.parse(localStorage.getItem("premiumOrders")) || [];
-            
-            savedOrders.reverse().forEach((order, index) => {
-                let badgeClass = order.status === 'Pending' ? 'badge-pending' : 'badge-done';
-                let actualIndex = savedOrders.length - 1 - index; // because of reverse()
-                
-                table.innerHTML += `
-                    <tr>
-                        <td><strong>${order.orderId}</strong><br><small style="color:#777;">${order.time}</small><br><small style="color:#e23744; font-weight:600;">${order.items}</small></td>
-                        <td><strong>${order.customer}</strong><br><i class="fa-solid fa-phone" style="font-size:10px;"></i> ${order.phone}<br><i class="fa-solid fa-location-dot" style="font-size:10px;"></i> ${order.address}</td>
-                        <td style="font-size: 18px; font-weight: bold; color: #2d2d2d;">₹${order.total}</td>
-                        <td><span class="badge ${badgeClass}">${order.status}</span></td>
-                        <td>
-                            ${order.status === 'Pending' ? 
-                            `<button onclick="updateStatus(${actualIndex}, 'Delivered')" style="background:#1ba672; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(27, 166, 114, 0.2);"><i class="fa-solid fa-check"></i> Mark Done</button>` 
-                            : `<span style="color:#1ba672; font-weight:bold; font-size:14px;"><i class="fa-solid fa-check-double"></i> Delivered</span>`}
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            if(savedOrders.length === 0) {
-                table.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#777;">Abhi tak koi order nahi aaya hai.</td></tr>`;
-            }
-        }
-
-        function updateStatus(index, newStatus) {
-            ordersDB[index].status = newStatus;
-            localStorage.setItem("premiumOrders", JSON.stringify(ordersDB));
-            loadAdminOrders();
-        }
-
-        // Initialize App
-        renderCustomerMenu();
-    </script>
 </body>
 </html>
