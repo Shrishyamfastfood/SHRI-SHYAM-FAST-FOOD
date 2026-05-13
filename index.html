@@ -9,34 +9,88 @@
 <style>
   body {
     font-family: 'Roboto', sans-serif;
-    background-color: #fafafa;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    line-height: 1.6;
     color: #333;
   }
 
   header {
     background-color: #ffcc00;
+    padding: 20px;
     text-align: center;
-    padding: 30px 20px;
-    border-bottom: 5px solid #e6b800;
+    position: relative;
   }
 
   header h1 {
     margin: 0;
-    font-size: 2.5em;
-    color: #222;
+    font-size: 2em;
   }
 
-  .menu-section {
+  nav {
+    margin-top: 10px;
+  }
+
+  nav button {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  nav button:hover {
+    background-color: #e6e6e6;
+  }
+
+  .container {
     max-width: 1200px;
     margin: 20px auto;
     padding: 0 20px;
   }
 
-  .menu-category {
+  /* Cart */
+  #cart {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 300px;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+
+  #cart h3 {
+    margin-top: 0;
+  }
+
+  #cart-items {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .cart-item span {
+    flex: 1;
+  }
+
+  /* Menu and sections */
+ .menu-section {
     margin-top: 40px;
+  }
+
+  .menu-category {
+    margin-top: 30px;
   }
 
   .menu-category h2 {
@@ -83,6 +137,7 @@
     color: #555;
   }
 
+  /* Offer */
   .offer {
     background-color: #d1e7dd;
     color: #0f5132;
@@ -94,20 +149,18 @@
     font-size: 1.2em;
   }
 
-  /* Order form styling */
-  .order-section {
+  /* Order and admin login forms */
+ .section {
+    margin-top: 50px;
     background-color: #fff;
-    max-width: 800px;
-    margin: 40px auto;
     padding: 30px 20px;
     border-radius: 10px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.15);
   }
 
-  .order-section h2 {
+  h2 {
     text-align: center;
     margin-bottom: 20px;
-    font-size: 2em;
   }
 
   form {
@@ -120,7 +173,7 @@
     font-weight: 600;
   }
 
-  select, input[type="file"] {
+  input[type="text"], input[type="password"], input[type="file"] {
     margin-top: 8px;
     padding: 10px;
     border-radius: 6px;
@@ -137,23 +190,20 @@
     border-radius: 8px;
     font-size: 1.1em;
     cursor: pointer;
-    transition: background-color 0.3s;
   }
 
   button:hover {
     background-color: #218838;
   }
 
-  /* Responsive adjustments */
+  /* Responsive */
   @media(max-width: 600px) {
+    #cart {
+      width: 90%;
+      right: 5%;
+    }
     header h1 {
-      font-size: 2em;
-    }
-    .offer {
-      font-size: 1em;
-    }
-    form {
-      padding: 10px;
+      font-size: 1.8em;
     }
   }
 </style>
@@ -162,130 +212,177 @@
 
 <header>
   <h1>Shri Shyam Fast Food</h1>
+  <nav>
+    <button onclick="showSection('menu')">Menu</button>
+    <button onclick="showSection('order')">Order</button>
+    <button onclick="showSection('admin')">Admin Login</button>
+  </nav>
 </header>
 
-<div class="menu-section">
-  <!-- Sandwiches & Burgers -->
-  <div class="menu-category">
-    <h2>🥪 Sandwiches & Burgers</h2>
-    <div class="menu-items">
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Sandwich" alt="Sandwich" class="item-image" />
-        <div class="item-name">Sandwich</div>
-        <div class="item-price">₹___</div>
-      </div>
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Burger" alt="Burger" class="item-image" />
-        <div class="item-name">Burger</div>
-        <div class="item-price">₹___</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Momos -->
-  <div class="menu-category">
-    <h2>🥟 Momos</h2>
-    <div class="menu-items">
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Momos+Full" alt="Momos Full Plate" class="item-image" />
-        <div class="item-name">Momos (Full Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Momos+Half" alt="Momos Half Plate" class="item-image" />
-        <div class="item-name">Momos (Half Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Pav Bhaji -->
-  <div class="menu-category">
-    <h2>🥘 Pav Bhaji</h2>
-    <div class="menu-items">
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Pav+Bhaji+Full" alt="Pav Bhaji Full" class="item-image" />
-        <div class="item-name">Pav Bhaji (Full Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Pav+Bhaji+Half" alt="Pav Bhaji Half" class="item-image" />
-        <div class="item-name">Pav Bhaji (Half Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Chowmein -->
-  <div class="menu-category">
-    <h2>🍝 Chowmein</h2>
-    <div class="menu-items">
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Chowmein+Full" alt="Chowmein Full" class="item-image" />
-        <div class="item-name">Chowmein (Full Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Chowmein+Half" alt="Chowmein Half" class="item-image" />
-        <div class="item-name">Chowmein (Half Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bhel Puri -->
-  <div class="menu-category">
-    <h2>🥣 Bhel Puri</h2>
-    <div class="menu-items">
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Bhel+Puri+Full" alt="Bhel Puri Full" class="item-image" />
-        <div class="item-name">Bhel Puri (Full Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-      <div class="item-card">
-        <img src="https://via.placeholder.com/300x150?text=Bhel+Puri+Half" alt="Bhel Puri Half" class="item-image" />
-        <div class="item-name">Bhel Puri (Half Plate)</div>
-        <div class="item-price">₹___</div>
-      </div>
-    </div>
-  </div>
+<!-- Cart -->
+<div id="cart">
+  <h3>🛒 Your Cart</h3>
+  <div id="cart-items"></div>
+  <p>Total: ₹<span id="total-price">0</span></p>
+  <button onclick="checkout()">Checkout</button>
 </div>
 
-<div class="offer">
-  <p>And with Rs. 100+ order, 1 Cold Drink Glass Free!</p>
-</div>
+<div class="container">
+  <!-- Menu Section -->
+  <div id="menu" class="section">
+    <h2>Menu</h2>
+    <!-- Repeat menu categories as before -->
+    <!-- Example: Sandwiches & Burgers -->
+    <div class="menu-category">
+      <h2>🥪 Sandwiches & Burgers</h2>
+      <div class="menu-items" id="menu-sandwich">
+        <!-- Items will be dynamically inserted here -->
+      </div>
+    </div>
+    <!-- Add other categories similarly -->
+    <!-- Momos, Pav Bhaji, Chowmein, Bhel Puri -->
+  </div>
 
-<div class="order-section" id="order">
-  <h2>Place Your Order</h2>
-  <form id="orderForm">
-    <label for="item">Select Item:</label>
-    <select id="item" name="item" required>
-      <option value="">--Select an Item--</option>
-      <option value="Sandwich">Sandwich</option>
-      <option value="Burger">Burger</option>
-      <option value="Momos Full">Momos (Full Plate)</option>
-      <option value="Momos Half">Momos (Half Plate)</option>
-      <option value="Pav Bhaji Full">Pav Bhaji (Full Plate)</option>
-      <option value="Pav Bhaji Half">Pav Bhaji (Half Plate)</option>
-      <option value="Chowmein Full">Chowmein (Full Plate)</option>
-      <option value="Chowmein Half">Chowmein (Half Plate)</option>
-      <option value="Bhel Puri Full">Bhel Puri (Full Plate)</option>
-      <option value="Bhel Puri Half">Bhel Puri (Half Plate)</option>
-    </select>
+  <!-- Order Section -->
+  <div id="order" class="section" style="display:none;">
+    <h2>Place Your Order</h2>
+    <form id="orderForm">
+      <label for="item">Select Item:</label>
+      <select id="item" required>
+        <option value="">--Select an Item--</option>
+        <!-- options will be populated dynamically -->
+      </select>
 
-    <label for="payment">Upload Payment Proof (QR or Screenshot):</label>
-    <input type="file" id="payment" name="payment" accept="image/*" required />
+      <label for="payment">Upload Payment Proof (QR or Screenshot):</label>
+      <input type="file" id="payment" accept="image/*" required />
 
-    <button type="submit">Place Order</button>
-  </form>
+      <button type="submit">Place Order</button>
+    </form>
+  </div>
+
+  <!-- Admin Login -->
+  <div id="admin" class="section" style="display:none;">
+    <h2>Admin Login</h2>
+    <form id="adminLogin">
+      <label for="adminUser">Username:</label>
+      <input type="text" id="adminUser" required />
+      <label for="adminPass">Password:</label>
+      <input type="password" id="adminPass" required />
+      <button type="submit">Login</button>
+    </form>
+  </div>
 </div>
 
 <script>
-  document.getElementById('orderForm').addEventListener('submit', function(e) {
+  // Sample Data
+  const menuItems = [
+    { category: 'Sandwiches & Burgers', items: [
+        { name: 'Sandwich', price: 50, image: 'https://via.placeholder.com/300x150?text=Sandwich' },
+        { name: 'Burger', price: 80, image: 'https://via.placeholder.com/300x150?text=Burger' }
+      ]
+    },
+    { category: '🥟 Momos', items: [
+        { name: 'Momos (Full)', price: 70, image: 'https://via.placeholder.com/300x150?text=Momos+Full' },
+        { name: 'Momos (Half)', price: 40, image: 'https://via.placeholder.com/300x150?text=Momos+Half' }
+      ]
+    },
+    { category: '🥘 Pav Bhaji', items: [
+        { name: 'Pav Bhaji (Full)', price: 100, image: 'https://via.placeholder.com/300x150?text=Pav+Bhaji+Full' },
+        { name: 'Pav Bhaji (Half)', price: 60, image: 'https://via.placeholder.com/300x150?text=Pav+Bhaji+Half' }
+      ]
+    },
+    { category: '🍝 Chowmein', items: [
+        { name: 'Chowmein (Full)', price: 80, image: 'https://via.placeholder.com/300x150?text=Chowmein+Full' },
+        { name: 'Chowmein (Half)', price: 50, image: 'https://via.placeholder.com/300x150?text=Chowmein+Half' }
+      ]
+    },
+    { category: '🥣 Bhel Puri', items: [
+        { name: 'Bhel Puri (Full)', price: 40, image: 'https://via.placeholder.com/300x150?text=Bhel+Puri+Full' },
+        { name: 'Bhel Puri (Half)', price: 25, image: 'https://via.placeholder.com/300x150?text=Bhel+Puri+Half' }
+      ]
+    }
+  ];
+
+  const cart = [];
+  let totalPrice = 0;
+
+  // Functions
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(sec => sec.style.display='none');
+    document.getElementById(sectionId).style.display='block';
+  }
+
+  function populateMenu() {
+    menuItems.forEach(cat => {
+      const container = document.getElementById(`menu-${cat.category.replace(/\s+/g, '').toLowerCase()}`);
+      cat.items.forEach(item => {
+        const card = document.createElement('div');
+        card.className='item-card';
+        card.innerHTML=`
+          <img src="${item.image}" alt="${item.name}" class="item-image" />
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">₹${item.price}</div>
+          <button onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
+        `;
+        container.appendChild(card);
+      });
+    });
+
+    // Populate select options
+    const select = document.getElementById('item');
+    menuItems.forEach(cat => {
+      cat.items.forEach(i => {
+        const option = document.createElement('option');
+        option.value = i.name;
+        option.text = `${i.name} - ₹${i.price}`;
+        select.appendChild(option);
+      });
+    });
+  }
+
+  function addToCart(name, price) {
+    cart.push({name, price});
+    totalPrice += price;
+    updateCart();
+  }
+
+  function updateCart() {
+    const container = document.getElementById('cart-items');
+    container.innerHTML='';
+    cart.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className='cart-item';
+      div.innerHTML=`<span>${item.name}</span><span>₹${item.price} <button onclick="removeFromCart(${index})">Remove</button></span>`;
+      container.appendChild(div);
+    });
+    document.getElementById('total-price').innerText=totalPrice;
+  }
+
+  function removeFromCart(index) {
+    totalPrice -= cart[index].price;
+    cart.splice(index,1);
+    updateCart();
+  }
+
+  document.getElementById('orderForm').addEventListener('submit', function(e){
     e.preventDefault();
-    // You can replace this alert with your backend API call
-    alert('Order submitted! Connect your backend to process.');
+    alert('Order placed! Connect with backend.');
   });
+
+  document.getElementById('adminLogin').addEventListener('submit', function(e){
+    e.preventDefault();
+    const username = document.getElementById('adminUser').value;
+    const password = document.getElementById('adminPass').value;
+    if(username==='admin' && password==='password') {
+      alert('Welcome, Admin!');
+    } else {
+      alert('Invalid credentials');
+    }
+  });
+
+  // Initialize
+  populateMenu();
+
 </script>
 
 </body>
