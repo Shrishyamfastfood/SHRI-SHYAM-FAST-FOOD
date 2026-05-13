@@ -4,7 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shri Shyam Fast Food - Self Pickup</title>
+    
+    <!-- Google Site Verification -->
     <meta name="google-site-verification" content="LpUYJVosMIE5qw2zFybFtpN3uhG7VjtGH5bLDA3asaU" />
+
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FastFoodRestaurant",
+      "name": "Shri Shyam Fast Food",
+      "url": "https://shrishyamfastfood.github.io/SHRI-SHYAM-FAST-FOOD/",
+      "telephone": "+918058733741",
+      "priceRange": "₹30 - ₹70",
+      "servesCuisine": "Fast Food",
+      "hasMenu": {
+        "@type": "Menu",
+        "mainEntity": [
+          { "@type": "MenuItem", "name": "Special Sandwich", "offers": { "@type": "Offer", "price": "70", "priceCurrency": "INR" } },
+          { "@type": "MenuItem", "name": "Crispy Burger", "offers": { "@type": "Offer", "price": "50", "priceCurrency": "INR" } },
+          { "@type": "MenuItem", "name": "Veg Momos", "offers": { "@type": "Offer", "price": "50", "priceCurrency": "INR" } },
+          { "@type": "MenuItem", "name": "Veg Chowmein", "offers": { "@type": "Offer", "price": "50", "priceCurrency": "INR" } },
+          { "@type": "MenuItem", "name": "Bhelpuri Premium", "offers": { "@type": "Offer", "price": "50", "priceCurrency": "INR" } },
+          { "@type": "MenuItem", "name": "Bhelpuri Economy", "offers": { "@type": "Offer", "price": "30", "priceCurrency": "INR" } }
+        ]
+      }
+    }
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,17 +45,18 @@
         .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
         .pickup-badge { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; }
         .admin-panel { display: none; background: white; border-top: 4px solid #cc0000; padding: 20px; margin-top: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .closed-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .closed-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .quality-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- Shop Closed Overlay -->
+    <!-- Shop Closed Screen -->
     <div id="closed-screen" class="closed-overlay">
-        <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
-        <h2 class="text-3xl font-black text-gray-900">Shop Currently Closed</h2>
-        <p class="text-gray-500 mt-2 px-6">We are not accepting orders right now. Please check back later.</p>
-        <button onclick="showLogin()" class="mt-8 text-gray-400 text-xs">Admin Login</button>
+        <i class="fa-solid fa-clock-rotate-left text-6xl text-red-500 mb-4"></i>
+        <h2 class="text-3xl font-black text-gray-900">Shop is Closed</h2>
+        <p class="text-gray-500 mt-2 px-6 font-medium">We are not accepting orders right now. See you soon!</p>
+        <button onclick="showLogin()" class="mt-12 text-gray-300 text-xs hover:text-gray-600 transition">Admin Login</button>
     </div>
 
     <!-- Toast Notification -->
@@ -43,9 +70,9 @@
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-extrabold tracking-tight">Shri Shyam Fast Food</h1>
-                <p class="text-xs bg-white/20 px-2 py-0.5 rounded font-bold uppercase w-fit mt-1 italic">Self-Pickup Order</p>
+                <p class="text-[10px] bg-white/20 px-2 py-0.5 rounded font-bold uppercase w-fit mt-1 tracking-wider">Self-Pickup Only</p>
             </div>
-            <button onclick="showLogin()" class="text-white/50 hover:text-white transition"><i class="fa-solid fa-user-shield"></i></button>
+            <button onclick="showLogin()" class="text-white/30 hover:text-white transition text-sm"><i class="fa-solid fa-lock"></i></button>
         </div>
     </header>
 
@@ -54,32 +81,32 @@
         <!-- ADMIN PANEL SECTION -->
         <div id="admin-section" class="admin-panel mb-8">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black uppercase text-red-600 tracking-widest">Admin Control</h2>
-                <button onclick="logout()" class="text-gray-400 hover:text-red-500 font-bold text-sm">LOGOUT</button>
+                <h2 class="text-xl font-black uppercase text-red-600">Admin Dashboard</h2>
+                <button onclick="logout()" class="text-gray-400 hover:text-red-500 font-bold text-xs">EXIT ADMIN</button>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex justify-between items-center">
                     <div>
-                        <p class="font-bold text-gray-700">Shop Status</p>
-                        <p class="text-xs text-gray-500">Toggle shop online/offline</p>
+                        <p class="font-bold text-gray-700">Shop Online Status</p>
+                        <p class="text-xs text-gray-500 italic">Toggle to open/close store</p>
                     </div>
-                    <button id="shop-toggle" onclick="toggleShop()" class="px-6 py-2 rounded-full font-bold transition"></button>
+                    <button id="shop-toggle" onclick="toggleShop()" class="px-6 py-2 rounded-full font-bold transition shadow-sm"></button>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <p class="font-bold text-gray-700">Orders Received</p>
-                    <p id="order-status-text" class="text-xs text-green-600 font-bold italic">Waiting for orders...</p>
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200">
+                    <p class="font-bold text-gray-700">Live Connection</p>
+                    <p id="order-status-text" class="text-[10px] text-green-600 font-bold uppercase mt-1">Checking orders...</p>
                 </div>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px]">
+                    <thead class="bg-gray-100 text-gray-500 font-bold uppercase text-[10px] tracking-widest">
                         <tr>
-                            <th class="p-3">Time</th>
-                            <th class="p-3">Customer</th>
-                            <th class="p-3">Order Items</th>
-                            <th class="p-3">Total</th>
+                            <th class="p-4">Time</th>
+                            <th class="p-4">Customer</th>
+                            <th class="p-4">Details</th>
+                            <th class="p-4 text-right">Bill</th>
                         </tr>
                     </thead>
                     <tbody id="admin-orders-table"></tbody>
@@ -90,45 +117,60 @@
         <!-- MAIN SHOP UI -->
         <div id="shop-ui" class="flex flex-col md:flex-row gap-8">
             <div class="w-full md:w-2/3">
-                <div class="pickup-badge p-4 rounded-xl mb-6 flex items-start gap-3">
-                    <i class="fa-solid fa-store text-xl mt-0.5"></i>
-                    <div><p class="font-bold">Fresh Food, Self-Pickup!</p><p class="text-sm italic text-gray-600">Order online and pick up from the counter. (Pav Bhaji unavailable)</p></div>
+                <div class="pickup-badge p-5 rounded-2xl mb-8 flex items-start gap-4 shadow-sm">
+                    <i class="fa-solid fa-store text-2xl text-orange-400"></i>
+                    <div><p class="font-bold text-lg leading-none mb-1">Quick Pickup</p><p class="text-sm text-gray-600">Order online, pay at counter. No waiting!</p></div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="menu-container"></div>
             </div>
 
+            <!-- Cart Section -->
             <div id="cart-section" class="w-full md:w-1/3">
-                <div class="bg-white rounded-2xl shadow-xl p-6 sticky-cart border border-gray-100">
-                    <h2 class="text-xl font-bold mb-4 flex justify-between items-center"><span>Your Cart</span> <span id="cart-count" class="bg-red-50 text-red-600 px-2 py-1 rounded text-sm font-black">0</span></h2>
-                    <div id="cart-items" class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2"><p class="text-gray-400 text-center py-4 italic">Empty cart...</p></div>
-                    <div class="border-t border-gray-200 pt-4 mb-4">
-                        <div class="flex justify-between items-center text-2xl font-black"><span>Total Bill</span><span id="total" class="text-red-600">₹0</span></div>
+                <div class="bg-white rounded-3xl shadow-2xl p-6 sticky-cart border border-gray-100">
+                    <h2 class="text-xl font-bold mb-6 flex justify-between items-center">
+                        <span>Your Cart</span> 
+                        <span id="cart-count" class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">0</span>
+                    </h2>
+                    
+                    <div id="cart-items" class="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2">
+                        <p class="text-gray-400 text-center py-6 text-sm italic">Hungry? Add some food!</p>
                     </div>
+
+                    <div class="border-t border-gray-100 pt-6 mb-6">
+                        <div class="flex justify-between items-center text-3xl font-black tracking-tighter">
+                            <span class="text-gray-400 text-lg font-bold">Total</span>
+                            <span id="total" class="text-red-600">₹0</span>
+                        </div>
+                    </div>
+
                     <div id="checkout-form" class="hidden space-y-4">
-                        <input type="text" id="cust-name" class="w-full border rounded-xl p-3 outline-none focus:border-red-500 shadow-sm" placeholder="Your Full Name">
-                        <input type="tel" id="cust-phone" class="w-full border rounded-xl p-3 outline-none focus:border-red-500 shadow-sm" placeholder="Mobile Number">
+                        <input type="text" id="cust-name" class="w-full border-2 border-gray-50 rounded-2xl p-4 outline-none focus:border-red-400 bg-gray-50 transition" placeholder="Full Name">
+                        <input type="tel" id="cust-phone" class="w-full border-2 border-gray-50 rounded-2xl p-4 outline-none focus:border-red-400 bg-gray-50 transition" placeholder="Phone Number">
                         
-                        <label class="block text-xs font-bold text-gray-400 ml-1">WHEN WILL YOU ARRIVE?</label>
-                        <select id="pickup-time" class="w-full border rounded-xl p-3 outline-none bg-gray-50 font-bold shadow-sm">
+                        <div class="px-1"><label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Arrival Time</label></div>
+                        <select id="pickup-time" class="w-full border-2 border-gray-50 rounded-2xl p-4 outline-none bg-gray-50 font-bold text-gray-700">
                             <option value="15 Minutes">In 15 Minutes</option>
                             <option value="30 Minutes">In 30 Minutes</option>
-                            <option value="Already Here">I'm at the shop</option>
+                            <option value="Already Here">I am at the shop</option>
                         </select>
-                        <button id="order-btn" onclick="processOrder()" class="w-full bg-green-600 text-white font-black py-4 rounded-xl flex justify-center items-center gap-2 text-lg shadow-lg">CONFIRM ON WHATSAPP</button>
+                        <button id="order-btn" onclick="processOrder()" class="w-full bg-green-600 text-white font-black py-5 rounded-2xl flex justify-center items-center gap-3 text-lg shadow-xl shadow-green-100 hover:bg-green-700 active:scale-95 transition">
+                            <i class="fa-brands fa-whatsapp text-2xl"></i> CONFIRM ORDER
+                        </button>
                     </div>
-                    <div id="min-order-warning" class="text-orange-600 text-center text-sm font-bold py-2 bg-orange-50 rounded-lg mt-4 hidden">Min. Order ₹100 required</div>
+                    <div id="min-order-warning" class="text-orange-600 text-center text-xs font-bold py-3 bg-orange-50 rounded-xl mt-4 hidden">Min. Order ₹100 required</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Mobile Bar -->
-    <div id="mobile-cart-bar" class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t p-4 z-40 transform translate-y-full transition-transform flex justify-between items-center shadow-2xl">
+    <div id="mobile-cart-bar" class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t p-4 z-40 transform translate-y-full transition-transform flex justify-between items-center shadow-2xl">
         <p class="text-2xl font-black text-red-600" id="mobile-cart-total">₹0</p>
-        <button onclick="scrollToCart()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-bold">VIEW ORDER</button>
+        <button onclick="scrollToCart()" class="bg-red-600 text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-red-200">View Cart</button>
     </div>
 
     <script>
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
             authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -141,12 +183,12 @@
         const db = firebase.firestore();
 
         const menuItems = [
-            { id: 1, name: "Special Sandwich", price: 70, icon: "🥪" },
-            { id: 2, name: "Crispy Burger", price: 50, icon: "🍔" },
-            { id: 3, name: "Veg Momos (Full)", price: 50, icon: "🥟" },
-            { id: 4, name: "Veg Chowmein (Full)", price: 50, icon: "🍝" },
-            { id: 5, name: "Bhelpuri (High Quality)", price: 50, icon: "🥣" },
-            { id: 6, name: "Bhelpuri (Low Quality)", price: 30, icon: "🥣" }
+            { id: 1, name: "Special Sandwich", price: 70, icon: "🥪", quality: "" },
+            { id: 2, name: "Crispy Burger", price: 50, icon: "🍔", quality: "" },
+            { id: 3, name: "Veg Momos (Full)", price: 50, icon: "🥟", quality: "" },
+            { id: 4, name: "Veg Chowmein (Full)", price: 50, icon: "🍝", quality: "" },
+            { id: 5, name: "Bhelpuri (High Quality)", price: 50, icon: "🥣", quality: "Premium" },
+            { id: 6, name: "Bhelpuri (Low Quality)", price: 30, icon: "🥣", quality: "Economy" }
         ];
 
         let cart = [];
@@ -155,12 +197,18 @@
         function renderMenu() {
             const container = document.getElementById('menu-container');
             container.innerHTML = menuItems.map(item => `
-                <div class="bg-white rounded-2xl shadow-sm p-4 flex justify-between items-center border border-gray-50">
+                <div class="bg-white rounded-3xl shadow-sm p-5 flex justify-between items-center border border-gray-50 hover:shadow-lg transition-all duration-300">
                     <div class="flex items-center gap-4">
-                        <div class="text-3xl">${item.icon}</div>
-                        <div><h3 class="font-bold text-gray-800">${item.name}</h3><p class="text-red-600 font-bold">₹${item.price}</p></div>
+                        <div class="text-4xl shadow-inner bg-gray-100 p-3 rounded-2xl">${item.icon}</div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h3 class="font-bold text-gray-800 leading-none">${item.name}</h3>
+                                ${item.quality ? `<span class="quality-tag ${item.quality==='Premium'?'bg-orange-100 text-orange-600':'bg-gray-200 text-gray-500'}">${item.quality}</span>` : ''}
+                            </div>
+                            <p class="text-red-600 font-black text-xl">₹${item.price}</p>
+                        </div>
                     </div>
-                    <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" class="bg-red-50 text-red-600 font-bold px-5 py-2 rounded-xl active:scale-90">ADD</button>
+                    <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" class="bg-red-50 text-red-600 font-black px-6 py-3 rounded-2xl hover:bg-red-600 hover:text-white transition shadow-sm active:scale-90">ADD</button>
                 </div>
             `).join('');
         }
@@ -173,11 +221,11 @@
                     const screen = document.getElementById('closed-screen');
                     if(isShopOpen) {
                         screen.style.display = 'none';
-                        btn.innerText = "SHOP IS: ONLINE";
+                        btn.innerText = "STORE OPEN";
                         btn.className = "px-6 py-2 rounded-full font-bold bg-green-100 text-green-600 border border-green-200";
                     } else {
                         screen.style.display = 'flex';
-                        btn.innerText = "SHOP IS: OFFLINE";
+                        btn.innerText = "STORE CLOSED";
                         btn.className = "px-6 py-2 rounded-full font-bold bg-red-100 text-red-600 border border-red-200";
                     }
                 }
@@ -187,25 +235,24 @@
         function toggleShop() { db.collection("settings").doc("shop_status").set({ isOpen: !isShopOpen }); }
 
         function showLogin() {
-            const pass = prompt("Enter Admin Password:");
-            if(pass === "shyam123") {
+            const pass = prompt("Admin Password:");
+            if(pass === "jitu8087") { // Naya Password
                 document.getElementById('admin-section').style.display = 'block';
                 loadAdminOrders();
-            } else { alert("Wrong Password!"); }
+            } else if(pass !== null) { alert("Access Denied!"); }
         }
-
         function logout() { document.getElementById('admin-section').style.display = 'none'; }
 
         function loadAdminOrders() {
-            db.collection("orders").orderBy("timestamp", "desc").limit(10).onSnapshot((snapshot) => {
+            db.collection("orders").orderBy("timestamp", "desc").limit(15).onSnapshot((snapshot) => {
                 const table = document.getElementById('admin-orders-table');
                 table.innerHTML = '';
                 snapshot.forEach((doc) => {
                     const o = doc.data();
                     const time = o.timestamp ? new Date(o.timestamp.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...';
-                    table.innerHTML += `<tr class="border-b text-xs"><td class="p-3 font-bold">${time}</td><td class="p-3">${o.customerName}<br><span class="text-blue-500">${o.customerPhone}</span></td><td class="p-3 italic text-gray-600">${o.orderDetails.substring(0,25)}...</td><td class="p-3 font-bold text-red-600">₹${o.totalAmount}</td></tr>`;
+                    table.innerHTML += `<tr class="border-b text-[11px]"><td class="p-4 font-bold text-gray-400">${time}</td><td class="p-4"><b>${o.customerName}</b><br><span class="text-blue-500 font-bold">${o.customerPhone}</span></td><td class="p-4 text-gray-500 italic font-medium">${o.orderDetails.substring(0,30)}...</td><td class="p-4 font-black text-red-600 text-right text-sm">₹${o.totalAmount}</td></tr>`;
                 });
-                document.getElementById('order-status-text').innerText = "Live: Checking naye orders...";
+                document.getElementById('order-status-text').innerText = "LIVE: DATA SYNCED";
             });
         }
 
@@ -215,10 +262,10 @@
         function updateCart() {
             const list = document.getElementById('cart-items');
             let subtotal = cart.reduce((acc, item) => acc + item.price, 0);
-            list.innerHTML = cart.length === 0 ? '<p class="text-gray-400 text-center py-4 italic text-sm">Cart is empty...</p>' : cart.map((item, index) => `
-                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
+            list.innerHTML = cart.length === 0 ? '<p class="text-gray-400 text-center py-6 text-sm italic">Hungry? Add some food!</p>' : cart.map((item, index) => `
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
                     <div><p class="font-bold text-sm text-gray-800">${item.name}</p><p class="text-red-600 font-black text-xs">₹${item.price}</p></div>
-                    <button onclick="removeFromCart(${index})" class="text-red-300"><i class="fa-solid fa-trash-can"></i></button>
+                    <button onclick="removeFromCart(${index})" class="text-red-300 hover:text-red-600 transition p-2"><i class="fa-solid fa-trash-can"></i></button>
                 </div>`).join('');
 
             document.getElementById('cart-count').innerText = cart.length;
@@ -231,19 +278,18 @@
         }
 
         function processOrder() {
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
             const time = document.getElementById('pickup-time').value;
-            if(!name || !phone) return alert("Please fill your details!");
+            if(!name || !phone) return alert("Please enter your name and phone number.");
 
             let itemsText = "";
             let subtotal = cart.reduce((acc, item) => { itemsText += `▫️ ${item.name} - ₹${item.price}\n`; return acc + item.price; }, 0);
             
             db.collection("orders").add({ customerName: name, customerPhone: phone, pickupTime: time, orderDetails: itemsText, totalAmount: subtotal, status: "Pending", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
             
-            // --- HINDI MESSAGE LOGIC ---
-            const arrivalHindi = time === "15 Minutes" ? "15 मिनट में" : (time === "30 Minutes" ? "30 मिनट में" : "दुकान के बाहर हूँ");
-            const hindiMsg = `*🍔 नया ऑर्डर (PICKUP)*\n\n*नाम:* ${name}\n*फोन:* ${phone}\n*कब आएँगे:* ${arrivalHindi}\n\n*समान की लिस्ट:*\n${itemsText}-------------------\n*कुल बिल: ₹${subtotal}*\n-------------------\n_(भाई मेरा ऑर्डर तैयार रखना, मैं ऊपर दिए समय पर आ रहा हूँ!)_`;
+            const arrivalHindi = time === "15 Minutes" ? "15 मिनट में" : (time === "30 Minutes" ? "30 मिनट में" : "दुकान पर पहुँच गया हूँ");
+            const hindiMsg = `*🍔 नया ऑर्डर (PICKUP)*\n\n*ग्राहक का नाम:* ${name}\n*फोन नंबर:* ${phone}\n*कब आएँगे:* ${arrivalHindi}\n\n*ऑर्डर लिस्ट:*\n${itemsText}-------------------\n*कुल बिल: ₹${subtotal}*\n-------------------\n_(भाई मेरा ऑर्डर तैयार रखना, मैं ऊपर दिए समय पर पहुँच रहा हूँ!)_`;
             
             window.location.href = `https://wa.me/918058733741?text=${encodeURIComponent(hindiMsg)}`;
             cart = []; updateCart();
@@ -256,6 +302,7 @@
         }
 
         function scrollToCart() { document.getElementById('cart-section').scrollIntoView({behavior:'smooth'}); }
+
         renderMenu();
         checkShopStatus();
     </script>
