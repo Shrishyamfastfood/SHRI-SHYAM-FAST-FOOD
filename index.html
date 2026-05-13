@@ -14,26 +14,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
         
-        /* Colorful Animated Background */
-        .bg-animated {
-            background: linear-gradient(-45deg, #ffecd2, #fcb69f, #ffdee9, #b5fffc, #ffecd2);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        body { font-family: 'Outfit', sans-serif; padding-bottom: 140px; overflow-x: hidden; }
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; padding-bottom: 140px; overflow-x: hidden; }
         
         /* Premium UI */
-        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); border-bottom: 2px solid rgba(255, 87, 34, 0.2); }
-        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
-        .gradient-text { background: linear-gradient(90deg, #dc2626, #ea580c, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shine 3s linear infinite; }
-        @keyframes shine { to { background-position: 200% center; } }
-        
+        .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,0,0,0.1); }
+        .gradient-text { background: linear-gradient(90deg, #dc2626, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-press:active { transform: scale(0.95); transition: 0.2s; }
         
         /* Animations */
@@ -50,181 +35,138 @@
         .text-red-500 .status-dot { background-color: #ef4444; }
     </style>
 </head>
-<body class="bg-animated">
+<body>
 
     <!-- 1. DUKAAN BAND OVERLAY -->
-    <div id="closed-screen" class="hidden fixed inset-0 bg-white/80 backdrop-blur-xl z-[2000] flex flex-col items-center justify-center text-center p-6 border-4 border-red-500/30 m-4 rounded-3xl">
-        <div class="w-32 h-32 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mb-6 shadow-inner border-2 border-red-200">
-            <i class="fa-solid fa-store-slash text-6xl text-red-500"></i>
-        </div>
-        <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-pink-600 drop-shadow-sm">Dukaan Band Hai</h2>
-        <p class="text-gray-600 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
-        <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gradient-to-r from-gray-100 to-white shadow-xl rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border-2 border-gray-200 btn-press">
-            <i class="fa-solid fa-lock text-red-400 mr-2"></i> Admin Login
+    <div id="closed-screen" class="hidden fixed inset-0 bg-white/95 backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
+        <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
+        <h2 class="text-4xl font-black text-gray-800">Dukaan Band Hai</h2>
+        <p class="text-gray-500 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
+        <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">
+            Admin Login
         </button>
     </div>
 
-    <!-- 2. HEADER -->
-    <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-lg shadow-orange-100/50">
+    <!-- 2. HEADER (WITH YOUR ORIGINAL LOGO) -->
+    <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="relative">
-                <div class="absolute inset-0 bg-gradient-to-tr from-yellow-400 to-red-500 rounded-full blur opacity-50"></div>
-                <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="relative w-13 h-13 rounded-full border-2 border-white shadow-md object-cover ring-2 ring-orange-400">
-            </div>
+            <!-- AAPKA ASLI LOGO WAPIS AA GAYA -->
+            <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full border-2 border-red-500 shadow-md object-cover">
             <div>
-                <h1 class="font-black text-xl leading-tight gradient-text uppercase tracking-tight drop-shadow-sm">Shri Shyam Fast Food</h1>
+                <h1 class="font-black text-lg leading-tight gradient-text uppercase tracking-tight">Shri Shyam Fast Food</h1>
                 <div class="flex items-center gap-2 mt-0.5">
-                    <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase bg-white/50 px-2 py-0.5 rounded-full border border-red-100">
+                    <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
                         <span class="status-dot"></span> <span id="shop-text">Checking...</span>
                     </span>
-                    <span class="text-[10px] font-bold text-gray-500 bg-white/50 px-2 py-0.5 rounded-full border border-gray-200">📍 MOULASAR</span>
+                    <span class="text-[10px] font-bold text-gray-400">| MOULASAR</span>
                 </div>
             </div>
         </div>
-        <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 text-orange-600 flex items-center justify-center btn-press shadow-md"><i class="fa-solid fa-crown"></i></button>
+        <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press shadow-sm"><i class="fa-solid fa-sliders"></i></button>
     </header>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
         
         <!-- 3. ADMIN DASHBOARD -->
-        <div id="admin-panel" class="hidden slide-up bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-[2rem] shadow-[0_20px_50px_rgba(255,87,34,0.3)] p-6 mb-8 text-white relative overflow-hidden border border-gray-700">
-            <div class="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-purple-500 to-pink-500 opacity-20 blur-3xl rounded-full"></div>
-            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-br from-red-500 to-orange-500 opacity-20 blur-3xl rounded-full"></div>
-
-            <div class="flex justify-between items-center mb-6 relative z-10">
-                <h2 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i> MASTER CONTROL</h2>
-                <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 hover:bg-red-500/50 transition-colors rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
+        <div id="admin-panel" class="hidden slide-up bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white relative">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i> MASTER CONTROL</h2>
+                <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <!-- Shop Toggle -->
-            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase tracking-widest btn-press shadow-xl border border-white/10 relative z-10 transition-all"></button>
+            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase tracking-widest btn-press shadow-lg"></button>
 
             <!-- Add Item -->
-            <div class="bg-white/5 backdrop-blur-sm p-4 rounded-2xl mb-6 border border-white/10 relative z-10 shadow-inner">
-                <p class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-blue-300 text-xs mb-3 uppercase tracking-wider"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Naya Item Add Karein</p>
-                <div class="grid grid-cols-12 gap-3">
-                    <input id="new-i" placeholder="🍔" class="col-span-3 p-3 bg-black/50 text-white rounded-xl text-center outline-none border border-white/20 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all shadow-inner">
-                    <input id="new-n" placeholder="Item Name" class="col-span-9 p-3 bg-black/50 text-white rounded-xl outline-none border border-white/20 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all shadow-inner">
-                    <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/50 text-white rounded-xl outline-none border border-white/20 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all shadow-inner">
-                    <button onclick="addItem()" class="col-span-6 bg-gradient-to-r from-green-400 to-emerald-500 text-white font-black rounded-xl btn-press shadow-[0_0_15px_rgba(52,211,153,0.4)] border border-green-300 hover:scale-[1.02] transition-transform">ADD ITEM <i class="fa-solid fa-plus ml-1"></i></button>
+            <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
+                <p class="font-bold text-gray-300 text-xs mb-3 uppercase tracking-wider">Naya Item Add Karein</p>
+                <div class="grid grid-cols-12 gap-2">
+                    <input id="new-i" placeholder="🍔" class="col-span-3 p-3 bg-black/30 rounded-xl text-center outline-none border border-white/10">
+                    <input id="new-n" placeholder="Item Name" class="col-span-9 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
+                    <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
+                    <button onclick="addItem()" class="col-span-6 bg-gradient-to-r from-red-600 to-orange-500 text-white font-black rounded-xl btn-press shadow-lg">ADD +</button>
                 </div>
             </div>
 
             <!-- Manage Items -->
-            <p class="font-bold text-gray-400 text-[10px] mb-3 uppercase tracking-widest relative z-10 bg-black/30 inline-block px-3 py-1 rounded-full border border-white/5">LIVE MENU INVENTORY</p>
-            <div id="admin-menu-list" class="space-y-2 max-h-60 overflow-y-auto relative z-10 pr-2"></div>
+            <p class="font-bold text-gray-400 text-[10px] mb-3 uppercase tracking-widest">Live Menu</p>
+            <div id="admin-menu-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
         </div>
 
         <!-- 4. MENU LIST -->
-        <div class="flex items-center gap-3 mb-6 bg-white/60 p-3 rounded-2xl border border-white shadow-sm backdrop-blur-sm">
-            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-200">
-                <i class="fa-solid fa-fire text-xl"></i>
-            </div>
-            <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-purple-600 tracking-tight">Today's Menu</h2>
-        </div>
-        
-        <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+        <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-4 border-b-2 border-red-100 pb-2 border-dashed">Today's Menu</h2>
+        <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
     </div>
 
     <!-- 5. FLOATING CART -->
-    <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-transform duration-500 translate-y-32">
-        <div onclick="openCheckout()" class="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-1 rounded-2xl shadow-[0_10px_40px_rgba(16,185,129,0.4)] cursor-pointer btn-press overflow-hidden relative">
-            <div class="absolute inset-0 bg-white/20 w-1/2 -skew-x-12 -translate-x-full animate-[shimmer_2s_infinite]"></div>
-            <div class="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-4 flex justify-between items-center text-white relative z-10 border border-green-400/50">
-                <div>
-                    <p id="float-items" class="text-xs font-bold text-green-100 uppercase tracking-widest bg-black/20 inline-block px-2 py-0.5 rounded-full mb-1 border border-white/10">0 Items</p>
-                    <p id="float-total" class="text-2xl font-black drop-shadow-md">₹0</p>
-                </div>
-                <div class="flex items-center gap-2 font-black text-sm bg-white text-green-600 px-4 py-2 rounded-xl shadow-lg">
-                    VIEW CART <i class="fa-solid fa-basket-shopping text-lg"></i>
-                </div>
+    <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-transform duration-300 translate-y-32">
+        <div onclick="openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
+            <div>
+                <p id="float-items" class="text-xs font-bold uppercase tracking-widest">0 Items</p>
+                <p id="float-total" class="text-lg font-black">₹0</p>
+            </div>
+            <div class="flex items-center gap-2 font-black text-sm">
+                VIEW CART <i class="fa-solid fa-bag-shopping text-xl"></i>
             </div>
         </div>
     </div>
-    <style>@keyframes shimmer { 100% { transform: translateX(250%); } }</style>
 
     <!-- 6. BOTTOM CHECKOUT SHEET -->
-    <div id="checkout-sheet" class="cart-sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/50 backdrop-blur-md">
-        <div class="bg-gradient-to-b from-white to-gray-50 w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-[0_-20px_60px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] border-t-4 border-orange-400">
+    <div id="checkout-sheet" class="cart-sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[90vh]">
             
-            <div class="p-5 border-b border-gray-100 flex justify-between items-center rounded-t-[2.5rem] bg-white relative">
-                <div class="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-gray-200 rounded-full"></div>
-                <h3 class="font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600 mt-2">Checkout Details</h3>
-                <button onclick="closeCheckout()" class="w-10 h-10 bg-red-50 text-red-500 rounded-full shadow-sm flex items-center justify-center btn-press border border-red-100 mt-2 hover:bg-red-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-[2.5rem]">
+                <h3 class="font-black text-2xl text-gray-800">Checkout</h3>
+                <button onclick="closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
             </div>
 
-            <div class="p-6 overflow-y-auto space-y-6">
-                <!-- Colorful Order Summary -->
-                <div class="bg-gradient-to-br from-orange-50 to-red-50 p-5 rounded-[2rem] border border-orange-200/50 shadow-inner">
-                    <p class="text-xs font-black text-orange-400 mb-3 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Order Summary</p>
-                    <div id="cart-summary" class="space-y-3 mb-4"></div>
-                    <div class="flex justify-between items-center border-t border-orange-200/50 pt-4 font-black text-xl">
-                        <span class="text-gray-800">Total Pay</span>
-                        <span id="sheet-total" class="text-white bg-gradient-to-r from-red-500 to-orange-500 px-4 py-1 rounded-xl shadow-md">₹0</span>
+            <div class="p-6 overflow-y-auto space-y-5">
+                <div class="bg-gray-50 p-4 rounded-2xl border">
+                    <p class="text-xs font-bold text-gray-400 mb-3 uppercase">Order Summary</p>
+                    <div id="cart-summary" class="space-y-2 mb-3"></div>
+                    <div class="flex justify-between items-center border-t pt-3 font-black text-lg">
+                        <span>Total Pay</span><span id="sheet-total" class="text-red-600">₹0</span>
                     </div>
                 </div>
 
-                <!-- Colorful Inputs -->
-                <div class="space-y-4">
-                    <p class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2 flex items-center gap-2"><i class="fa-solid fa-location-dot"></i> Delivery Info</p>
-                    <div class="relative">
-                        <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
-                        <input id="u-n" placeholder="Aapka Naam" class="w-full p-4 pl-12 bg-white border-2 border-orange-100 rounded-2xl outline-none font-bold focus:border-orange-400 focus:ring-4 focus:ring-orange-400/20 transition-all shadow-sm">
-                    </div>
-                    <div class="relative">
-                        <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
-                        <input id="u-p" type="tel" placeholder="Mobile Number" class="w-full p-4 pl-12 bg-white border-2 border-orange-100 rounded-2xl outline-none font-bold focus:border-orange-400 focus:ring-4 focus:ring-orange-400/20 transition-all shadow-sm">
-                    </div>
-                    <div class="relative">
-                        <i class="fa-solid fa-map absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
-                        <input id="u-a" placeholder="Pura Address (Ya Self Pickup)" class="w-full p-4 pl-12 bg-white border-2 border-orange-100 rounded-2xl outline-none font-bold focus:border-orange-400 focus:ring-4 focus:ring-orange-400/20 transition-all shadow-sm">
-                    </div>
-                    <div class="relative">
-                        <i class="fa-solid fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
-                        <select id="u-t" class="w-full p-4 pl-12 bg-white border-2 border-orange-100 rounded-2xl outline-none font-bold focus:border-orange-400 focus:ring-4 focus:ring-orange-400/20 transition-all shadow-sm appearance-none text-gray-700">
-                            <option>⚡ 15 मिनट में (Fastest)</option>
-                            <option>🕒 30 मिनट में</option>
-                            <option>⏳ 1 घंटे में</option>
-                        </select>
-                    </div>
+                <div class="space-y-3">
+                    <input id="u-n" placeholder="Aapka Naam" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
+                    <input id="u-p" type="tel" placeholder="Mobile Number" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
+                    <input id="u-a" placeholder="Pura Address (Ya Self Pickup)" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
+                    <select id="u-t" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
+                        <option>15 मिनट में</option>
+                        <option>30 मिनट में</option>
+                        <option>1 घंटे में</option>
+                    </select>
                 </div>
 
-                <div class="space-y-3 pb-6 border-t border-dashed pt-6">
-                    <p class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2 flex items-center gap-2"><i class="fa-solid fa-wallet"></i> Payment Method</p>
-                    <select id="u-pay" class="w-full p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 text-green-700 rounded-2xl outline-none font-black shadow-sm focus:border-green-500 focus:ring-4 focus:ring-green-400/20 transition-all appearance-none">
-                        <option value="PAID">📱 QR Code (Online Pay) - Secure</option>
-                        <option value="COD">💵 Cash on Delivery (COD)</option>
+                <div class="space-y-3 pb-6">
+                    <select id="u-pay" class="w-full p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl outline-none font-black">
+                        <option value="PAID">QR Code (Online Pay)</option>
+                        <option value="COD">Cash on Delivery (COD)</option>
                     </select>
                 </div>
             </div>
 
-            <div class="p-5 bg-white border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.02)] relative z-10">
-                <button onclick="processPayment()" class="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-500 bg-[length:200%_auto] hover:bg-[position:right_center] text-white font-black py-5 rounded-2xl shadow-[0_10px_20px_rgba(239,68,68,0.3)] btn-press text-lg uppercase tracking-widest transition-all duration-500 flex justify-center items-center gap-2">
-                    CONFIRM ORDER <i class="fa-solid fa-paper-plane"></i>
-                </button>
+            <div class="p-5 bg-white border-t">
+                <button onclick="processPayment()" class="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-black py-4 rounded-2xl shadow-xl btn-press">CONFIRM ORDER</button>
             </div>
         </div>
     </div>
 
     <!-- 7. QR MODAL -->
-    <div id="qr-modal" class="hidden fixed inset-0 bg-black/80 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-xl">
-        <div class="bg-white rounded-[3rem] p-8 max-w-xs w-full slide-up border-4 border-orange-100 relative overflow-hidden shadow-[0_20px_60px_rgba(255,87,34,0.5)]">
-             <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-red-500 to-orange-500"></div>
-             <h3 class="font-black text-2xl mb-2 gradient-text mt-2">JAY SHREE SHYAM</h3>
-             <p class="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest bg-gray-50 inline-block px-3 py-1 rounded-full">Scan & Pay Securely</p>
-             <div class="p-2 bg-gradient-to-br from-orange-100 to-red-100 rounded-3xl mb-6 shadow-inner">
-                <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl border-4 border-white shadow-md">
-             </div>
-             <button onclick="sendWhatsAppOrder('PAID')" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-black py-4 rounded-2xl shadow-[0_10px_20px_rgba(16,185,129,0.3)] mb-4 btn-press border border-green-300">
-                <i class="fa-solid fa-circle-check mr-1"></i> PAYMENT DONE
-             </button>
-             <button onclick="document.getElementById('qr-modal').classList.add('hidden'); document.getElementById('qr-modal').classList.remove('flex');" class="text-gray-400 font-bold text-xs uppercase hover:text-red-500 transition-colors bg-gray-50 px-6 py-2 rounded-full border">Cancel</button>
+    <div id="qr-modal" class="hidden fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] p-8 max-w-xs w-full slide-up">
+             <h3 class="font-black text-2xl mb-2 gradient-text">JAY SHREE SHYAM</h3>
+             <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl border-4 mb-6">
+             <button onclick="sendWhatsAppOrder('PAID')" class="w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">PAYMENT DONE</button>
+             <button onclick="document.getElementById('qr-modal').classList.add('hidden'); document.getElementById('qr-modal').classList.remove('flex');" class="text-gray-400 font-bold text-xs uppercase btn-press">CANCEL</button>
         </div>
     </div>
 
     <script>
-        // FULL FIREBASE CONFIG
+        // FULL FIREBASE CONFIG (Yahi galti thi pichli baar, ab theek hai)
         const firebaseConfig = {
             apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
             authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -244,12 +186,12 @@
         rdb.ref('shop_status').on('value', snap => {
             isShopOpen = snap.val() ?? true;
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
-            document.getElementById('shop-indicator').className = isShopOpen ? "text-green-600 flex items-center gap-1.5 text-[10px] font-black uppercase bg-green-50 px-2 py-0.5 rounded-full border border-green-200" : "text-red-600 flex items-center gap-1.5 text-[10px] font-black uppercase bg-red-50 px-2 py-0.5 rounded-full border border-red-200";
+            document.getElementById('shop-indicator').className = isShopOpen ? "text-green-500 flex items-center gap-1.5 text-[10px] font-black uppercase" : "text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase";
             document.getElementById('shop-text').innerText = isShopOpen ? "SHOP OPEN" : "SHOP CLOSED";
             
             const btn = document.getElementById('toggle-shop-btn');
-            btn.innerHTML = isShopOpen ? '<i class="fa-solid fa-power-off mr-2"></i> TURN OFF SHOP' : '<i class="fa-solid fa-power-off mr-2"></i> TURN ON SHOP';
-            btn.className = isShopOpen ? "w-full py-4 rounded-2xl font-black mb-6 uppercase bg-gradient-to-r from-red-500 to-red-600 text-white shadow-[0_10px_20px_rgba(239,68,68,0.4)] btn-press border border-red-400" : "w-full py-4 rounded-2xl font-black mb-6 uppercase bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-[0_10px_20px_rgba(16,185,129,0.4)] btn-press border border-green-300";
+            btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
+            btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black mb-6 uppercase bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black mb-6 uppercase bg-green-500 text-white shadow-lg btn-press";
         });
 
         // 2. Sync Menu
@@ -263,29 +205,26 @@
             Object.keys(data).forEach(id => {
                 const i = data[id];
                 
-                // UI Customer (Colorful Glass Cards)
+                // UI Customer
                 box.innerHTML += `
-                <div class="glass-card p-5 rounded-[2rem] flex justify-between items-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] slide-up hover:shadow-[0_8px_30px_rgba(234,88,12,0.1)] transition-all group" style="animation-delay: ${delay}s">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white group-hover:scale-110 transition-transform">${i.icon || '🍽️'}</div>
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 slide-up" style="animation-delay: ${delay}s">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-2xl border">${i.icon || '🍽️'}</div>
                         <div>
-                            <p class="font-black text-gray-800 text-lg leading-tight tracking-tight">${i.name}</p>
-                            <p class="text-white font-black text-xs bg-gradient-to-r from-orange-500 to-red-500 inline-block px-3 py-1 rounded-lg mt-1.5 shadow-sm">₹${i.price}</p>
+                            <p class="font-black text-gray-800">${i.name}</p>
+                            <p class="text-red-500 font-black text-sm">₹${i.price}</p>
                         </div>
                     </div>
-                    <button onclick="addToCart('${i.name}', ${i.price})" class="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-orange-200 text-orange-600 px-6 py-3 rounded-2xl text-xs font-black hover:from-orange-500 hover:to-red-500 hover:text-white hover:border-transparent btn-press transition-all shadow-sm flex flex-col items-center leading-none gap-1">ADD <i class="fa-solid fa-plus text-[10px]"></i></button>
+                    <button onclick="addToCart('${i.name}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>
                 </div>`;
                 
                 // UI Admin
                 adminBox.innerHTML += `
-                <div class="flex justify-between items-center bg-white/5 backdrop-blur-md p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
-                    <span class="font-bold text-xs truncate w-1/2 flex items-center gap-2 bg-black/20 px-2 py-1 rounded-lg"><span class="text-lg">${i.icon || ''}</span> ${i.name}</span>
+                <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg border border-white/5">
+                    <span class="font-bold text-xs truncate w-1/2">${i.icon || ''} ${i.name}</span>
                     <div class="flex gap-2">
-                        <div class="relative">
-                            <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">₹</span>
-                            <input value="${i.price}" onchange="rdb.ref('menu/${id}/price').set(parseInt(this.value))" class="w-16 p-1.5 pl-5 bg-black/50 text-center rounded-lg text-xs font-bold border border-white/20 outline-none text-yellow-300 focus:border-yellow-400 transition-colors shadow-inner">
-                        </div>
-                        <button onclick="rdb.ref('menu/${id}').remove()" class="bg-red-500/20 text-red-400 p-2 rounded-lg hover:bg-red-500 hover:text-white transition border border-red-500/30 shadow-sm"><i class="fa fa-trash"></i></button>
+                        <input value="${i.price}" onchange="rdb.ref('menu/${id}/price').set(parseInt(this.value))" class="w-14 p-1 bg-black/40 text-center rounded text-xs font-bold border border-white/10 outline-none text-white">
+                        <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 p-1"><i class="fa fa-trash"></i></button>
                     </div>
                 </div>`;
                 delay += 0.05;
@@ -307,7 +246,7 @@
             const floatBar = document.getElementById('floating-cart');
             if(cart.length > 0) {
                 floatBar.classList.remove('translate-y-32');
-                document.getElementById('float-items').innerText = `${cart.length} ITEMS ADDED`;
+                document.getElementById('float-items').innerText = `${cart.length} ITEMS`;
                 document.getElementById('float-total').innerText = `₹${total}`;
             } else {
                 floatBar.classList.add('translate-y-32');
@@ -316,11 +255,11 @@
 
             const sumBox = document.getElementById('cart-summary');
             sumBox.innerHTML = cart.map((i, idx) => `
-                <div class="flex justify-between items-center text-sm font-bold text-gray-700 bg-white p-3 rounded-xl border border-orange-100 shadow-sm">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-green-400 text-[10px]"></i> ${i.name}</span>
-                    <div class="flex items-center gap-4">
-                        <span class="text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">₹${i.price}</span>
-                        <i onclick="cart.splice(${idx},1);updateCartUI();" class="fa-solid fa-trash-can text-red-400 text-base cursor-pointer btn-press hover:text-red-600 bg-red-50 p-1.5 rounded-lg border border-red-100"></i>
+                <div class="flex justify-between items-center text-sm font-bold text-gray-700">
+                    <span>${i.name}</span>
+                    <div class="flex gap-3">
+                        <span>₹${i.price}</span>
+                        <i onclick="cart.splice(${idx},1);updateCartUI();" class="fa-solid fa-circle-minus text-red-400 text-lg cursor-pointer btn-press"></i>
                     </div>
                 </div>`).join('');
             document.getElementById('sheet-total').innerText = `₹${total}`;
@@ -332,7 +271,7 @@
         // 5. Payment & WhatsApp
         function processPayment() {
             if(!document.getElementById('u-n').value || !document.getElementById('u-p').value || !document.getElementById('u-a').value) { 
-                alert("Kripya saari details bhariye!"); return; 
+                alert("Details poori bhariye!"); return; 
             }
             if(document.getElementById('u-pay').value === "PAID") {
                 document.getElementById('qr-modal').classList.remove('hidden');
