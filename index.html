@@ -15,6 +15,8 @@
       "@type": "FastFoodRestaurant",
       "name": "Shri Shyam Fast Food",
       "url": "https://shrishyamfastfood.github.io/SHRI-SHYAM-FAST-FOOD/",
+      "logo": "1000493588.jpg",
+      "image": "1000493588.jpg",
       "telephone": "+918058733741",
       "priceRange": "₹30 - ₹70",
       "servesCuisine": "Fast Food",
@@ -47,6 +49,7 @@
         .admin-panel { display: none; background: white; border-top: 4px solid #cc0000; padding: 20px; margin-top: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .closed-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .quality-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .logo-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; object-fit: cover; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -65,12 +68,15 @@
         <span id="toast-msg">Added to cart!</span>
     </div>
 
-    <!-- Header -->
+    <!-- Header with Logo -->
     <header class="gradient-nav text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-extrabold tracking-tight">Shri Shyam Fast Food</h1>
-                <p class="text-[10px] bg-white/20 px-2 py-0.5 rounded font-bold uppercase w-fit mt-1 tracking-wider">Self-Pickup Only</p>
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="1000493588.jpg" alt="Logo" class="logo-img shadow-md">
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight leading-none">Shri Shyam Fast Food</h1>
+                    <p class="text-[10px] bg-white/20 px-2 py-0.5 rounded font-bold uppercase w-fit mt-1 tracking-wider">Self-Pickup Only</p>
+                </div>
             </div>
             <button onclick="showLogin()" class="text-white/30 hover:text-white transition text-sm"><i class="fa-solid fa-lock"></i></button>
         </div>
@@ -236,7 +242,7 @@
 
         function showLogin() {
             const pass = prompt("Admin Password:");
-            if(pass === "jitu8087") { // Naya Password
+            if(pass === "jitu8087") { 
                 document.getElementById('admin-section').style.display = 'block';
                 loadAdminOrders();
             } else if(pass !== null) { alert("Access Denied!"); }
