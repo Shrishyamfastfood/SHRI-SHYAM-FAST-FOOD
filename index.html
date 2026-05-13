@@ -3,30 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Admin Panel</title>
+    <title>Shri Shyam Fast Food - Admin Control</title>
+    <meta name="google-site-verification" content="LpUYJVosMIE5qw2zFybFtpN3uhG7VjtGH5bLDA3asaU" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
-        .admin-panel { display: none; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
+        .logo-img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid white; object-fit: cover; }
+        .admin-panel { display: none; background: white; border-top: 5px solid #cc0000; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
+        .out-of-stock { filter: grayscale(1); opacity: 0.6; pointer-events: none; }
     </style>
 </head>
-<body class="bg-gray-100 p-4">
+<body class="pb-20">
 
-    <!-- Admin Panel Section -->
-    <div id="admin-section" class="admin-panel max-w-2xl mx-auto mb-10">
-        <h2 class="text-2xl font-black text-red-600 mb-6">ADMIN CONTROL PANEL</h2>
-        <div id="admin-menu-list" class="space-y-4"></div>
-        <button onclick="logout()" class="w-full mt-6 bg-gray-800 text-white py-3 rounded-xl font-bold">LOGOUT</button>
-    </div>
+    <!-- Header -->
+    <header class="gradient-nav text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" alt="Logo" class="logo-img shadow-lg">
+                <h1 class="text-xl font-black">Shri Shyam Fast Food</h1>
+            </div>
+            <button onclick="showLogin()" class="text-white/30 hover:text-white"><i class="fa-solid fa-lock"></i></button>
+        </div>
+    </header>
 
-    <!-- Customer Menu -->
-    <div class="max-w-2xl mx-auto">
-        <h1 class="text-3xl font-black mb-6 text-center">Our Menu</h1>
-        <div id="menu-container" class="space-y-4"></div>
+    <div class="max-w-2xl mx-auto px-4 py-8">
+        
+        <!-- ADMIN PANEL -->
+        <div id="admin-section" class="admin-panel p-6 mb-10">
+            <h2 class="text-xl font-black text-red-600 mb-6 flex justify-between items-center">
+                ADMIN SETTINGS <button onclick="logout()" class="text-gray-400 text-xs">EXIT</button>
+            </h2>
+            <div id="admin-controls" class="space-y-4">
+                <!-- Admin controls dynamically load here -->
+            </div>
+            <div class="mt-6 p-4 bg-blue-50 rounded-xl text-[10px] text-blue-600 font-bold uppercase">
+                Note: Prices aur Stock change karne par site turant update hogi.
+            </div>
+        </div>
+
+        <!-- CUSTOMER MENU -->
+        <h2 class="text-2xl font-black mb-6 text-gray-800 italic">Today's Menu</h2>
+        <div id="menu-container" class="space-y-4">
+            <!-- Menu items load here -->
+            <p class="text-center py-10 text-gray-400">Loading menu...</p>
+        </div>
     </div>
 
     <script>
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
             authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -38,60 +66,87 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Load Menu from Firestore
-        function loadMenu() {
-            db.collection("menu").onSnapshot(snapshot => {
-                const container = document.getElementById('menu-container');
-                const adminList = document.getElementById('admin-menu-list');
-                container.innerHTML = '';
-                adminList.innerHTML = '';
+        // Default Menu Data (In case Database is empty)
+        const defaultMenu = [
+            { id: "item1", name: "Special Sandwich", price: 70, available: true, icon: "🥪" },
+            { id: "item2", name: "Crispy Burger", price: 50, available: true, icon: "🍔" },
+            { id: "item3", name: "Veg Momos", price: 50, available: true, icon: "🥟" },
+            { id: "item4", name: "Veg Chowmein", price: 50, available: true, icon: "🍝" },
+            { id: "item5", name: "Bhelpuri Premium", price: 50, available: true, icon: "🥣" },
+            { id: "item6", name: "Bhelpuri Economy", price: 30, available: true, icon: "🥣" }
+        ];
 
-                snapshot.forEach(doc => {
-                    const item = doc.data();
-                    const id = doc.id;
-
-                    // Show to Customers
-                    if (item.available) {
-                        container.innerHTML += `
-                            <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow">
-                                <div><p class="font-bold">${item.name}</p><p class="text-red-600 font-bold">₹${item.price}</p></div>
-                                <button onclick="order('${item.name}', ${item.price})" class="bg-red-600 text-white px-6 py-2 rounded-xl font-bold">ORDER</button>
-                            </div>`;
-                    }
-
-                    // Show to Admin
-                    adminList.innerHTML += `
-                        <div class="bg-gray-50 p-4 rounded-xl border flex flex-col gap-2">
-                            <div class="flex justify-between items-center">
-                                <p class="font-bold">${item.name}</p>
-                                <button onclick="toggleStock('${id}', ${item.available})" class="px-4 py-1 rounded-lg text-xs font-bold ${item.available ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}">
-                                    ${item.available ? 'AVAILABLE' : 'OUT OF STOCK'}
-                                </button>
-                            </div>
-                            <input type="number" value="${item.price}" onchange="updatePrice('${id}', this.value)" class="w-full p-2 border rounded-lg" placeholder="Edit Price">
-                        </div>`;
-                });
+        function syncMenu() {
+            db.collection("menu").onSnapshot((snapshot) => {
+                let menuData = [];
+                if (snapshot.empty) {
+                    // Agar database khali hai toh default data daal do
+                    defaultMenu.forEach(item => db.collection("menu").doc(item.id).set(item));
+                    menuData = defaultMenu;
+                } else {
+                    snapshot.forEach(doc => menuData.push({ id: doc.id, ...doc.data() }));
+                }
+                renderUI(menuData);
             });
         }
 
-        // Functions
-        function toggleStock(id, status) { db.collection("menu").doc(id).update({ available: !status }); }
-        function updatePrice(id, newPrice) { db.collection("menu").doc(id).update({ price: parseInt(newPrice) }); }
-        
-        function showLogin() {
-            if(prompt("Admin Password:") === "jitu8087") document.getElementById('admin-section').style.display = 'block';
-        }
-        function logout() { document.getElementById('admin-section').style.display = 'none'; }
-        
-        // WhatsApp
-        function order(name, price) {
-            window.location.href = `https://wa.me/918058733741?text=Order: ${name}, Price: ₹${price}`;
+        function renderUI(data) {
+            const container = document.getElementById('menu-container');
+            const adminBox = document.getElementById('admin-controls');
+            container.innerHTML = '';
+            adminBox.innerHTML = '';
+
+            data.forEach(item => {
+                // Customer View
+                container.innerHTML += `
+                    <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm ${!item.available ? 'opacity-50' : ''}">
+                        <div class="flex items-center gap-4">
+                            <span class="text-3xl">${item.icon}</span>
+                            <div>
+                                <p class="font-bold text-gray-800">${item.name} ${!item.available ? '<span class="text-red-500 text-[10px] ml-2">(OFF)</span>' : ''}</p>
+                                <p class="text-red-600 font-black">₹${item.price}</p>
+                            </div>
+                        </div>
+                        <button onclick="order('${item.name}', ${item.price})" ${!item.available ? 'disabled' : ''} class="bg-red-600 text-white px-6 py-2 rounded-xl font-black shadow-lg ${!item.available ? 'bg-gray-400 shadow-none' : 'active:scale-95'}">
+                            ${item.available ? 'ORDER' : 'NO STOCK'}
+                        </button>
+                    </div>`;
+
+                // Admin View
+                adminBox.innerHTML += `
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="font-bold text-gray-700">${item.name}</p>
+                            <button onclick="updateStock('${item.id}', ${item.available})" class="px-4 py-1 rounded-lg text-[10px] font-black ${item.available ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                                ${item.available ? 'IN STOCK' : 'OUT OF STOCK'}
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-gray-400">Price: ₹</span>
+                            <input type="number" value="${item.price}" onchange="updatePrice('${item.id}', this.value)" class="w-full p-2 border rounded-lg text-sm font-bold focus:border-red-500 outline-none">
+                        </div>
+                    </div>`;
+            });
         }
 
-        // Add a hidden login trigger
-        document.body.innerHTML += `<button onclick="showLogin()" class="fixed bottom-4 right-4 bg-black text-white p-2 rounded-full opacity-20">Admin</button>`;
-        
-        loadMenu();
+        // Database Functions
+        function updateStock(id, current) { db.collection("menu").doc(id).update({ available: !current }); }
+        function updatePrice(id, price) { db.collection("menu").doc(id).update({ price: parseInt(price) }); }
+
+        function showLogin() {
+            if(prompt("Admin Password:") === "jitu8087") {
+                document.getElementById('admin-section').style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+        }
+        function logout() { document.getElementById('admin-section').style.display = 'none'; }
+
+        function order(name, price) {
+            const msg = `*🍔 नया ऑर्डर*\n*आइटम:* ${name}\n*कीमत:* ₹${price}\n\n_(भाई मेरा ये ऑर्डर तैयार रखना!)_`;
+            window.location.href = `https://wa.me/918058733741?text=${encodeURIComponent(msg)}`;
+        }
+
+        syncMenu();
     </script>
 </body>
 </html>
