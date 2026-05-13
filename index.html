@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase -->
+    <!-- Firebase Sirf Yahi Rahega -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -16,17 +16,13 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
         
         body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; padding-bottom: 140px; overflow-x: hidden; }
-        
-        /* Premium UI */
         .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,0,0,0.1); }
         .gradient-text { background: linear-gradient(90deg, #dc2626, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-press:active { transform: scale(0.95); transition: 0.2s; }
-        
-        /* Cart Sheet */
+        .slide-up { animation: slideUp 0.5s forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
         .cart-sheet { transition: transform 0.4s; transform: translateY(110%); }
         .cart-sheet.active { transform: translateY(0); }
-        
-        /* Bindi */
         .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px currentColor; }
         .text-green-500 .status-dot { background-color: #22c55e; }
         .text-red-500 .status-dot { background-color: #ef4444; }
@@ -34,16 +30,14 @@
 </head>
 <body>
 
-    <!-- Yahan error dikhega agar database lock hoga -->
+    <!-- Yahan error dikhega agar DB lock hoga -->
     <div id="debug-error" style="display:none;" class="bg-red-100 text-red-700 p-2 text-center text-[10px] font-black w-full border-b border-red-200 z-50"></div>
 
-    <!-- ERROR CATCHER SCRIPT -->
     <script>
+        // CRASH BACHAO SCRIPT
         window.onerror = function(msg, url, line) {
             var errBox = document.getElementById('debug-error');
             if(errBox) { errBox.style.display = 'block'; errBox.innerText += " JS ERROR: " + msg + " (Line " + line + ")"; }
-            var t = document.getElementById('shop-text');
-            if(t) t.innerText = "CRASHED!";
         };
     </script>
 
@@ -52,7 +46,7 @@
         <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
         <h2 class="text-4xl font-black text-gray-800">Dukaan Band Hai</h2>
         <p class="text-gray-500 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
-        <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">
+        <button onclick="window.loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">
             Admin Login
         </button>
     </div>
@@ -71,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press shadow-sm"><i class="fa-solid fa-sliders"></i></button>
+        <button onclick="window.loginAdmin()" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press shadow-sm"><i class="fa-solid fa-sliders"></i></button>
     </header>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
@@ -83,7 +77,6 @@
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- LIVE ORDERS SECTION -->
             <div class="mb-8">
                 <h3 class="font-black text-yellow-400 text-sm mb-3 uppercase tracking-widest"><i class="fa-solid fa-bell text-white"></i> Live Orders</h3>
                 <div id="admin-orders-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
@@ -93,20 +86,19 @@
 
             <hr class="border-gray-700 mb-6">
 
-            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase tracking-widest btn-press shadow-lg"></button>
+            <button id="toggle-shop-btn" onclick="window.toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase tracking-widest btn-press shadow-lg"></button>
 
-            <!-- Add Item -->
             <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
                 <p class="font-bold text-gray-300 text-xs mb-3 uppercase tracking-wider">Naya Item Add Karein</p>
                 <div class="grid grid-cols-12 gap-2">
                     <input id="new-i" placeholder="Emoji/Photo" class="col-span-3 p-3 bg-black/30 rounded-xl text-center outline-none border border-white/10 text-xs">
                     <input id="new-n" placeholder="Item Name" class="col-span-9 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
                     <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
-                    <button onclick="addItem()" class="col-span-6 bg-gradient-to-r from-red-600 to-orange-500 text-white font-black rounded-xl btn-press shadow-lg">ADD +</button>
+                    <button onclick="window.addItem()" class="col-span-6 bg-gradient-to-r from-red-600 to-orange-500 text-white font-black rounded-xl btn-press shadow-lg">ADD +</button>
                 </div>
             </div>
 
-            <p class="font-bold text-gray-400 text-[10px] mb-3 uppercase tracking-widest">Live Menu</p>
+            <p class="font-bold text-gray-400 text-[10px] mb-3 uppercase tracking-widest">Live Menu Management</p>
             <div id="admin-menu-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
         </div>
 
@@ -118,7 +110,7 @@
 
     <!-- 5. FLOATING CART -->
     <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-transform duration-300 translate-y-32">
-        <div onclick="openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
+        <div onclick="window.openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
             <div>
                 <p id="float-items" class="text-xs font-bold uppercase tracking-widest">0 Items</p>
                 <p id="float-total" class="text-lg font-black">₹0</p>
@@ -135,7 +127,7 @@
             
             <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-[2.5rem]">
                 <h3 class="font-black text-2xl text-gray-800">Checkout</h3>
-                <button onclick="closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
+                <button onclick="window.closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
             </div>
 
             <div class="p-6 overflow-y-auto space-y-5">
@@ -166,7 +158,7 @@
             </div>
 
             <div class="p-5 bg-white border-t">
-                <button onclick="processPayment()" class="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-black py-4 rounded-2xl shadow-xl btn-press">CONFIRM ORDER</button>
+                <button onclick="window.processPayment()" class="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-black py-4 rounded-2xl shadow-xl btn-press">CONFIRM ORDER</button>
             </div>
         </div>
     </div>
@@ -176,148 +168,189 @@
         <div class="bg-white rounded-[2.5rem] p-8 max-w-xs w-full slide-up">
              <h3 class="font-black text-2xl mb-2 gradient-text">JAY SHREE SHYAM</h3>
              <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl border-4 mb-6">
-             <button onclick="submitOrderAndWhatsApp('PAID')" class="w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">PAYMENT DONE</button>
+             <button onclick="window.submitOrderAndWhatsApp('PAID')" class="w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">PAYMENT DONE</button>
              <button onclick="document.getElementById('qr-modal').classList.add('hidden'); document.getElementById('qr-modal').classList.remove('flex');" class="text-gray-400 font-bold text-xs uppercase btn-press">CANCEL</button>
         </div>
     </div>
 
+    <!-- MAIN SCRIPT (100% Safe Mode) -->
     <script>
-        // ==========================================
-        // AAPKA ASLI FIREBASE CONFIG YAHAN HAI
-        // ==========================================
-        const firebaseConfig = {
-          apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
-          authDomain: "shri-shyam-fast-food.firebaseapp.com",
-          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com",
-          projectId: "shri-shyam-fast-food",
-          storageBucket: "shri-shyam-fast-food.firebasestorage.app",
-          messagingSenderId: "828353855950",
-          appId: "1:828353855950:web:96d62828e8e410e8812b9f",
-          measurementId: "G-38J1Y2M8LD"
+        // SAFE GLOBAL VARIABLES
+        window.cart = [];
+        window.isShopOpen = true;
+        window.rdb = null;
+
+        // SAFE GLOBAL FUNCTIONS
+        window.loginAdmin = function() {
+            if(prompt("Enter PIN:") === "jitu8087") { 
+                var screen = document.getElementById('closed-screen');
+                if(screen) screen.style.display = 'none'; 
+                var panel = document.getElementById('admin-panel');
+                if(panel) panel.classList.remove('hidden'); 
+                window.scrollTo(0,0); 
+            }
         };
-        // ==========================================
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const rdb = firebase.database();
+        window.toggleShop = function() {
+            if(window.rdb) window.rdb.ref('shop_status').set(!window.isShopOpen);
+        };
 
-        let cart = [];
-        let isShopOpen = true;
+        window.toggleAvail = function(id, currentStatus) { 
+            if(window.rdb) window.rdb.ref('menu/' + id).update({ available: !currentStatus }); 
+        };
 
-        // 1. Sync Shop
-        rdb.ref('shop_status').on('value', snap => {
-            try {
-                isShopOpen = snap.val() !== false; 
-                document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
-                document.getElementById('shop-indicator').className = isShopOpen ? "text-green-500 flex items-center gap-1.5 text-[10px] font-black uppercase" : "text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase";
-                document.getElementById('shop-text').innerText = isShopOpen ? "SHOP OPEN" : "SHOP CLOSED";
-                
-                const btn = document.getElementById('toggle-shop-btn');
-                if(btn) {
-                    btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
-                    btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black mb-6 uppercase bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black mb-6 uppercase bg-green-500 text-white shadow-lg btn-press";
-                }
-            } catch(e) {}
-        }, err => {
-            let errBox = document.getElementById('debug-error');
-            if(errBox){ errBox.style.display='block'; errBox.innerText = "Firebase Permission Blocked. Apne Firebase me jaakar Database Rules 'true' karein."; }
-            document.getElementById('shop-text').innerText = "DB LOCKED!";
-        });
+        window.addItem = function() { 
+            const n = document.getElementById('new-n').value;
+            const p = document.getElementById('new-p').value;
+            const i = document.getElementById('new-i').value || "🍽️";
+            if(n && p && window.rdb) { 
+                window.rdb.ref('menu').push({name:String(n), price:Number(p), icon:String(i), available:true}); 
+                document.getElementById('new-n').value=''; 
+                document.getElementById('new-p').value=''; 
+                document.getElementById('new-i').value=''; 
+            }
+        };
 
-        // 2. Sync Live Orders
-        rdb.ref('orders').on('value', snap => {
-            try {
-                const data = snap.val() || {};
-                const orderBox = document.getElementById('admin-orders-list');
-                if(!orderBox) return;
-                
-                orderBox.innerHTML = '';
-                const orderIds = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
-                
-                if(orderIds.length === 0) {
-                    orderBox.innerHTML = '<p class="text-gray-500 text-xs italic">Koi order nahi hai...</p>';
-                    return;
-                }
+        window.addToCart = function(n, p) { 
+            window.cart.push({name:n, price:p}); 
+            window.updateCartUI(); 
+        };
 
-                orderIds.forEach(id => {
-                    const o = data[id];
-                    const isDone = o.status === 'Done';
-                    const itemsText = (o.items || []).map(i => `${i.name} (₹${i.price})`).join(', ');
+        window.updateCartUI = function() {
+            let total = window.cart.reduce((sum, i) => sum + i.price, 0);
+            const floatBar = document.getElementById('floating-cart');
+            if(window.cart.length > 0) {
+                floatBar.classList.remove('translate-y-32');
+                document.getElementById('float-items').innerText = `${window.cart.length} ITEMS`;
+                document.getElementById('float-total').innerText = `₹${total}`;
+            } else {
+                floatBar.classList.add('translate-y-32');
+                window.closeCheckout();
+            }
 
-                    orderBox.innerHTML += `
-                    <div class="bg-white/10 p-3 rounded-xl border ${isDone ? 'border-green-500/30' : 'border-orange-500/50'} relative">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <p class="font-black text-sm text-white">${o.name} <span class="text-xs text-gray-400 font-normal ml-1">${o.phone}</span></p>
-                                <p class="text-[10px] text-gray-300 font-bold bg-black/40 inline-block px-2 py-0.5 rounded mt-1">${o.time} | Mode: ${o.type}</p>
-                            </div>
-                            <span class="text-xs font-black px-2 py-1 rounded ${isDone ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'}">${isDone ? 'DONE' : 'NEW'}</span>
-                        </div>
-                        <p class="text-xs text-gray-300 leading-tight mb-2">${itemsText}</p>
-                        <div class="flex justify-between items-center border-t border-white/10 pt-2">
-                            <span class="font-black text-green-400">₹${o.total}</span>
-                            ${!isDone 
-                                ? `<button onclick="markDoneAndGenPDF('${id}')" class="bg-blue-500 text-white text-[10px] font-black px-3 py-1.5 rounded shadow-lg btn-press"><i class="fa-solid fa-print"></i> MARK DONE & BILL</button>` 
-                                : `<span class="text-gray-500 text-[10px]"><i class="fa-solid fa-check-double"></i> Completed</span>`
-                            }
-                        </div>
-                    </div>`;
+            const sumBox = document.getElementById('cart-summary');
+            sumBox.innerHTML = window.cart.map((i, idx) => `
+                <div class="flex justify-between items-center text-sm font-bold text-gray-700">
+                    <span>${i.name}</span>
+                    <div class="flex gap-3">
+                        <span>₹${i.price}</span>
+                        <i onclick="window.cart.splice(${idx},1); window.updateCartUI();" class="fa-solid fa-circle-minus text-red-400 text-lg cursor-pointer btn-press"></i>
+                    </div>
+                </div>`).join('');
+            document.getElementById('sheet-total').innerText = `₹${total}`;
+        };
+
+        window.openCheckout = function() { 
+            document.getElementById('checkout-sheet').classList.add('active'); 
+        };
+        
+        window.closeCheckout = function() { 
+            document.getElementById('checkout-sheet').classList.remove('active'); 
+        };
+
+        window.processPayment = function() {
+            if(!document.getElementById('u-n').value || !document.getElementById('u-p').value) { 
+                alert("Naam aur Number poora bhariye!"); return; 
+            }
+            if(document.getElementById('u-pay').value === "PAID") {
+                document.getElementById('qr-modal').classList.remove('hidden');
+                document.getElementById('qr-modal').classList.add('flex');
+            } else {
+                window.submitOrderAndWhatsApp("COD");
+            }
+        };
+
+        window.submitOrderAndWhatsApp = function(type) {
+            const n = document.getElementById('u-n').value;
+            const p = document.getElementById('u-p').value;
+            const t = document.getElementById('u-t').value;
+            let total = window.cart.reduce((sum, i) => sum + i.price, 0);
+            
+            const orderData = {
+                name: n, phone: p, time: t, type: type,
+                items: window.cart, total: total, status: 'Pending', timestamp: Date.now()
+            };
+            
+            if(window.rdb) {
+                window.rdb.ref('orders').push(orderData).then(() => {
+                    let itemsText = window.cart.map(i => `▫️ ${i.name} - ₹${i.price}`).join('%0A');
+                    let footerMsg = type === "PAID" ? `_(भाई मैंने ₹${total} का पेमेंट QR से कर दिया है, स्क्रीनशॉट भेज रहा हूँ!)_` : `_(पैसे दुकान पर दूंगा)_`;
+                    
+                    const msg = `*🍔 नया ${type} ऑर्डर (MOULASAR)*%0A%0A*ग्राहक:* ${n}%0A*नंबर:* ${p}%0A*समय:* ${t}%0A*डिलीवरी:* Self Pickup (दुकान से लेंगे)%0A%0A*आइटम्स:*%0A${itemsText}%0A-------------------%0A*कुल बिल: ₹${total}*%0A-------------------%0A${footerMsg}`;
+                    
+                    window.cart = [];
+                    window.updateCartUI();
+                    if(type === "PAID") { document.getElementById('qr-modal').classList.add('hidden'); }
+                    
+                    window.location.href = `https://wa.me/918058733741?text=${msg}`;
                 });
-            } catch(e) {}
-        });
+            }
+        };
 
-        // 3. Sync Menu
-        rdb.ref('menu').on('value', snap => {
-            try {
-                const data = snap.val() || {};
-                const box = document.getElementById('menu-box');
-                const adminBox = document.getElementById('admin-menu-list');
-                if(box) box.innerHTML = ''; 
-                if(adminBox) adminBox.innerHTML = '';
+        window.markDoneAndGenPDF = function(orderId) {
+            if(!window.rdb) return;
+            window.rdb.ref('orders/' + orderId).once('value').then(snap => {
+                const o = snap.val();
+                if(!o) return;
+
+                window.rdb.ref('orders/' + orderId).update({ status: 'Done' });
+
+                const printWindow = window.open('', '_blank');
+                const d = new Date(o.timestamp);
+                const dateStr = d.toLocaleDateString() + " " + d.toLocaleTimeString();
                 
-                let delay = 0;
-                Object.keys(data).forEach(id => {
-                    try {
-                        const i = data[id];
-                        if (!i) return; 
-                        
-                        const isAvail = i.available !== false; 
-                        let itemName = String(i.name || 'Unnamed Item');
-                        let safeName = itemName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                        let lowerName = itemName.toLowerCase();
-                        let displayIcon = String(i.icon || '');
-                        
-                        if (lowerName.includes('momo')) displayIcon = 'https://i.ibb.co/wFHJycY9/images.jpg';
-                        else if (lowerName.includes('chawmin') || lowerName.includes('chowmein')) displayIcon = 'https://i.ibb.co/C3r9FycT/images-1.jpg';
-                        else if (lowerName.includes('bhel')) displayIcon = 'https://i.ibb.co/MxjCt7QN/images-2.jpg';
-                        else if (lowerName.includes('sandwich')) displayIcon = 'https://i.ibb.co/fdrpHxK8/images-3.jpg';
-                        else if (lowerName.includes('burger')) displayIcon = 'https://i.ibb.co/Y4p4NYZx/images-4.jpg';
+                let itemsHTML = (o.items || []).map(i => `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>${i.name}</span>
+                        <span>Rs ${i.price}</span>
+                    </div>
+                `).join('');
 
-                        let isImage = displayIcon.startsWith('http');
-                        let renderCustomerIcon = isImage ? `<img src="${displayIcon}" class="w-full h-full object-cover">` : displayIcon;
-                        let renderAdminIcon = isImage ? `<img src="${displayIcon}" class="w-5 h-5 rounded object-cover inline-block mr-1">` : displayIcon;
-                        let itemPrice = Number(i.price) || 0;
+                printWindow.document.write(`
+                    <html><head><title>Receipt_${o.name}</title></head>
+                    <body style="font-family:monospace; padding:20px; color:black;">
+                        <div style="border: 2px dashed #000; padding: 20px; border-radius: 10px; max-width:400px; margin:auto;">
+                            <h2 style="text-align:center; margin:0;">SHRI SHYAM FAST FOOD</h2>
+                            <p style="text-align:center; margin:5px 0 15px 0; font-size: 12px;">Moulasar | Ph: +91 80587 33741</p>
+                            <hr style="border:1px dashed #000">
+                            <p style="margin:5px 0;"><b>Name:</b> ${o.name}</p>
+                            <p style="margin:5px 0;"><b>Phone:</b> ${o.phone}</p>
+                            <p style="margin:5px 0;"><b>Date:</b> ${dateStr}</p>
+                            <p style="margin:5px 0;"><b>Type:</b> ${o.type} | ${o.time}</p>
+                            <hr style="border:1px dashed #000">
+                            <h4 style="margin:10px 0;">Order Items:</h4>
+                            ${itemsHTML}
+                            <hr style="border:1px dashed #000">
+                            <h3 style="text-align:right; margin:10px 0;">Total: Rs ${o.total}</h3>
+                            <p style="text-align:center; margin-top: 30px; font-weight: bold;">Thank You! Visit Again.</p>
+                        </div>
+                        <script>
+                            window.onload = function() { window.print(); window.close(); }
+                        <\/script>
+                    </body></html>
+                `);
+                printWindow.document.close();
+            });
+        };
 
-                        if(box) {
-                            box.innerHTML += `
-                            <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 slide-up ${isAvail ? '' : 'opacity-60 grayscale'}" style="animation-delay: ${delay}s">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-2xl border overflow-hidden shrink-0">${renderCustomerIcon}</div>
-                                    <div>
-                                        <p class="font-black text-gray-800">${itemName}</p>
-                                        <p class="text-red-500 font-black text-sm">₹${itemPrice}</p>
-                                    </div>
-                                </div>
-                                ${isAvail 
-                                    ? `<button onclick="addToCart('${safeName}', ${itemPrice})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` 
-                                    : `<button disabled class="border-2 border-gray-200 text-gray-400 px-3 py-2 rounded-xl text-[10px] font-black cursor-not-allowed">OUT OF<br>STOCK</button>`
-                                }
-                            </div>`;
-                        }
-                        
-                        if(adminBox) {
-                            adminBox.innerHTML += `
-                            <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg border border-white/5">
-                                <span class="font-bold text-xs truncate w-1/3 flex items-center">${renderAdminIcon} ${itemName}</span>
-      
+        // FIREBASE SETUP
+        try {
+            const firebaseConfig = {
+              apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
+              authDomain: "shri-shyam-fast-food.firebaseapp.com",
+              databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com",
+              projectId: "shri-shyam-fast-food",
+              storageBucket: "shri-shyam-fast-food.firebasestorage.app",
+              messagingSenderId: "828353855950",
+              appId: "1:828353855950:web:96d62828e8e410e8812b9f",
+              measurementId: "G-38J1Y2M8LD"
+            };
+
+            if (!window.firebase) throw new Error("Firebase load nahi hua. Internet check karein.");
+            
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            window.rdb = firebase.database();
+
+            /
