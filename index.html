@@ -57,7 +57,6 @@
                     <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
                         <span class="status-dot"></span> <span id="shop-text">Checking...</span>
                     </span>
-                    <!-- Number Add Kiya Gaya Hai -->
                     <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
                 </div>
             </div>
@@ -180,10 +179,10 @@
         let cart = [];
         let isShopOpen = true;
 
-        // 1. Sync Shop - Makkhan (Smooth) logic ke sath
+        // 1. Sync Shop
         rdb.ref('shop_status').on('value', snap => {
             try {
-                isShopOpen = snap.val() !== false; // Agar null ho toh open manega
+                isShopOpen = snap.val() !== false; 
                 
                 let closedScreen = document.getElementById('closed-screen');
                 let indicator = document.getElementById('shop-indicator');
@@ -198,10 +197,10 @@
                     btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
                     btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black mb-6 uppercase bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black mb-6 uppercase bg-green-500 text-white shadow-lg btn-press";
                 }
-            } catch(e) { console.error("Status error"); }
+            } catch(e) { console.error("Status error", e); }
         });
 
-        // 2. Sync Menu - Anti-Crash Guard ke sath
+        // 2. Sync Menu
         rdb.ref('menu').on('value', snap => {
             try {
                 const data = snap.val() || {};
@@ -214,7 +213,7 @@
                 Object.keys(data).forEach(id => {
                     try {
                         const i = data[id];
-                        if (!i) return; // Crash Bachav
+                        if (!i) return;
                         
                         const isAvail = i.available !== false; 
                         
@@ -268,19 +267,32 @@
                             </div>`;
                         }
                         delay += 0.05;
-                    } catch(itemErr) {} // Kisi ek item me galti ho toh ignore karo
+                    } catch(itemErr) {} 
                 });
-            } catch(e) { console.error("Menu error"); }
+            } catch(e) { console.error("Menu error", e); }
         });
 
         // 3. Admin Tools
-        function loginAdmin() { if(prompt("Enter PIN:") === "jitu8087") { document.getElementById('closed-screen').style.display = 'none'; document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
+        function loginAdmin() { 
+            if(prompt("Enter PIN:") === "jitu8087") { 
+                document.getElementById('closed-screen').style.display = 'none'; 
+                document.getElementById('admin-panel').classList.remove('hidden'); 
+                window.scrollTo(0,0); 
+            } 
+        }
         function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
         function toggleAvail(id, currentStatus) { rdb.ref('menu/' + id).update({ available: !currentStatus }); } 
         
         function addItem() { 
-            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍽️";
-            if(n && p) { rdb.ref('menu').push({name:n, price:Number(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; document.getElementById('new-i').value=''; }
+            const n = document.getElementById('new-n').value;
+            const p = document.getElementById('new-p').value;
+            const i = document.getElementById('new-i').value || "🍽️";
+            if(n && p) { 
+                rdb.ref('menu').push({name:n, price:Number(p), icon:i, available:true}); 
+                document.getElementById('new-n').value=''; 
+                document.getElementById('new-p').value=''; 
+                document.getElementById('new-i').value=''; 
+            }
         }
 
         // 4. Cart Logic
@@ -313,4 +325,4 @@
         function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
 
         // 5. Payment & WhatsApp
-        func
+       
