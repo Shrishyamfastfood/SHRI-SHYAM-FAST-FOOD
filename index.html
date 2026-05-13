@@ -1,17 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shri Shyam Fast Food Moulasar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase Realtime Database Libraries -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; }
         .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px currentColor; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; transition: 0.3s; }
+        .dot-online { background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .dot-offline { background-color: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        .dot-connecting { background-color: #ffb100; box-shadow: 0 0 10px #ffb100; }
     </style>
 </head>
 <body>
@@ -23,41 +29,152 @@
                 <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" alt="Logo" class="w-12 h-12 rounded-full border-2 border-white">
                 <div>
                     <h1 class="text-sm font-black italic">SHRI SHYAM FAST FOOD</h1>
-                    <!-- YAHAN HAI WOH BINDI -->
-                    <p class="text-[10px] flex items-center gap-2 font-bold uppercase">
-                        <span id="conn-dot" class="status-dot bg-yellow-400"></span> 
-                        <span id="status-text">Connecting...</span>
-                    </p>
+                    <div class="flex items-center gap-2">
+                        <span id="main-status-dot" class="status-dot dot-connecting"></span>
+                        <span id="main-status-text" class="text-[10px] font-bold uppercase tracking-tighter text-white/90">Connecting...</span>
+                    </div>
                 </div>
             </div>
-            <button onclick="showLogin()" class="text-white/50"><i class="fa-solid fa-gear"></i></button>
+            <button onclick="showAdmin()" class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-lock"></i></button>
         </div>
     </header>
 
+    <div class="max-w-6xl mx-auto px-4 py-6">
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="hidden mb-6 p-6 bg-white rounded-3xl shadow-xl border-t-4 border-red-600">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-black text-gray-800">SHOP CONTROL</h2>
+                <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="text-gray-400 text-xs">CLOSE</button>
+            </div>
+            <button id="toggle-shop-btn" onclick="toggleShopStatus()" class="w-full py-4 rounded-2xl font-black text-white shadow-lg"></button>
+            <p class="text-center text-[10px] text-gray-400 mt-2">PIN: jitu8087</p>
+        </div>
+
+        <!-- Menu Section -->
+        <h2 class="text-2xl font-black mb-4 italic text-gray-800">Menu List</h2>
+        <div id="menu-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Items will load here -->
+        </div>
+    </div>
+
+    <!-- Payment QR Modal -->
+    <div id="qr-modal" style="display:none;" class="fixed inset-0 bg-black/95 z-[300] flex items-center justify-center p-6 text-center">
+        <div class="bg-white rounded-3xl p-6 max-w-xs w-full">
+             <h3 class="font-black text-xl mb-4 text-gray-800 italic">JAY SHREE SHYAM</h3>
+             <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" alt="QR" class="w-full rounded-2xl mb-6 shadow-inner border">
+             <p class="text-xs font-bold text-gray-500 mb-4 uppercase">Scan karke payment karein</p>
+             <button onclick="confirmPayment()" class="w-full bg-green-600 text-white font-black py-4 rounded-xl shadow-lg">PAYMENT KAR DIYA</button>
+        </div>
+    </div>
+
     <script>
-        const firebaseConfig = { /* ... wahi purana config ... */ };
+        // FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
+            authDomain: "shri-shyam-fast-food.firebaseapp.com",
+            databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/",
+            projectId: "shri-shyam-fast-food",
+            storageBucket: "shri-shyam-fast-food.firebasestorage.app",
+            messagingSenderId: "828353855950",
+            appId: "1:828353855950:web:96d62828e8e410e8812b9f"
+        };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const rdb = firebase.database();
 
-        // 1. Connection Check & Shop Status
-        db.collection("settings").doc("shop_status").onSnapshot(doc => {
-            const dot = document.getElementById('conn-dot');
-            const txt = document.getElementById('status-text');
-            
-            if(doc.exists) {
-                const isOpen = doc.data().isOpen;
-                dot.className = isOpen ? "status-dot bg-green-500" : "status-dot bg-red-500";
-                txt.innerText = isOpen ? "SHOP OPEN" : "SHOP CLOSED";
-            } else {
-                dot.className = "status-dot bg-red-500";
-                txt.innerText = "OFFLINE";
+        let isShopOpen = false;
+
+        // 1. Monitor Shop Status & Connection
+        function initApp() {
+            const dot = document.getElementById('main-status-dot');
+            const txt = document.getElementById('main-status-text');
+            const btn = document.getElementById('toggle-shop-btn');
+
+            rdb.ref('shop_status').on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data === null) {
+                    // Initial setup if database is empty
+                    rdb.ref('shop_status').set(true);
+                } else {
+                    isShopOpen = data;
+                    dot.className = isShopOpen ? "status-dot dot-online" : "status-dot dot-offline";
+                    txt.innerText = isShopOpen ? "Shop Open" : "Shop Closed";
+                    
+                    // Update Admin Button
+                    btn.innerText = isShopOpen ? "CLOSE SHOP (OFF)" : "OPEN SHOP (ON)";
+                    btn.className = isShopOpen ? "w-full py-4 rounded-2xl font-black bg-red-600 text-white" : "w-full py-4 rounded-2xl font-black bg-green-600 text-white";
+                }
+            }, (error) => {
+                dot.className = "status-dot dot-offline";
+                txt.innerText = "Check Rules!";
+                console.error(error);
+            });
+
+            loadMenu();
+        }
+
+        // 2. Load Menu from Realtime Database
+        function loadMenu() {
+            const menuContainer = document.getElementById('menu-list');
+            const defaultMenu = [
+                { name: "Special Sandwich", price: 60, icon: "🥪" },
+                { name: "Crispy Burger", price: 50, icon: "🍔" },
+                { name: "Veg Chowmein", price: 50, icon: "🍝" },
+                { name: "Bhelpuri Premium", price: 40, icon: "🥣" }
+            ];
+
+            rdb.ref('menu').on('value', (snapshot) => {
+                const items = snapshot.val();
+                menuContainer.innerHTML = '';
+                
+                if (!items) {
+                    // If no menu, push defaults
+                    rdb.ref('menu').set(defaultMenu);
+                } else {
+                    Object.values(items).forEach(item => {
+                        menuContainer.innerHTML += `
+                            <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-3xl">${item.icon}</span>
+                                    <div>
+                                        <p class="font-bold text-gray-800">${item.name}</p>
+                                        <p class="text-red-600 font-black italic text-sm">₹${item.price}</p>
+                                    </div>
+                                </div>
+                                <button onclick="addToCart('${item.name}')" class="bg-red-50 text-red-600 font-bold px-5 py-2 rounded-xl active:scale-95 transition">ADD</button>
+                            </div>`;
+                    });
+                }
+            });
+        }
+
+        // 3. Functions
+        function toggleShopStatus() {
+            rdb.ref('shop_status').set(!isShopOpen);
+        }
+
+        function showAdmin() {
+            if(prompt("Enter Admin PIN:") === "jitu8087") {
+                document.getElementById('admin-panel').classList.remove('hidden');
+                window.scrollTo(0,0);
             }
-        }, () => {
-            document.getElementById('conn-dot').className = "status-dot bg-red-500";
-            document.getElementById('status-text').innerText = "DISCONNECTED";
-        });
+        }
 
-        function showLogin() { if(prompt("Password:") === "jitu8087") alert("Admin Panel logic yahan add karein..."); }
+        function addToCart(name) {
+            if(!isShopOpen) {
+                alert("Bhai, dukaan abhi band hai!");
+                return;
+            }
+            document.getElementById('qr-modal').style.display = 'flex';
+        }
+
+        function confirmPayment() {
+            alert("Order Details WhatsApp par bhejein!");
+            window.location.href = "https://wa.me/918058733741?text=Bhai Order Check Karo!";
+            document.getElementById('qr-modal').style.display = 'none';
+        }
+
+        initApp();
     </script>
 </body>
 </html>
