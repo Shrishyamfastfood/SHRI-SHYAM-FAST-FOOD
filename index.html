@@ -2,96 +2,299 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shri Shyam Fast Food Moulasar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding-bottom: 120px; }
+        .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .dot-green { background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
         .dot-red { background-color: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        
+        #closed-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: white; 
+            z-index: 9999; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center;
+        }
     </style>
 </head>
-<body class="bg-gray-100 pb-20">
+<body>
 
-    <!-- Header with Bindi -->
-    <header class="bg-red-600 text-white p-4 sticky top-0 z-50 shadow-lg">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="font-black italic text-lg">SHRI SHYAM FAST FOOD</h1>
-                <p class="text-[10px] uppercase font-bold tracking-widest italic">Moulasar | 8058733741</p>
-                <div class="flex items-center gap-2 mt-1">
-                    <span id="conn-dot" class="status-dot dot-red"></span>
-                    <span id="conn-text" class="text-[9px] font-bold">CONNECTING...</span>
+    <!-- 1. DUKAAN BAND PARDA -->
+    <div id="closed-screen">
+        <i class="fa-solid fa-store-slash text-7xl text-red-600 mb-6"></i>
+        <h2 class="text-3xl font-black text-gray-900 uppercase">Dukaan Abhi Band Hai</h2>
+        <p class="text-gray-500 font-bold mt-2">Hum jald hi wapas aayenge!</p>
+        <button onclick="showLogin()" class="mt-12 px-6 py-2 bg-gray-100 rounded-full text-xs font-bold text-gray-400 border">
+            ADMIN LOGIN (OPEN SHOP)
+        </button>
+    </div>
+
+    <!-- 2. HEADER -->
+    <header class="gradient-nav text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full border-2 border-white">
+                <div>
+                    <h1 class="text-sm font-black italic">SHRI SHYAM FAST FOOD</h1>
+                    <p class="text-[10px] font-bold mt-1 uppercase italic">Moulasar | 8058733741</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span id="shop-dot" class="status-dot dot-red"></span>
+                        <span id="shop-status-text" class="text-[9px] font-bold tracking-widest">Checking...</span>
+                    </div>
                 </div>
             </div>
-            <button onclick="checkAdmin()" class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-gear"></i></button>
+            <button onclick="showLogin()" class="bg-white/20 p-2 rounded-xl"><i class="fa-solid fa-gear"></i></button>
         </div>
     </header>
 
-    <div class="max-w-md mx-auto p-4">
-        <!-- ADMIN PANEL (FULL CONTROL) -->
-        <div id="admin-panel" class="hidden bg-white p-5 rounded-2xl shadow-xl border-t-4 border-red-600 mb-6">
-            <h2 class="font-black text-red-600 mb-4 uppercase">Master Control</h2>
-            <button id="shop-toggle" onclick="toggleShop()" class="w-full py-3 rounded-lg font-black text-white mb-4"></button>
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <input id="n-name" placeholder="Name" class="p-2 border rounded text-sm">
-                <input id="n-price" placeholder="Price" class="p-2 border rounded text-sm">
-                <input id="n-icon" placeholder="Emoji" class="p-2 border rounded text-sm">
-                <button onclick="addItem()" class="bg-black text-white rounded-lg font-bold text-xs">ADD ITEM</button>
+    <div class="max-w-6xl mx-auto px-4 py-6">
+        
+        <!-- 3. ADMIN PANEL (Hidden by default) -->
+        <div id="admin-section" class="hidden bg-white rounded-2xl shadow-xl p-6 mb-8 border-t-4 border-red-600">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-black text-gray-800">MASTER CONTROL</h2>
+                <button onclick="document.getElementById('admin-section').classList.add('hidden')" class="text-gray-400"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div id="admin-menu-list" class="space-y-2"></div>
+
+            <!-- Shop On/Off -->
+            <button id="shop-toggle-btn" onclick="toggleShop()" class="w-full py-3 rounded-xl font-black text-white mb-6 shadow-md"></button>
+
+            <!-- Add Item -->
+            <div class="bg-red-50 p-3 rounded-xl mb-6">
+                <p class="font-bold text-red-600 text-xs mb-2">Naya Item Add Karein:</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" id="new-name" placeholder="Naam" class="p-2 border rounded-lg text-sm outline-none col-span-2">
+                    <input type="text" id="new-icon" placeholder="Emoji (🍔)" class="p-2 border rounded-lg text-sm outline-none">
+                    <input type="number" id="new-price" placeholder="Price (₹)" class="p-2 border rounded-lg text-sm outline-none col-span-2">
+                    <button onclick="addItem()" class="bg-black text-white font-bold rounded-lg text-xs">ADD</button>
+                </div>
+            </div>
+
+            <!-- Manage Items -->
+            <p class="font-bold text-gray-500 text-xs mb-2">Edit Prices & Delete:</p>
+            <div id="admin-menu-items" class="space-y-2"></div>
         </div>
 
-        <!-- CUSTOMER MENU -->
-        <div id="menu-container" class="space-y-3"></div>
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- 4. CUSTOMER MENU -->
+            <div class="w-full md:w-2/3">
+                <h2 class="text-xl font-black mb-4 italic text-gray-800">Menu</h2>
+                <div id="customer-menu" class="grid grid-cols-1 gap-3"></div>
+            </div>
+
+            <!-- 5. CART & CHECKOUT FORM -->
+            <div class="w-full md:w-1/3">
+                <div class="bg-white rounded-2xl shadow-xl p-5 sticky top-24 border">
+                    <h2 class="text-lg font-black mb-3 text-gray-800">Aapka Order</h2>
+                    
+                    <div id="cart-box" class="space-y-2 mb-4 text-sm max-h-40 overflow-y-auto">
+                        <p class="text-center text-gray-400 py-4 italic">Basket is empty</p>
+                    </div>
+                    
+                    <div id="checkout-form" style="display:none;" class="space-y-3 pt-4 border-t">
+                        <!-- Address & Time Details -->
+                        <input type="text" id="u-name" placeholder="Aapka Naam" class="w-full p-3 bg-gray-50 rounded-xl border outline-none font-bold text-sm">
+                        <input type="tel" id="u-phone" placeholder="Mobile Number" class="w-full p-3 bg-gray-50 rounded-xl border outline-none font-bold text-sm">
+                        <input type="text" id="u-address" placeholder="Pura Address (Ya Self Delivery)" class="w-full p-3 bg-gray-50 rounded-xl border outline-none font-bold text-sm">
+                        <select id="u-time" class="w-full p-3 bg-gray-50 rounded-xl border outline-none font-bold text-sm">
+                            <option value="15 मिनट में">15 मिनट में</option>
+                            <option value="30 मिनट में">30 मिनट में</option>
+                            <option value="1 घंटे में">1 घंटे में</option>
+                        </select>
+
+                        <div class="flex justify-between items-center text-xl font-black py-2">
+                            <span>Total</span><span id="final-total" class="text-red-600">₹0</span>
+                        </div>
+                        <button onclick="showQRModal()" class="w-full bg-green-600 text-white font-black py-4 rounded-xl shadow-lg">PAY & ORDER NOW</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. QR PAYMENT MODAL -->
+    <div id="qr-modal" style="display:none;" class="fixed inset-0 bg-black/90 z-[1000] flex items-center justify-center p-6 text-center">
+        <div class="bg-white rounded-[2rem] p-6 max-w-xs w-full">
+             <h3 class="font-black text-xl mb-4 italic text-gray-800">JAY SHREE SHYAM</h3>
+             <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl border mb-6">
+             <button onclick="sendToWhatsApp()" class="w-full bg-green-600 text-white font-black py-4 rounded-xl shadow-lg mb-3">DONE (SEND ON WHATSAPP)</button>
+             <button onclick="document.getElementById('qr-modal').style.display='none'" class="text-gray-400 font-bold text-xs">CANCEL</button>
+        </div>
     </div>
 
     <script>
-        const config = { databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(config);
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
+            authDomain: "shri-shyam-fast-food.firebaseapp.com",
+            databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/",
+            projectId: "shri-shyam-fast-food",
+            storageBucket: "shri-shyam-fast-food.firebasestorage.app",
+            messagingSenderId: "828353855950",
+            appId: "1:828353855950:web:96d62828e8e410e8812b9f"
+        };
+        firebase.initializeApp(firebaseConfig);
         const rdb = firebase.database();
 
-        // 1. Monitor Shop Status & Bindi
-        rdb.ref('shop_status').on('value', snap => {
-            const open = snap.val() ?? true;
-            document.getElementById('conn-dot').className = open ? "status-dot dot-green" : "status-dot dot-red";
-            document.getElementById('conn-text').innerText = open ? "SHOP OPEN" : "SHOP CLOSED";
-            const btn = document.getElementById('shop-toggle');
-            btn.innerText = open ? "CLOSE SHOP" : "OPEN SHOP";
-            btn.className = open ? "w-full py-3 bg-red-600 text-white rounded-lg font-bold" : "w-full py-3 bg-green-600 text-white rounded-lg font-bold";
-        });
+        let cart = [];
+        let isStoreOpen = true;
 
-        // 2. Load Menu & Admin List
-        rdb.ref('menu').on('value', snap => {
-            const data = snap.val() || {};
-            const list = document.getElementById('menu-container');
-            const adminList = document.getElementById('admin-menu-list');
-            list.innerHTML = ''; adminList.innerHTML = '';
-            
-            Object.keys(data).forEach(id => {
-                const i = data[id];
-                // Customer View
-                list.innerHTML += `<div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm">
-                    <div class="flex items-center gap-3"><span class="text-2xl">${i.icon}</span><div><p class="font-bold text-sm">${i.name}</p><p class="text-red-500 font-bold text-xs">₹${i.price}</p></div></div>
-                    <button onclick="alert('Order Feature active!')" class="bg-black text-white px-4 py-2 rounded-lg text-[10px] font-black">ADD</button>
-                </div>`;
-                // Admin View
-                adminList.innerHTML += `<div class="flex justify-between items-center text-xs border-b p-1">
-                    <span>${i.name}</span>
-                    <div class="flex gap-1"><input value="${i.price}" onchange="rdb.ref('menu/${id}/price').set(parseInt(this.value))" class="w-10 border text-center">
-                    <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-500"><i class="fa fa-trash"></i></button></div>
-                </div>`;
+        function startApp() {
+            // Monitor Shop Status
+            rdb.ref('shop_status').on('value', (snap) => {
+                isStoreOpen = snap.val() ?? true;
+                
+                document.getElementById('closed-screen').style.display = isStoreOpen ? 'none' : 'flex';
+                
+                document.getElementById('shop-dot').className = isStoreOpen ? "status-dot dot-green" : "status-dot dot-red";
+                document.getElementById('shop-status-text').innerText = isStoreOpen ? "SHOP OPEN" : "SHOP CLOSED";
+                
+                const btn = document.getElementById('shop-toggle-btn');
+                btn.innerText = isStoreOpen ? "CLOSE DUKAAN" : "OPEN DUKAAN";
+                btn.className = isStoreOpen ? "w-full py-3 rounded-xl font-black bg-red-600 text-white" : "w-full py-3 rounded-xl font-black bg-green-600 text-white";
             });
-        });
 
-        // Functions
-        function toggleShop() { rdb.ref('shop_status').set(!document.getElementById('conn-text').innerText.includes("OPEN")); }
-        function addItem() { 
-            rdb.ref('menu').push({ name: document.getElementById('n-name').value, price: parseInt(document.getElementById('n-price').value), icon: document.getElementById('n-icon').value }); 
+            // Monitor Menu
+            rdb.ref('menu').on('value', (snap) => {
+                const data = snap.val();
+                const custMenu = document.getElementById('customer-menu');
+                const adminMenu = document.getElementById('admin-menu-items');
+                
+                custMenu.innerHTML = ''; 
+                adminMenu.innerHTML = '';
+
+                if(data) {
+                    Object.keys(data).forEach(id => {
+                        const item = data[id];
+                        
+                        // Customer List (With Emoji)
+                        custMenu.innerHTML += `
+                            <div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm border border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">${item.icon || '🍽️'}</span>
+                                    <div>
+                                        <p class="font-black text-gray-800 text-sm">${item.name}</p>
+                                        <p class="text-red-600 font-black italic text-xs">₹${item.price}</p>
+                                    </div>
+                                </div>
+                                <button onclick="addToCart('${item.name}', ${item.price})" class="bg-black text-white font-bold px-5 py-2 rounded-lg text-xs">ADD</button>
+                            </div>`;
+
+                        // Admin List
+                        adminMenu.innerHTML += `
+                            <div class="bg-gray-50 p-2 rounded-lg flex justify-between items-center border">
+                                <span class="font-bold text-xs text-gray-700 w-1/2 truncate">${item.icon || ''} ${item.name}</span>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" value="${item.price}" onchange="editPrice('${id}', this.value)" class="w-14 p-1 border rounded text-center font-bold text-xs outline-none">
+                                    <button onclick="deleteItem('${id}')" class="text-red-500 px-2 bg-red-100 rounded py-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                                </div>
+                            </div>`;
+                    });
+                }
+            });
         }
-        function checkAdmin() { if(prompt("Password:") === "jitu8087") document.getElementById('admin-panel').classList.toggle('hidden'); }
+
+        // --- ADMIN FUNCTIONS ---
+        function showLogin() {
+            if(prompt("Admin Password:") === "jitu8087") {
+                document.getElementById('closed-screen').style.display = 'none';
+                document.getElementById('admin-section').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        function toggleShop() { rdb.ref('shop_status').set(!isStoreOpen); }
+        function editPrice(id, val) { rdb.ref('menu/' + id).update({ price: parseInt(val) }); }
+        function deleteItem(id) { if(confirm("Ye item delete karein?")) rdb.ref('menu/' + id).remove(); }
+        function addItem() {
+            const n = document.getElementById('new-name').value;
+            const i = document.getElementById('new-icon').value || "🍽️";
+            const p = document.getElementById('new-price').value;
+            if(n && p) {
+                rdb.ref('menu').push({ name: n, icon: i, price: parseInt(p) });
+                document.getElementById('new-name').value = '';
+                document.getElementById('new-icon').value = '';
+                document.getElementById('new-price').value = '';
+            }
+        }
+
+        // --- CART LOGIC ---
+        function addToCart(n, p) { cart.push({name:n, price:p}); renderCart(); }
+        
+        function renderCart() {
+            let total = cart.reduce((a, b) => a + b.price, 0);
+            const box = document.getElementById('cart-box');
+            
+            if(cart.length === 0) {
+                box.innerHTML = '<p class="text-center text-gray-400 py-4 italic">Basket is empty</p>';
+            } else {
+                box.innerHTML = cart.map((i, x) => `
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded mb-1 border-b">
+                        <span class="font-bold text-xs text-gray-700">${i.name}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-xs text-red-600">₹${i.price}</span>
+                            <i onclick="cart.splice(${x},1);renderCart();" class="fa-solid fa-circle-xmark text-gray-400 cursor-pointer"></i>
+                        </div>
+                    </div>`).join('');
+            }
+            
+            document.getElementById('final-total').innerText = `₹${total}`;
+            document.getElementById('checkout-form').style.display = total > 0 ? 'block' : 'none';
+        }
+
+        function showQRModal() {
+            const name = document.getElementById('u-name').value;
+            const phone = document.getElementById('u-phone').value;
+            const address = document.getElementById('u-address').value;
+            
+            if(!name || !phone || !address) { 
+                alert("Bhai, Naam, Number aur Address bharna zaroori hai!"); 
+                return; 
+            }
+            document.getElementById('qr-modal').style.display = 'flex';
+        }
+
+        // --- WHATSAPP ORDER SUBMIT ---
+        function sendToWhatsApp() {
+            const name = document.getElementById('u-name').value;
+            const phone = document.getElementById('u-phone').value;
+            const addr = document.getElementById('u-address').value;
+            const time = document.getElementById('u-time').value;
+            
+            let itemsTxt = "";
+            let total = cart.reduce((a, b) => { 
+                itemsTxt += `▫️ ${b.name} - ₹${b.price}\n`; 
+                return a + b.price; 
+            }, 0);
+
+            // Exactly matching user's requested format
+            const msg = `*🍔 नया PAID ऑर्डर (MOULASAR)*\n\n*ग्राहक:* ${name}\n*नंबर:* ${phone}\n*समय:* ${time}\n*एड्रेस:* ${addr}\n\n*आइटम्स:*\n${itemsTxt}-------------------\n*कुल बिल: ₹${total}*\n-------------------\n_(भाई मैंने ₹${total} का पेमेंट QR से कर दिया है, स्क्रीनशॉट भेज रहा हूँ!)_`;
+            
+            // Send to Admin Panel Live Orders Optional
+            rdb.ref('live_orders').push({ name, phone, addr, time, total, items_text: itemsTxt, timestamp: Date.now() });
+
+            window.location.href = `https://wa.me/918058733741?text=${encodeURIComponent(msg)}`;
+            
+            // Clear cart after sending
+            cart = [];
+            renderCart();
+            document.getElementById('qr-modal').style.display = 'none';
+        }
+
+        startApp();
     </script>
 </body>
 </html>
