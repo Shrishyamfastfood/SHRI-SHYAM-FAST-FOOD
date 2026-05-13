@@ -1,4 +1,263 @@
-// Sample product data
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Modern E-Commerce Website</title>
+<style>
+/* Reset styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Header styles */
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  margin-right: 20px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 20px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Sections */
+section {
+  padding: 20px;
+  margin: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+section h2 {
+  margin-bottom: 15px;
+}
+
+/* Products */
+.products-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.product-card {
+  background-color: #e2e2e2;
+  padding: 10px;
+  border-radius: 8px;
+  width: calc(25% - 20px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.product-card:hover {
+  transform: scale(1.02);
+}
+
+.product-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.product-card h3 {
+  margin: 10px 0 5px 0;
+}
+
+.product-card p {
+  margin: 5px 0;
+}
+
+.product-card button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  background-color: #333;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.product-card button:hover {
+  background-color: #555;
+}
+
+/* Cart */
+#cart {
+  display: none;
+}
+
+#cart-items {
+  min-height: 50px;
+}
+
+#cart div {
+  margin-bottom: 10px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #333;
+  color: #fff;
+  margin-top: 20px;
+}
+
+/* Modal styles */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Admin Panel */
+.admin-panel {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  z-index: 1001;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.hidden {
+  display: none;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>My Store</h1>
+  <nav>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#products">Products</a></li>
+      <li><a href="#cart" id="cart-link">Cart (<span id="cart-count">0</span>)</a></li>
+      <li><a href="#" id="admin-login-btn">Admin Login</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section id="home">
+  <h2>Welcome to My Store</h2>
+  <p>Shop the best products online!</p>
+</section>
+
+<section id="products" class="products-section">
+  <h2>Products</h2>
+  <div class="products-container" id="products-container"></div>
+</section>
+
+<section id="cart" class="cart-section">
+  <h2>Your Cart</h2>
+  <div id="cart-items"></div>
+  <button id="checkout-btn">Checkout</button>
+</section>
+
+<!-- Admin Login Modal -->
+<div id="admin-modal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="close-admin">&times;</span>
+    <h2>Admin Login</h2>
+    <input type="password" id="admin-password" placeholder="Enter admin password" />
+    <button id="admin-login-submit">Login</button>
+    <div id="admin-message" style="color:red; margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel" class="admin-panel hidden">
+  <h2>Admin Panel</h2>
+  <button id="add-product-btn">Add New Product</button>
+  <div id="admin-products"></div>
+  <button id="logout-admin">Logout</button>
+</div>
+
+<!-- Add Product Modal -->
+<div id="add-product-modal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="close-add">&times;</span>
+    <h2>Add New Product</h2>
+    <input type="text" id="product-name" placeholder="Product Name" style="width:100%; margin-bottom:10px;" />
+    <input type="number" id="product-price" placeholder="Price" style="width:100%; margin-bottom:10px;" />
+    <button id="save-product" style="width:100%;">Save</button>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2024 My Store. All rights reserved.</p>
+</footer>
+
+<script>
+/* JavaScript code */
+
 let products = [
   { id: 1, name: "Product 1", price: 29.99, image: "https://via.placeholder.com/150" },
   { id: 2, name: "Product 2", price: 49.99, image: "https://via.placeholder.com/150" },
@@ -20,6 +279,10 @@ window.onload = () => {
   document.getElementById('save-product').onclick = saveProduct;
   document.getElementById('logout-admin').onclick = logoutAdmin;
   document.getElementById('checkout-btn').onclick = checkout;
+  document.getElementById('cart-link').onclick = (e) => {
+    e.preventDefault();
+    toggleCart();
+  };
 };
 
 // Display products
@@ -83,6 +346,16 @@ function removeFromCart(index) {
   updateCart();
 }
 
+// Toggle cart visibility
+function toggleCart() {
+  const cartSection = document.getElementById('cart');
+  if (cartSection.style.display === 'block') {
+    cartSection.style.display = 'none';
+  } else {
+    cartSection.style.display = 'block';
+  }
+}
+
 // Checkout
 function checkout() {
   if (cart.length === 0) {
@@ -92,6 +365,7 @@ function checkout() {
   alert('Thank you for your purchase!');
   cart = [];
   updateCart();
+  toggleCart();
 }
 
 // Admin login modal
@@ -155,7 +429,7 @@ function closeAddProduct() {
 
 // Save new product
 function saveProduct() {
-  const name = document.getElementById('product-name').value;
+  const name = document.getElementById('product-name').value.trim();
   const price = parseFloat(document.getElementById('product-price').value);
   if (name && !isNaN(price)) {
     const newProduct = {
@@ -171,3 +445,6 @@ function saveProduct() {
     alert('Please enter valid product details.');
   }
 }
+</script>
+</body>
+</html>
