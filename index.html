@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -37,7 +36,6 @@
 </head>
 <body>
 
-    <!-- 1. DUKAAN BAND OVERLAY -->
     <div id="closed-screen" class="hidden fixed inset-0 bg-white/95 backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
         <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
         <h2 class="text-4xl font-black text-gray-800">Dukaan Band Hai</h2>
@@ -47,7 +45,6 @@
         </button>
     </div>
 
-    <!-- 2. HEADER -->
     <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
             <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full border-2 border-red-500 shadow-md object-cover">
@@ -57,7 +54,6 @@
                     <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
                         <span class="status-dot"></span> <span id="shop-text">Checking...</span>
                     </span>
-                    <!-- Mobile Number -->
                     <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
                 </div>
             </div>
@@ -67,7 +63,6 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6">
         
-        <!-- 3. ADMIN DASHBOARD -->
         <div id="admin-panel" class="hidden slide-up bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white relative">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-black"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i> MASTER CONTROL</h2>
@@ -90,13 +85,11 @@
             <div id="admin-menu-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
         </div>
 
-        <!-- 4. MENU LIST -->
         <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-4 border-b-2 border-red-100 pb-2 border-dashed">Today's Menu</h2>
         <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
     </div>
 
-    <!-- 5. FLOATING CART -->
     <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-transform duration-300 translate-y-32">
         <div onclick="openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
             <div>
@@ -109,7 +102,6 @@
         </div>
     </div>
 
-    <!-- 6. BOTTOM CHECKOUT SHEET -->
     <div id="checkout-sheet" class="cart-sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/40 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[90vh]">
             <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-[2.5rem]">
@@ -147,7 +139,6 @@
         </div>
     </div>
 
-    <!-- 7. QR MODAL -->
     <div id="qr-modal" class="hidden fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-md">
         <div class="bg-white rounded-[2.5rem] p-8 max-w-xs w-full slide-up">
              <h3 class="font-black text-2xl mb-2 gradient-text">JAY SHREE SHYAM</h3>
@@ -190,19 +181,20 @@
             const adminBox = document.getElementById('admin-menu-list');
             box.innerHTML = ''; adminBox.innerHTML = '';
             
+            let delay = 0;
             Object.keys(data).forEach(id => {
                 const i = data[id];
                 if (!i) return;
                 
                 const isAvail = i.available !== false;
                 
-                // Crash-proof Name Logic
+                // Safe name taaki button crash na ho
                 let itemName = String(i.name || '');
                 let safeName = itemName.replace(/['"]/g, ""); // Remove quotes to prevent button crash
                 let itemPrice = Number(i.price) || 0;
                 
                 box.innerHTML += `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 slide-up ${isAvail ? '' : 'opacity-60 grayscale'}" style="animation-delay: ${delay}s">
                     <div class="flex items-center gap-3">
                         <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-2xl border shrink-0">${i.icon || '🍽️'}</div>
                         <div>
@@ -210,7 +202,7 @@
                             <p class="text-red-500 font-black text-sm">₹${itemPrice}</p>
                         </div>
                     </div>
-                    ${isAvail ? `<button onclick="addToCart('${safeName}', ${itemPrice})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black">ADD</button>` : `<button disabled class="text-[10px] text-gray-400 font-black">OUT</button>`}
+                    ${isAvail ? `<button onclick="addToCart('${safeName}', ${itemPrice})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<button disabled class="text-[10px] text-gray-400 font-black">OUT</button>`}
                 </div>`;
                 
                 adminBox.innerHTML += `
@@ -222,19 +214,23 @@
                         <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 p-1"><i class="fa fa-trash"></i></button>
                     </div>
                 </div>`;
+                delay += 0.05;
             });
         });
 
-        function loginAdmin() { if(prompt("Enter PIN:") === "jitu8087") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
-        function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
-        function addItem() { 
-            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍽️"; 
-            if(n && p) { 
-                rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); 
-                document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; document.getElementById('new-i').value=''; 
+        function loginAdmin() { 
+            if(prompt("Enter PIN:") === "jitu8087") { 
+                // YAHAN FIX KIYA HAI - Dukaan band wala parda hide hoga!
+                document.getElementById('closed-screen').style.display = 'none'; 
+                document.getElementById('admin-panel').classList.remove('hidden'); 
+                window.scrollTo(0,0); 
             } 
         }
+
+        function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
+        function addItem() { const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍽️"; if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; document.getElementById('new-i').value=''; } }
         
+        // Cart Logic
         function addToCart(n, p) { 
             cart.push({name:n, price:p}); 
             updateCartUI(); 
@@ -244,7 +240,6 @@
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             const floatBar = document.getElementById('floating-cart');
             
-            // Cart Pop-up Logic
             if(cart.length > 0) {
                 floatBar.classList.remove('translate-y-32');
             } else {
@@ -271,6 +266,7 @@
         function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
         function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
 
+        // Payment & WhatsApp
         function processPayment() {
             if(!document.getElementById('u-n').value || !document.getElementById('u-p').value || !document.getElementById('u-a').value) { 
                 alert("Details poori bhariye!"); return; 
