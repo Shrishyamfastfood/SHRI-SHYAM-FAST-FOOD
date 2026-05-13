@@ -1,450 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>My Modern E-Commerce Website</title>
-<style>
-/* Reset styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Body styles */
-body {
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
-  background-color: #f4f4f4;
-  color: #333;
-}
-
-/* Header styles */
-header {
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-header h1 {
-  margin-right: 20px;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-}
-
-nav ul li {
-  margin-left: 20px;
-}
-
-nav ul li a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-nav ul li a:hover {
-  text-decoration: underline;
-}
-
-/* Sections */
-section {
-  padding: 20px;
-  margin: 10px;
-  background-color: #fff;
-  border-radius: 8px;
-}
-
-section h2 {
-  margin-bottom: 15px;
-}
-
-/* Products */
-.products-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.product-card {
-  background-color: #e2e2e2;
-  padding: 10px;
-  border-radius: 8px;
-  width: calc(25% - 20px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s;
-}
-
-.product-card:hover {
-  transform: scale(1.02);
-}
-
-.product-card img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-.product-card h3 {
-  margin: 10px 0 5px 0;
-}
-
-.product-card p {
-  margin: 5px 0;
-}
-
-.product-card button {
-  margin-top: 10px;
-  padding: 8px 12px;
-  border: none;
-  background-color: #333;
-  color: #fff;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.product-card button:hover {
-  background-color: #555;
-}
-
-/* Cart */
-#cart {
-  display: none;
-}
-
-#cart-items {
-  min-height: 50px;
-}
-
-#cart div {
-  margin-bottom: 10px;
-}
-
-/* Footer */
-footer {
-  text-align: center;
-  padding: 10px;
-  background-color: #333;
-  color: #fff;
-  margin-top: 20px;
-}
-
-/* Modal styles */
-.modal {
-  display: none; 
-  position: fixed; 
-  z-index: 1000; 
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
-  background-color: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  position: relative;
-}
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-/* Admin Panel */
-.admin-panel {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 600px;
-  z-index: 1001;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-.hidden {
-  display: none;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jay Shri Shyam Fast Food</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --brand-orange: #FF5722; --brand-yellow: #FFC107; }
+        body { background-color: #fffaf0; }
+        .bg-brand { background-color: var(--brand-orange); }
+        .text-brand { color: var(--brand-orange); }
+    </style>
 </head>
-<body>
-<header>
-  <h1>My Store</h1>
-  <nav>
-    <ul>
-      <li><a href="#home">Home</a></li>
-      <li><a href="#products">Products</a></li>
-      <li><a href="#cart" id="cart-link">Cart (<span id="cart-count">0</span>)</a></li>
-      <li><a href="#" id="admin-login-btn">Admin Login</a></li>
-    </ul>
-  </nav>
-</header>
+<body class="font-sans">
 
-<section id="home">
-  <h2>Welcome to My Store</h2>
-  <p>Shop the best products online!</p>
-</section>
+    <!-- NAVIGATION -->
+    <nav class="bg-brand p-4 text-white flex justify-between items-center sticky top-0 z-50 shadow-lg">
+        <h1 class="text-xl font-bold">Jay Shri Shyam Fast Food</h1>
+        <button onclick="toggleAdmin()" class="text-sm bg-white text-orange-600 px-3 py-1 rounded">Admin Login</button>
+    </nav>
 
-<section id="products" class="products-section">
-  <h2>Products</h2>
-  <div class="products-container" id="products-container"></div>
-</section>
+    <!-- CUSTOMER SECTION -->
+    <div id="customer-view" class="max-w-md mx-auto p-4">
+        <!-- Menu -->
+        <h2 class="text-2xl font-bold mb-4 border-b-2 border-orange-200">Menu</h2>
+        
+        <div id="menu-list" class="space-y-4">
+            <!-- Items will be injected here -->
+        </div>
 
-<section id="cart" class="cart-section">
-  <h2>Your Cart</h2>
-  <div id="cart-items"></div>
-  <button id="checkout-btn">Checkout</button>
-</section>
+        <!-- Cart Summary -->
+        <div class="mt-8 bg-white p-4 rounded-xl shadow-md border-t-4 border-orange-500">
+            <h3 class="font-bold text-lg mb-2">Your Cart</h3>
+            <div id="cart-items" class="text-sm text-gray-600 mb-2">Cart is empty</div>
+            <hr class="my-2">
+            <div class="flex justify-between"><span>Subtotal:</span> <span id="subtotal">₹0</span></div>
+            <div class="flex justify-between text-blue-600"><span>Delivery:</span> <span id="delivery">₹0</span></div>
+            <div id="free-gift" class="text-green-600 font-bold hidden">🎁 1 Free Cold Drink Included!</div>
+            <div class="flex justify-between font-bold text-xl mt-2"><span>Total:</span> <span id="total">₹0</span></div>
+            
+            <p id="min-order-msg" class="text-red-500 text-xs mt-2"></p>
+            
+            <button id="checkout-btn" disabled class="w-full bg-gray-400 text-white py-3 rounded-lg mt-4 font-bold uppercase tracking-wider">
+                Order via PhonePe QR
+            </button>
+        </div>
+    </div>
 
-<!-- Admin Login Modal -->
-<div id="admin-modal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="close-admin">&times;</span>
-    <h2>Admin Login</h2>
-    <input type="password" id="admin-password" placeholder="Enter admin password" />
-    <button id="admin-login-submit">Login</button>
-    <div id="admin-message" style="color:red; margin-top:10px;"></div>
-  </div>
-</div>
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-xl w-full max-w-xs">
+            <h2 class="text-xl font-bold mb-4">Admin Access</h2>
+            <input type="text" id="admin-id" placeholder="ID" class="w-full border p-2 mb-2 rounded">
+            <input type="password" id="admin-pass" placeholder="Password" class="w-full border p-2 mb-4 rounded">
+            <button onclick="login()" class="w-full bg-brand text-white py-2 rounded">Login</button>
+            <button onclick="toggleAdmin()" class="w-full text-gray-500 mt-2 text-sm">Cancel</button>
+        </div>
+    </div>
 
-<!-- Admin Panel -->
-<div id="admin-panel" class="admin-panel hidden">
-  <h2>Admin Panel</h2>
-  <button id="add-product-btn">Add New Product</button>
-  <div id="admin-products"></div>
-  <button id="logout-admin">Logout</button>
-</div>
+    <script>
+        const menu = [
+            { id: 1, name: "Sandwich", price: 60, cat: "🥪" },
+            { id: 2, name: "Burger", price: 50, cat: "🍔" },
+            { id: 3, name: "Momos (Full)", price: 80, cat: "🥟" },
+            { id: 4, name: "Pav Bhaji (Full)", price: 90, cat: "🥘" },
+            { id: 5, name: "Chowmein (Full)", price: 70, cat: "🍝" }
+        ];
 
-<!-- Add Product Modal -->
-<div id="add-product-modal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="close-add">&times;</span>
-    <h2>Add New Product</h2>
-    <input type="text" id="product-name" placeholder="Product Name" style="width:100%; margin-bottom:10px;" />
-    <input type="number" id="product-price" placeholder="Price" style="width:100%; margin-bottom:10px;" />
-    <button id="save-product" style="width:100%;">Save</button>
-  </div>
-</div>
+        let cart = [];
 
-<footer>
-  <p>&copy; 2024 My Store. All rights reserved.</p>
-</footer>
+        function renderMenu() {
+            const menuList = document.getElementById('menu-list');
+            menuList.innerHTML = menu.map(item => `
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                    <div>
+                        <span class="text-lg">${item.cat}</span>
+                        <span class="font-medium">${item.name}</span>
+                        <div class="text-orange-600 font-bold">₹${item.price}</div>
+                    </div>
+                    <button onclick="addToCart(${item.id})" class="bg-orange-100 text-orange-600 px-4 py-1 rounded-full border border-orange-600 hover:bg-orange-600 hover:text-white transition">+ Add</button>
+                </div>
+            `).join('');
+        }
 
-<script>
-/* JavaScript code */
+        function addToCart(id) {
+            const item = menu.find(m => m.id === id);
+            cart.push(item);
+            updateCart();
+        }
 
-let products = [
-  { id: 1, name: "Product 1", price: 29.99, image: "https://via.placeholder.com/150" },
-  { id: 2, name: "Product 2", price: 49.99, image: "https://via.placeholder.com/150" },
-  { id: 3, name: "Product 3", price: 19.99, image: "https://via.placeholder.com/150" },
-  { id: 4, name: "Product 4", price: 99.99, image: "https://via.placeholder.com/150" }
-];
+        function updateCart() {
+            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+            const delivery = (subtotal > 0 && subtotal < 200) ? 20 : 0;
+            const isMinMet = subtotal >= 100;
+            const hasFreeDrink = subtotal >= 100;
 
-let cart = [];
-let adminAuthenticated = false;
+            document.getElementById('subtotal').innerText = `₹${subtotal}`;
+            document.getElementById('delivery').innerText = `₹${delivery}`;
+            document.getElementById('total').innerText = `₹${subtotal + delivery}`;
+            
+            // Free Drink Logic
+            const giftEl = document.getElementById('free-gift');
+            hasFreeDrink ? giftEl.classList.remove('hidden') : giftEl.classList.add('hidden');
 
-// Load products on page load
-window.onload = () => {
-  displayProducts();
-  document.getElementById('admin-login-btn').onclick = showAdminLogin;
-  document.getElementById('close-admin').onclick = closeAdminLogin;
-  document.getElementById('admin-login-submit').onclick = adminLogin;
-  document.getElementById('add-product-btn').onclick = showAddProduct;
-  document.getElementById('close-add').onclick = closeAddProduct;
-  document.getElementById('save-product').onclick = saveProduct;
-  document.getElementById('logout-admin').onclick = logoutAdmin;
-  document.getElementById('checkout-btn').onclick = checkout;
-  document.getElementById('cart-link').onclick = (e) => {
-    e.preventDefault();
-    toggleCart();
-  };
-};
+            // Checkout Validation
+            const btn = document.getElementById('checkout-btn');
+            const msg = document.getElementById('min-order-msg');
+            
+            if (subtotal > 0 && !isMinMet) {
+                msg.innerText = "Minimum order ₹100 required.";
+                btn.disabled = true;
+                btn.classList.replace('bg-brand', 'bg-gray-400');
+            } else if (subtotal >= 100) {
+                msg.innerText = "";
+                btn.disabled = false;
+                btn.classList.replace('bg-gray-400', 'bg-brand');
+            }
 
-// Display products
-function displayProducts() {
-  const container = document.getElementById('products-container');
-  container.innerHTML = '';
+            document.getElementById('cart-items').innerText = cart.length > 0 ? `${cart.length} items added` : "Cart is empty";
+        }
 
-  products.forEach(product => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
+        function toggleAdmin() {
+            const modal = document.getElementById('admin-modal');
+            modal.classList.toggle('hidden');
+        }
 
-    card.innerHTML = `
-      <img src="${product.image}" alt="${product.name}" />
-      <h3>${product.name}</h3>
-      <p>$${product.price.toFixed(2)}</p>
-      <button onclick="addToCart(${product.id})">Add to Cart</button>
-    `;
-    container.appendChild(card);
-  });
-}
+        function login() {
+            const id = document.getElementById('admin-id').value;
+            const pass = document.getElementById('admin-pass').value;
+            if(id === "Jitu" && pass === "Jitu12") {
+                alert("Welcome Jitu! Redirecting to Admin Panel...");
+                // Here you would redirect to admin.html
+            } else {
+                alert("Invalid Credentials");
+            }
+        }
 
-// Add to cart
-function addToCart(productId) {
-  const product = products.find(p => p.id === productId);
-  if (product) {
-    cart.push(product);
-    updateCart();
-  }
-}
-
-// Update cart display
-function updateCart() {
-  document.getElementById('cart-count').innerText = cart.length;
-  const cartItemsDiv = document.getElementById('cart-items');
-  cartItemsDiv.innerHTML = '';
-
-  if (cart.length === 0) {
-    cartItemsDiv.innerHTML = '<p>Your cart is empty.</p>';
-    return;
-  }
-
-  let total = 0;
-  cart.forEach((item, index) => {
-    total += item.price;
-    const itemDiv = document.createElement('div');
-    itemDiv.innerHTML = `
-      <p>${item.name} - $${item.price.toFixed(2)} <button onclick="removeFromCart(${index})">Remove</button></p>
-    `;
-    cartItemsDiv.appendChild(itemDiv);
-  });
-
-  // Show total
-  const totalDiv = document.createElement('div');
-  totalDiv.innerHTML = `<strong>Total: $${total.toFixed(2)}</strong>`;
-  cartItemsDiv.appendChild(totalDiv);
-}
-
-// Remove item from cart
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  updateCart();
-}
-
-// Toggle cart visibility
-function toggleCart() {
-  const cartSection = document.getElementById('cart');
-  if (cartSection.style.display === 'block') {
-    cartSection.style.display = 'none';
-  } else {
-    cartSection.style.display = 'block';
-  }
-}
-
-// Checkout
-function checkout() {
-  if (cart.length === 0) {
-    alert('Your cart is empty.');
-    return;
-  }
-  alert('Thank you for your purchase!');
-  cart = [];
-  updateCart();
-  toggleCart();
-}
-
-// Admin login modal
-function showAdminLogin() {
-  document.getElementById('admin-modal').style.display = 'flex';
-}
-
-function closeAdminLogin() {
-  document.getElementById('admin-modal').style.display = 'none';
-  document.getElementById('admin-message').innerText = '';
-  document.getElementById('admin-password').value = '';
-}
-
-// Admin login validation
-function adminLogin() {
-  const password = document.getElementById('admin-password').value;
-  if (password === 'admin123') {
-    adminAuthenticated = true;
-    document.getElementById('admin-modal').style.display = 'none';
-    showAdminPanel();
-  } else {
-    document.getElementById('admin-message').innerText = 'Incorrect password!';
-  }
-}
-
-// Show admin panel
-function showAdminPanel() {
-  document.querySelector('.admin-panel').classList.remove('hidden');
-  loadAdminProducts();
-}
-
-// Load admin products
-function loadAdminProducts() {
-  const adminDiv = document.getElementById('admin-products');
-  adminDiv.innerHTML = '';
-  products.forEach(product => {
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <p><strong>${product.name}</strong> - $${product.price.toFixed(2)}</p>
-    `;
-    adminDiv.appendChild(div);
-  });
-}
-
-// Logout admin
-function logoutAdmin() {
-  adminAuthenticated = false;
-  document.querySelector('.admin-panel').classList.add('hidden');
-}
-
-// Show add product modal
-function showAddProduct() {
-  document.getElementById('add-product-modal').style.display = 'flex';
-}
-
-function closeAddProduct() {
-  document.getElementById('add-product-modal').style.display = 'none';
-  document.getElementById('product-name').value = '';
-  document.getElementById('product-price').value = '';
-}
-
-// Save new product
-function saveProduct() {
-  const name = document.getElementById('product-name').value.trim();
-  const price = parseFloat(document.getElementById('product-price').value);
-  if (name && !isNaN(price)) {
-    const newProduct = {
-      id: Date.now(),
-      name,
-      price,
-      image: "https://via.placeholder.com/150"
-    };
-    products.push(newProduct);
-    displayProducts();
-    closeAddProduct();
-  } else {
-    alert('Please enter valid product details.');
-  }
-}
-</script>
+        renderMenu();
+    </script>
 </body>
 </html>
