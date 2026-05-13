@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Fast Food</title>
+    <title>Shri Shyam Fast Food - Order Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,26 +13,31 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding-bottom: 80px; /* Space for mobile bar */ }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; }
         .sticky-cart { position: sticky; top: 20px; }
+        .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
+        .pickup-badge { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- Toast Notification (Hidden by default) -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none z-[60] flex items-center gap-3 font-semibold w-max max-w-[90vw]">
-        <i class="fa-solid fa-circle-check text-green-400 text-lg"></i>
-        <span id="toast-msg">Item added!</span>
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-msg">Added!</span>
     </div>
 
-    <header class="bg-red-600 text-white shadow-md sticky top-0 z-50">
+    <!-- Header -->
+    <header class="gradient-nav text-white shadow-md sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Shri Shyam Fast Food</h1>
-                <p class="text-red-200 text-sm font-semibold"><i class="fa-solid fa-leaf text-green-400"></i> 100% Pure Veg</p>
+                <h1 class="text-2xl font-extrabold tracking-tight">Shri Shyam Fast Food</h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded font-bold italic uppercase">Self-Pickup Only</span>
+                </div>
             </div>
-            <div class="bg-white text-red-600 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
-                <i class="fa-solid fa-gift"></i> Free Drink on ₹100+
+            <div class="bg-white text-red-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                <i class="fa-solid fa-clock"></i> Open Now
             </div>
         </div>
     </header>
@@ -40,96 +45,79 @@
     <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
         <!-- Menu Section -->
         <div class="w-full md:w-2/3">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-red-200 pb-2">Our Menu</h2>
+            <div class="pickup-badge p-4 rounded-xl mb-6 flex items-start gap-3">
+                <i class="fa-solid fa-store text-xl mt-0.5"></i>
+                <div>
+                    <p class="font-bold">Self-Pickup Order</p>
+                    <p class="text-sm">Apna order online karein aur dukan se aakar utha lein. Garam aur fresh!</p>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-red-200 pb-2">Menu</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="menu-container"></div>
         </div>
 
-        <!-- Cart Section (Added ID 'cart-section' for scrolling) -->
+        <!-- Cart Section -->
         <div id="cart-section" class="w-full md:w-1/3">
-            <div class="bg-white rounded-xl shadow-lg p-6 sticky-cart border border-gray-100">
+            <div class="bg-white rounded-2xl shadow-xl p-6 sticky-cart border border-gray-100">
                 <h2 class="text-xl font-bold mb-4 flex justify-between items-center text-gray-800">
-                    <span><i class="fa-solid fa-basket-shopping text-red-500 mr-2"></i> Your Cart</span>
-                    <span id="cart-count" class="bg-red-100 text-red-600 px-2 py-1 rounded text-sm">0 Items</span>
+                    <span>Your Order</span>
+                    <span id="cart-count" class="bg-red-50 text-red-600 px-2 py-1 rounded text-sm">0 Items</span>
                 </h2>
 
                 <div id="cart-items" class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2">
-                    <p class="text-gray-400 text-center py-4">Cart is empty</p>
+                    <p class="text-gray-400 text-center py-4">Kuch tasty add karein!</p>
                 </div>
 
-                <div class="border-t border-gray-200 pt-4 space-y-2 text-sm text-gray-600 mb-4">
-                    <div class="flex justify-between"><span>Subtotal</span><span id="subtotal" class="font-semibold text-gray-800">₹0</span></div>
-                    <div class="flex justify-between items-center">
-                        <span>Delivery <span class="text-[10px] bg-green-100 text-green-700 px-1 py-0.5 rounded">Free over ₹200</span></span>
-                        <span id="delivery" class="font-semibold text-gray-800">₹0</span>
+                <div class="border-t border-gray-200 pt-4 mb-4">
+                    <div id="free-drink-msg" class="hidden text-green-700 font-bold bg-green-50 p-3 rounded-lg text-center border border-green-200 mb-4 animate-pulse">
+                        🎁 Free Cold Drink Unlocked!
                     </div>
-                    <div id="free-drink-msg" class="hidden text-green-600 font-bold bg-green-50 p-2 rounded text-center border border-green-200 mt-2">
-                        🎁 1 Free Cold Drink Added!
+                    <div class="flex justify-between items-center text-2xl font-black text-gray-900">
+                        <span>Total</span><span id="total" class="text-red-600">₹0</span>
                     </div>
-                </div>
-
-                <div class="flex justify-between items-center text-xl font-bold mb-6 border-t border-gray-200 pt-4 text-gray-900">
-                    <span>Total</span><span id="total" class="text-red-600">₹0</span>
                 </div>
 
                 <div id="checkout-form" class="hidden space-y-4">
-                    <!-- Customer Name -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Your Name</label>
-                        <input type="text" id="cust-name" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-500" placeholder="Enter full name">
-                    </div>
+                    <input type="text" id="cust-name" class="w-full border border-gray-300 rounded-xl p-3 focus:border-red-500 outline-none" placeholder="Aapka Naam">
+                    <input type="tel" id="cust-phone" class="w-full border border-gray-300 rounded-xl p-3 focus:border-red-500 outline-none" placeholder="Mobile Number">
                     
-                    <!-- Phone Number -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-                        <input type="tel" id="cust-phone" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-500" placeholder="Enter phone number">
-                    </div>
-
-                    <!-- Delivery Address -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Delivery Address</label>
-                        <textarea id="cust-address" rows="2" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-500" placeholder="Enter full house no, street, landmark..."></textarea>
-                    </div>
-                    
-                    <!-- Payment Details -->
-                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-sm mb-2 mt-2">
-                        <p class="font-bold text-blue-900 mb-1">UPI Payment Details:</p>
-                        <p class="text-gray-700">Number: <span class="font-mono font-bold">+918058733741</span></p>
-                        <p class="text-gray-700">UPI ID: <span class="font-mono font-bold">8058733741@ybl</span></p>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Method</label>
-                        <select id="payment-method" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
-                            <option value="Paid via UPI">I will pay via UPI</option>
-                            <option value="Cash on Delivery">Cash on Delivery (COD)</option>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Kab Tak Aayenge? (Pickup Time)</label>
+                        <select id="pickup-time" class="w-full border border-gray-300 rounded-xl p-3 focus:border-red-500 outline-none bg-gray-50">
+                            <option value="15 Minutes">15 Minutes Mein</option>
+                            <option value="30 Minutes">30 Minutes Mein</option>
+                            <option value="1 Hour">1 Ghante Mein</option>
+                            <option value="Just reached">Dukan ke bahar hu</option>
                         </select>
                     </div>
 
-                    <button id="order-btn" onclick="processOrder()" class="w-full bg-green-500 text-white font-bold py-3.5 rounded-lg hover:bg-green-600 transition flex justify-center items-center gap-2 shadow-lg mt-2">
-                        <i class="fa-brands fa-whatsapp text-xl"></i> Order & Send to WhatsApp
+                    <div class="bg-gray-100 p-3 rounded-xl text-xs text-gray-600">
+                        <b>Payment:</b> Order karne ke baad WhatsApp par pay karein ya counter par cash dein.
+                    </div>
+
+                    <button id="order-btn" onclick="processOrder()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition flex justify-center items-center gap-2 shadow-lg shadow-green-200">
+                        <i class="fa-brands fa-whatsapp text-xl"></i> Order via WhatsApp
                     </button>
                 </div>
 
-                <div id="min-order-warning" class="text-red-500 text-center text-sm font-bold py-2 bg-red-50 rounded mt-4">
-                    Minimum order is ₹100
+                <div id="min-order-warning" class="text-orange-600 text-center text-sm font-bold py-2 bg-orange-50 rounded-lg mt-4 hidden">
+                    Minimum order ₹100 chahiye
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Mobile Floating Cart Bar -->
-    <div id="mobile-cart-bar" class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] p-4 z-40 transform translate-y-full transition-transform duration-300 flex justify-between items-center">
+    <!-- Mobile Bar -->
+    <div id="mobile-cart-bar" class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t p-4 z-40 transform translate-y-full transition-transform flex justify-between items-center shadow-[0_-5px_15px_rgba(0,0,0,0.1)]">
         <div>
-            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider" id="mobile-cart-count">1 Item</p>
-            <p class="text-xl font-extrabold text-red-600" id="mobile-cart-total">₹0</p>
+            <p class="text-xl font-black text-red-600" id="mobile-cart-total">₹0</p>
         </div>
-        <button onclick="scrollToCart()" class="bg-red-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-md hover:bg-red-700 transition flex items-center gap-2">
-            View Cart <i class="fa-solid fa-arrow-right"></i>
-        </button>
+        <button onclick="scrollToCart()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-bold">Check Order <i class="fa-solid fa-chevron-right ml-2 text-xs"></i></button>
     </div>
 
     <script>
-        // Firebase Configuration
+        // Paste your Firebase Config here
         const firebaseConfig = {
             apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
             authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -141,193 +129,117 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Static Menu Data
         const menuItems = [
             { id: 1, name: "Special Sandwich", price: 60, icon: "🥪" },
             { id: 2, name: "Crispy Burger", price: 50, icon: "🍔" },
-            { id: 3, name: "Momos (Full Plate)", price: 80, icon: "🥟" },
-            { id: 4, name: "Momos (Half Plate)", price: 40, icon: "🥟" },
-            { id: 5, name: "Pav Bhaji (Full Plate)", price: 90, icon: "🥘" },
-            { id: 6, name: "Pav Bhaji (Half Plate)", price: 50, icon: "🥘" },
-            { id: 7, name: "Chowmein (Full Plate)", price: 70, icon: "🍝" },
-            { id: 8, name: "Chowmein (Half Plate)", price: 40, icon: "🍝" },
-            { id: 9, name: "Bhel Puri (Full Plate)", price: 50, icon: "🥣" },
-            { id: 10, name: "Bhel Puri (Half Plate)", price: 30, icon: "🥣" }
+            { id: 3, name: "Momos (Full)", price: 80, icon: "🥟" },
+            { id: 4, name: "Momos (Half)", price: 40, icon: "🥟" },
+            { id: 5, name: "Pav Bhaji (Full)", price: 90, icon: "🥘" },
+            { id: 6, name: "Pav Bhaji (Half)", price: 50, icon: "🥘" },
+            { id: 7, name: "Chowmein (Full)", price: 70, icon: "🍝" },
+            { id: 8, name: "Chowmein (Half)", price: 40, icon: "🍝" },
+            { id: 9, name: "Bhel Puri (Full)", price: 50, icon: "🥣" },
+            { id: 10, name: "Bhel Puri (Half)", price: 30, icon: "🥣" }
         ];
 
         let cart = [];
 
-        const menuContainer = document.getElementById('menu-container');
-        menuItems.forEach(item => {
-            menuContainer.innerHTML += `
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center hover:shadow-md transition">
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = menuItems.map(item => `
+                <div class="bg-white rounded-2xl shadow-sm p-4 flex justify-between items-center border border-gray-50">
                     <div class="flex items-center gap-4">
-                        <div class="text-3xl bg-gray-50 w-14 h-14 flex items-center justify-center rounded-lg border border-gray-100">${item.icon}</div>
+                        <div class="text-3xl">${item.icon}</div>
                         <div>
                             <h3 class="font-bold text-gray-800">${item.name}</h3>
-                            <p class="text-red-600 font-extrabold text-lg">₹${item.price}</p>
+                            <p class="text-red-600 font-bold">₹${item.price}</p>
                         </div>
                     </div>
-                    <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition">
-                        Add
-                    </button>
+                    <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" class="bg-red-50 text-red-600 font-bold px-5 py-2 rounded-xl hover:bg-red-600 hover:text-white transition">Add</button>
                 </div>
-            `;
-        });
-
-        // Toast Notification Function
-        function showToast(itemName) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = `${itemName} added!`;
-            toast.classList.remove('opacity-0');
-            toast.classList.add('opacity-100');
-            
-            // Auto hide after 2.5 seconds
-            setTimeout(() => {
-                toast.classList.remove('opacity-100');
-                toast.classList.add('opacity-0');
-            }, 2500);
+            `).join('');
         }
 
-        // Scroll to Cart Function (For mobile bar)
-        function scrollToCart() {
-            document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
+        function addToCart(id, name, price) {
+            cart.push({id, name, price});
+            updateCart();
+            showToast(name);
         }
 
-        function addToCart(id, name, price) { 
-            cart.push({ id, name, price }); 
-            updateCart(); 
-            showToast(name); // Show notification
-        }
-
-        function removeFromCart(index) { 
-            cart.splice(index, 1); 
-            updateCart(); 
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
         }
 
         function updateCart() {
-            const cartItemsDiv = document.getElementById('cart-items');
-            let subtotal = 0;
-
-            if (cart.length === 0) {
-                cartItemsDiv.innerHTML = '<p class="text-gray-400 text-center py-4">Cart is empty</p>';
-                document.getElementById('cart-count').innerText = "0 Items";
-            } else {
-                cartItemsDiv.innerHTML = cart.map((item, index) => {
-                    subtotal += item.price;
-                    return `
-                        <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100">
-                            <div><p class="text-sm font-bold text-gray-800">${item.name}</p><p class="text-sm text-red-600 font-bold">₹${item.price}</p></div>
-                            <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 px-2"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('cart-count').innerText = `${cart.length} Items`;
-            }
-
-            const delivery = (subtotal > 0 && subtotal < 200) ? 20 : 0;
-            const total = subtotal + delivery;
-            const isMinMet = subtotal >= 100;
-
-            document.getElementById('subtotal').innerText = `₹${subtotal}`;
-            document.getElementById('delivery').innerText = delivery === 0 && subtotal > 0 ? "FREE" : `₹${delivery}`;
-            document.getElementById('total').innerText = `₹${total}`;
-
-            document.getElementById('free-drink-msg').style.display = isMinMet ? 'block' : 'none';
-            document.getElementById('min-order-warning').style.display = (subtotal > 0 && !isMinMet) ? 'block' : 'none';
+            const list = document.getElementById('cart-items');
+            let subtotal = cart.reduce((acc, item) => acc + item.price, 0);
             
-            if (isMinMet) {
-                document.getElementById('checkout-form').classList.remove('hidden');
-                document.getElementById('min-order-warning').classList.add('hidden');
+            if(cart.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-center py-4">Kuch tasty add karein!</p>';
             } else {
-                document.getElementById('checkout-form').classList.add('hidden');
-                if(subtotal === 0) document.getElementById('min-order-warning').classList.add('hidden');
+                list.innerHTML = cart.map((item, index) => `
+                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        <div><p class="font-bold text-sm">${item.name}</p><p class="text-red-600 font-bold text-xs">₹${item.price}</p></div>
+                        <button onclick="removeFromCart(${index})" class="text-red-300 hover:text-red-600"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `).join('');
             }
 
-            // Mobile Floating Cart Bar Logic
+            document.getElementById('cart-count').innerText = `${cart.length} Items`;
+            document.getElementById('total').innerText = `₹${subtotal}`;
+            document.getElementById('mobile-cart-total').innerText = `₹${subtotal}`;
+            
+            const isMin = subtotal >= 100;
+            document.getElementById('free-drink-msg').classList.toggle('hidden', !isMin);
+            document.getElementById('checkout-form').classList.toggle('hidden', !isMin);
+            document.getElementById('min-order-warning').classList.toggle('hidden', isMin || subtotal === 0);
+            
             const mobileBar = document.getElementById('mobile-cart-bar');
-            if (cart.length > 0) {
-                mobileBar.classList.remove('translate-y-full'); // Show bar
-                document.getElementById('mobile-cart-count').innerText = `${cart.length} Item${cart.length > 1 ? 's' : ''}`;
-                document.getElementById('mobile-cart-total').innerText = `₹${total}`;
-            } else {
-                mobileBar.classList.add('translate-y-full'); // Hide bar
-            }
+            cart.length > 0 ? mobileBar.classList.remove('translate-y-full') : mobileBar.classList.add('translate-y-full');
         }
 
         function processOrder() {
-            const name = document.getElementById('cust-name').value.trim();
-            const phone = document.getElementById('cust-phone').value.trim();
-            const address = document.getElementById('cust-address').value.trim(); 
-            const payment = document.getElementById('payment-method').value;
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const time = document.getElementById('pickup-time').value;
 
-            if (!name || !phone || !address) { 
-                alert("Please enter your Name, Phone Number, and Delivery Address."); 
-                return; 
-            }
+            if(!name || !phone) return alert("Naam aur Number zaruri hai!");
 
             const btn = document.getElementById('order-btn');
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xl"></i> Processing...`;
-            btn.disabled = true;
+            btn.innerHTML = 'Processing...'; btn.disabled = true;
 
-            let subtotal = 0;
-            let itemListText = "";
-            let itemCounts = {};
+            let itemsText = "";
+            let subtotal = cart.reduce((acc, item) => {
+                itemsText += `▫️ ${item.name} - ₹${item.price}\n`;
+                return acc + item.price;
+            }, 0);
+
+            const msg = `*🍔 NEW PICKUP ORDER*\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Arrival:* ${time}\n\n*Items:*\n${itemsText}-------------------\n*TOTAL: ₹${subtotal}*\n-------------------\n_(Main ${time} mein aa raha hu, mera order taiyar rakhna!)_`;
             
-            cart.forEach(item => {
-                subtotal += item.price;
-                if(itemCounts[item.name]) { itemCounts[item.name].qty += 1; itemCounts[item.name].price += item.price; } 
-                else { itemCounts[item.name] = { qty: 1, price: item.price }; }
+            // Background save to Admin
+            db.collection("orders").add({
+                customerName: name, customerPhone: phone, pickupTime: time,
+                orderDetails: itemsText, totalAmount: subtotal, status: "Pending", type: "Pickup",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            for (const [itemName, data] of Object.entries(itemCounts)) {
-                itemListText += `▫️ ${data.qty}x ${itemName} - ₹${data.price}\n`;
-            }
-
-            const delivery = subtotal < 200 ? 20 : 0;
-            const total = subtotal + delivery;
-            const hasFreeDrink = subtotal >= 100;
-
-            // 1. OPEN WHATSAPP IMMEDIATELY
-            openWhatsApp(name, phone, address, itemListText, subtotal, delivery, total, hasFreeDrink, payment);
-
-            // 2. BACKGROUND MEIN ADMIN PANEL PAR SAVE KAREN
-            const orderData = {
-                customerName: name,
-                customerPhone: phone,
-                customerAddress: address, 
-                orderDetails: itemListText,
-                totalAmount: total,
-                paymentMethod: payment,
-                hasFreeDrink: hasFreeDrink,
-                status: "Pending",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            db.collection("orders").add(orderData)
-              .then(() => console.log("Order saved to Admin Panel"))
-              .catch(err => console.log("Database error: ", err));
-
-            // 3. CART RESET KAREN
-            resetCart(btn);
-        }
-
-        function openWhatsApp(name, phone, address, items, sub, del, tot, drink, pay) {
-            const drinkText = drink ? "🎁 Yes (1 Free Cold Drink)" : "No";
-            const message = `*🍔 NEW ORDER - Shri Shyam Fast Food*\n\n*Customer Details:*\n👤 Name: ${name}\n📞 Phone: ${phone}\n📍 Address: ${address}\n\n*Order Summary:*\n${items}------------------------\n💰 Subtotal: ₹${sub}\n🛵 Delivery: ₹${del}\n🎁 Free Gift: ${drinkText}\n------------------------\n*🛒 TOTAL PAYABLE: ₹${tot}*\n\n💳 Payment Mode: ${pay}\n\n_(Please reply to confirm this order. If paying by UPI, attach the screenshot here.)_`.trim();
-            const whatsappUrl = `https://wa.me/918058733741?text=${encodeURIComponent(message)}`;
+            window.location.href = `https://wa.me/918058733741?text=${encodeURIComponent(msg)}`;
             
-            window.location.href = whatsappUrl;
+            // Reset
+            cart = []; updateCart(); btn.innerHTML = 'Order via WhatsApp'; btn.disabled = false;
         }
 
-        function resetCart(btn) {
-            cart = []; updateCart();
-            document.getElementById('cust-name').value = '';
-            document.getElementById('cust-phone').value = '';
-            document.getElementById('cust-address').value = ''; 
-            btn.innerHTML = `<i class="fa-brands fa-whatsapp text-xl"></i> Order & Send to WhatsApp`;
-            btn.disabled = false;
+        function showToast(name) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = `${name} Added!`;
+            t.classList.replace('opacity-0', 'opacity-100');
+            setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2000);
         }
+
+        function scrollToCart() { document.getElementById('cart-section').scrollIntoView({behavior:'smooth'}); }
+
+        renderMenu();
     </script>
 </body>
 </html>
