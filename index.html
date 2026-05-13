@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Fast Food | +91 80587 33741 | Moulasar</title>
+    <title>Shri Shyam Fast Food | Moulasar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -50,7 +50,7 @@
     <!-- 2. HEADER (WITH YOUR ORIGINAL LOGO) -->
     <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
-            <!-- AAPKA ASLI LOGO WAPIS AA GAYA -->
+            <!-- AAPKA ASLI LOGO -->
             <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full border-2 border-red-500 shadow-md object-cover">
             <div>
                 <h1 class="font-black text-lg leading-tight gradient-text uppercase tracking-tight">Shri Shyam Fast Food</h1>
@@ -81,7 +81,7 @@
             <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
                 <p class="font-bold text-gray-300 text-xs mb-3 uppercase tracking-wider">Naya Item Add Karein</p>
                 <div class="grid grid-cols-12 gap-2">
-                    <input id="new-i" placeholder="🍔" class="col-span-3 p-3 bg-black/30 rounded-xl text-center outline-none border border-white/10">
+                    <input id="new-i" placeholder="Emoji / Photo Link" class="col-span-3 p-3 bg-black/30 rounded-xl text-center outline-none border border-white/10 text-xs">
                     <input id="new-n" placeholder="Item Name" class="col-span-9 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
                     <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
                     <button onclick="addItem()" class="col-span-6 bg-gradient-to-r from-red-600 to-orange-500 text-white font-black rounded-xl btn-press shadow-lg">ADD +</button>
@@ -166,7 +166,6 @@
     </div>
 
     <script>
-        // FULL FIREBASE CONFIG (Yahi galti thi pichli baar, ab theek hai)
         const firebaseConfig = {
             apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
             authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -205,11 +204,37 @@
             Object.keys(data).forEach(id => {
                 const i = data[id];
                 
+                // ---------------------------------------------------------
+                // PHOTO LOGIC START: Automatically Set Photos Based on Name
+                // ---------------------------------------------------------
+                let displayIcon = i.icon || '';
+                let lowerName = i.name.toLowerCase();
+                
+                if (lowerName.includes('momo')) {
+                    displayIcon = 'https://i.ibb.co/wFHJycY9/images.jpg';
+                } else if (lowerName.includes('chawmin') || lowerName.includes('chowmein')) {
+                    displayIcon = 'https://i.ibb.co/C3r9FycT/images-1.jpg';
+                } else if (lowerName.includes('bhel')) {
+                    displayIcon = 'https://i.ibb.co/MxjCt7QN/images-2.jpg';
+                }
+
+                // Check if the icon is a Web Link (Image) or just Emoji
+                let isImage = displayIcon.startsWith('http');
+                
+                let renderCustomerIcon = isImage 
+                    ? `<img src="${displayIcon}" class="w-full h-full object-cover">` 
+                    : displayIcon;
+
+                let renderAdminIcon = isImage 
+                    ? `<img src="${displayIcon}" class="w-5 h-5 rounded object-cover inline-block mr-1">` 
+                    : displayIcon;
+                // ---------------------------------------------------------
+
                 // UI Customer
                 box.innerHTML += `
                 <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 slide-up" style="animation-delay: ${delay}s">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-2xl border">${i.icon || ''}</div>
+                        <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-2xl border overflow-hidden shrink-0">${renderCustomerIcon}</div>
                         <div>
                             <p class="font-black text-gray-800">${i.name}</p>
                             <p class="text-red-500 font-black text-sm">₹${i.price}</p>
@@ -221,7 +246,7 @@
                 // UI Admin
                 adminBox.innerHTML += `
                 <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg border border-white/5">
-                    <span class="font-bold text-xs truncate w-1/2">${i.icon || ''} ${i.name}</span>
+                    <span class="font-bold text-xs truncate w-1/2 flex items-center">${renderAdminIcon} ${i.name}</span>
                     <div class="flex gap-2">
                         <input value="${i.price}" onchange="rdb.ref('menu/${id}/price').set(parseInt(this.value))" class="w-14 p-1 bg-black/40 text-center rounded text-xs font-bold border border-white/10 outline-none text-white">
                         <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 p-1"><i class="fa fa-trash"></i></button>
