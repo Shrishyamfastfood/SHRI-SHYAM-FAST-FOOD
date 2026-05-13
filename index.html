@@ -3,288 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jay Shri Shyam Fast Food</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>Shri Shyam Fast Food</title>
     <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; overflow-x: hidden; }
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; color: #333; }
+        .header { background-color: #cc0000; color: white; text-align: center; padding: 20px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 10px; padding-bottom: 50px; }
         
-        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-        .gradient-text { background: linear-gradient(135deg, #ff5722, #ff9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-primary { background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(255, 87, 34, 0.4); }
+        .category { background: white; margin-top: 20px; padding: 15px; border-radius: 5px; border: 1px solid #ddd; }
+        .category h2 { margin-top: 0; font-size: 18px; border-bottom: 2px solid #cc0000; padding-bottom: 5px; color: #cc0000; }
         
-        .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .bottom-sheet.open { transform: translateY(0); }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item:last-child { border-bottom: none; }
+        .item-details h3 { margin: 0; font-size: 16px; }
+        .item-details p { margin: 5px 0 0 0; font-weight: bold; color: #555; }
         
-        .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-        .toast.show { transform: translateY(0); opacity: 1; }
+        button { background-color: #cc0000; color: white; border: none; padding: 8px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #990000; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-        .food-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .food-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+        .cart-box { background: white; margin-top: 20px; padding: 20px; border-radius: 5px; border: 2px solid #333; }
+        .cart-box h2 { margin-top: 0; font-size: 20px; }
+        .cart-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; }
+        .cart-total { font-size: 18px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px; margin-top: 10px; }
         
-        select { -webkit-appearance: none; appearance: none; background: url('data:image/svg+xml;utf8,<svg fill="%23ff5722" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 12px center; background-size: 18px; }
-        
-        .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .free-gift { color: green; font-weight: bold; font-size: 14px; margin-top: 10px; display: none; }
+        .error-msg { color: red; font-size: 14px; margin-top: 10px; font-weight: bold; display: none; }
+
+        .checkout-box { background: #fff8dc; padding: 15px; margin-top: 20px; border: 1px dashed #cc0000; display: none; }
+        .upi-details { background: white; padding: 10px; border: 1px solid #ccc; margin-top: 10px; font-family: monospace; font-size: 14px; }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen pb-28">
+<body>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-medium pointer-events-none w-max max-w-[90vw]">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-green-400"></i>
-        <span id="toast-msg">Success!</span>
+    <div class="header">
+        <h1>Shri Shyam Fast Food</h1>
+        <p style="margin:5px 0 0 0; font-size:14px;">100% Pure Veg</p>
     </div>
 
-    <!-- NAVBAR -->
-    <nav class="glass-nav sticky top-0 z-40 px-6 py-4 border-b border-gray-100 shadow-sm flex justify-between items-center transition-all">
-        <div class="flex items-center gap-3 cursor-pointer">
-            <div class="btn-primary text-white w-10 h-10 flex items-center justify-center rounded-xl text-xl shadow-lg shadow-orange-500/30">
-                <i class="fa-solid fa-fire-burner"></i>
+    <div class="container">
+        
+        <!-- Sandwiches & Burgers -->
+        <div class="category">
+            <h2>🥪 Sandwiches & Burgers</h2>
+            <div class="item">
+                <div class="item-details"><h3>Sandwich</h3><p>₹60</p></div>
+                <button onclick="addToCart('Sandwich', 60)">Add</button>
             </div>
-            <h1 class="text-2xl font-extrabold tracking-tight gradient-text">Shri Shyam</h1>
-        </div>
-        <div class="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-xs font-bold border border-orange-100">
-            <i class="fa-solid fa-leaf mr-1"></i> Pure Veg
-        </div>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <header class="relative px-6 py-12 md:py-20 max-w-5xl mx-auto text-center fade-in-up">
-        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-full bg-gradient-to-b from-orange-50 to-transparent -z-10 rounded-b-[3rem]"></div>
-        <h2 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight text-gray-900">
-            Craving <span class="gradient-text">Magic?</span><br>We Deliver.
-        </h2>
-        <div class="inline-flex items-center bg-white border border-gray-100 px-6 py-3.5 rounded-2xl font-semibold shadow-xl shadow-gray-200/50 transform hover:scale-105 transition duration-300">
-            <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3"><i class="fa-solid fa-gift text-green-600 text-lg"></i></div>
-            <span class="text-gray-700">Free Cold Drink on orders above <span class="text-orange-500 font-extrabold">₹100</span></span>
-        </div>
-    </header>
-
-    <!-- MENU SECTION -->
-    <main class="max-w-6xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between mb-8 fade-in-up" style="animation-delay: 0.1s;">
-            <h3 class="text-3xl font-extrabold text-gray-900">Explore Menu</h3>
-            <div class="h-1 w-16 bg-orange-500 rounded-full"></div>
-        </div>
-        
-        <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-    </main>
-
-    <!-- FLOATING CART BUTTON -->
-    <div class="fixed bottom-6 w-full px-6 z-30 max-w-6xl mx-auto left-0 right-0 pointer-events-none flex justify-center fade-in-up" style="animation-delay: 0.3s;">
-        <button onclick="toggleSheet('cart-sheet')" class="pointer-events-auto btn-primary text-white px-8 py-4 rounded-full shadow-2xl flex items-center justify-between gap-6 w-full max-w-sm group overflow-hidden relative">
-            <div class="flex items-center gap-3 relative z-10">
-                <div class="relative bg-white/20 p-2 rounded-full">
-                    <i class="fa-solid fa-bag-shopping text-xl"></i>
-                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-white text-orange-600 text-[10px] font-extrabold w-5 h-5 flex items-center justify-center rounded-full shadow-md hidden">0</span>
-                </div>
-                <span class="font-bold text-lg">View Order</span>
+            <div class="item">
+                <div class="item-details"><h3>Burger</h3><p>₹50</p></div>
+                <button onclick="addToCart('Burger', 50)">Add</button>
             </div>
-            <span class="font-extrabold text-xl bg-white text-orange-600 px-4 py-1.5 rounded-full shadow-inner relative z-10" id="floating-total">₹0</span>
-        </button>
-    </div>
-
-    <!-- OVERLAY FOR BOTTOM SHEETS -->
-    <div id="sheet-overlay" onclick="closeAllSheets()" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
-
-    <!-- CART BOTTOM SHEET -->
-    <div id="cart-sheet" class="bottom-sheet fixed bottom-0 left-0 w-full bg-white z-50 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] flex flex-col max-w-3xl mx-auto right-0">
-        <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-4 mb-2"></div>
-        <div class="px-6 pb-4 flex justify-between items-center border-b border-gray-100">
-            <h2 class="text-2xl font-extrabold text-gray-900">Your Cart</h2>
-            <button onclick="toggleSheet('cart-sheet')" class="bg-gray-100 text-gray-500 hover:bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        
-        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50"></div>
-        
-        <div class="p-6 bg-white border-t border-gray-100">
-            <div class="space-y-3 text-sm font-medium text-gray-600 mb-6">
-                <div class="flex justify-between"><span>Subtotal</span><span id="cart-subtotal" class="text-gray-900 font-bold">₹0</span></div>
-                <div class="flex justify-between items-center">
-                    <span>Delivery <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded ml-1">Free > ₹200</span></span>
-                    <span id="cart-delivery" class="text-gray-900 font-bold">₹0</span>
-                </div>
-                <div id="free-gift-banner" class="hidden bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 p-3 rounded-xl border border-green-200 text-sm font-bold flex items-center gap-3 mt-2 shadow-sm">
-                    <div class="bg-white p-1.5 rounded-lg shadow-sm"><i class="fa-solid fa-glass-water text-green-500"></i></div>
-                    1 Free Cold Drink Unlocked!
-                </div>
+
+        <!-- Momos -->
+        <div class="category">
+            <h2>🥟 Momos</h2>
+            <div class="item">
+                <div class="item-details"><h3>Momos (Full Plate)</h3><p>₹80</p></div>
+                <button onclick="addToCart('Momos (Full)', 80)">Add</button>
+            </div>
+            <div class="item">
+                <div class="item-details"><h3>Momos (Half Plate)</h3><p>₹40</p></div>
+                <button onclick="addToCart('Momos (Half)', 40)">Add</button>
+            </div>
+        </div>
+
+        <!-- Pav Bhaji -->
+        <div class="category">
+            <h2>🥘 Pav Bhaji</h2>
+            <div class="item">
+                <div class="item-details"><h3>Pav Bhaji (Full Plate)</h3><p>₹90</p></div>
+                <button onclick="addToCart('Pav Bhaji (Full)', 90)">Add</button>
+            </div>
+            <div class="item">
+                <div class="item-details"><h3>Pav Bhaji (Half Plate)</h3><p>₹50</p></div>
+                <button onclick="addToCart('Pav Bhaji (Half)', 50)">Add</button>
+            </div>
+        </div>
+
+        <!-- Chowmein -->
+        <div class="category">
+            <h2>🍝 Chowmein</h2>
+            <div class="item">
+                <div class="item-details"><h3>Chowmein (Full Plate)</h3><p>₹70</p></div>
+                <button onclick="addToCart('Chowmein (Full)', 70)">Add</button>
+            </div>
+            <div class="item">
+                <div class="item-details"><h3>Chowmein (Half Plate)</h3><p>₹40</p></div>
+                <button onclick="addToCart('Chowmein (Half)', 40)">Add</button>
+            </div>
+        </div>
+
+        <!-- Bhel Puri -->
+        <div class="category">
+            <h2>🥣 Bhel Puri</h2>
+            <div class="item">
+                <div class="item-details"><h3>Bhel Puri (Full Plate)</h3><p>₹50</p></div>
+                <button onclick="addToCart('Bhel Puri (Full)', 50)">Add</button>
+            </div>
+            <div class="item">
+                <div class="item-details"><h3>Bhel Puri (Half Plate)</h3><p>₹30</p></div>
+                <button onclick="addToCart('Bhel Puri (Half)', 30)">Add</button>
+            </div>
+        </div>
+
+        <!-- Cart Section -->
+        <div class="cart-box">
+            <h2>Your Cart</h2>
+            <div id="cart-items" style="margin-bottom: 15px; font-size: 14px; color: #555;">Cart is empty</div>
+            
+            <div class="cart-row">
+                <span>Subtotal:</span>
+                <span id="subtotal">₹0</span>
+            </div>
+            <div class="cart-row">
+                <span>Delivery Charge:</span>
+                <span id="delivery">₹0</span>
             </div>
             
-            <button id="checkout-btn" onclick="openCheckout()" class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-between items-center px-6">
-                <span id="min-order-warning">Min Order ₹100</span>
-                <div class="flex items-center gap-3">
-                    <span id="cart-total" class="text-xl">₹0</span>
-                    <i class="fa-solid fa-arrow-right bg-white/20 p-2 rounded-full"></i>
-                </div>
-            </button>
-        </div>
-    </div>
+            <div class="free-gift" id="free-drink">✔️ 1 Free Cold Drink Included!</div>
+            <div class="error-msg" id="min-order">❌ Minimum order is ₹100</div>
 
-    <!-- CHECKOUT BOTTOM SHEET -->
-    <div id="checkout-sheet" class="bottom-sheet fixed bottom-0 left-0 w-full bg-white z-50 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[90vh] overflow-y-auto max-w-3xl mx-auto right-0 pb-6">
-        <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-4 mb-2"></div>
-        <div class="px-6 pb-4 flex justify-between items-center border-b border-gray-100 sticky top-0 bg-white z-10">
-            <h2 class="text-2xl font-extrabold text-gray-900">Checkout</h2>
-            <button onclick="closeAllSheets()" class="bg-gray-100 text-gray-500 hover:bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        
-        <div class="p-6">
-            <div class="bg-orange-50 border border-orange-100 rounded-2xl p-5 mb-6 text-center shadow-inner">
-                <p class="text-orange-600 text-sm font-bold mb-1 uppercase tracking-wider">Amount to Pay</p>
-                <h3 class="text-4xl font-extrabold text-gray-900" id="final-pay-amount">₹0</h3>
+            <div class="cart-row cart-total">
+                <span>Total Payable:</span>
+                <span id="total">₹0</span>
             </div>
 
-            <div class="space-y-4 mb-6">
-                <div class="relative">
-                    <i class="fa-regular fa-user absolute left-4 top-4 text-gray-400"></i>
-                    <input type="text" id="cust-name" placeholder="Your Full Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition" required>
-                </div>
-                <div class="relative">
-                    <i class="fa-solid fa-mobile-screen absolute left-4 top-4 text-gray-400"></i>
-                    <input type="tel" id="cust-phone" placeholder="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition" required>
-                </div>
-            </div>
+            <button id="checkout-btn" style="width: 100%; margin-top: 15px; padding: 12px; font-size: 16px;" onclick="showCheckout()" disabled>Proceed to Order</button>
+        </div>
 
-            <h4 class="font-bold text-gray-900 mb-3 text-lg">Payment Method</h4>
+        <!-- Checkout / Payment Details -->
+        <div class="checkout-box" id="checkout-box">
+            <h2 style="margin-top: 0;">Payment Details</h2>
+            <p style="margin: 0 0 10px 0;">Please pay <b><span id="final-amt">₹0</span></b> using UPI:</p>
             
-            <div class="bg-white border-2 border-blue-100 rounded-2xl p-4 mb-4 relative overflow-hidden">
-                <label class="flex items-start gap-4 cursor-pointer w-full">
-                    <input type="radio" name="payment_method" value="UPI" checked class="mt-1 w-5 h-5 accent-blue-600">
-                    <div class="w-full">
-                        <span class="font-bold text-gray-900 block mb-1">Pay via UPI</span>
-                        <div class="bg-blue-50 p-3 rounded-xl mt-2 border border-blue-100">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs text-gray-500 font-semibold">UPI No:</span>
-                                <span class="font-mono font-bold text-blue-900 bg-white px-2 py-0.5 rounded shadow-sm">+918058733741</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500 font-semibold">UPI ID:</span>
-                                <span class="font-mono font-bold text-blue-900 bg-white px-2 py-0.5 rounded shadow-sm">8058733741@ybl</span>
-                            </div>
-                        </div>
-                    </div>
-                </label>
+            <div class="upi-details">
+                UPI Number: +918058733741<br>
+                UPI ID: 8058733741@ybl
             </div>
 
-            <div class="bg-white border-2 border-gray-100 rounded-2xl p-4 mb-8">
-                <label class="flex items-center gap-4 cursor-pointer w-full">
-                    <input type="radio" name="payment_method" value="COD" class="w-5 h-5 accent-orange-500">
-                    <span class="font-bold text-gray-900">Cash on Delivery (COD)</span>
-                </label>
-            </div>
+            <p style="font-size: 14px; color: #555;">*Upload payment screenshot to WhatsApp or select Cash on Delivery.</p>
 
-            <button onclick="submitOrder()" id="submit-order-btn" class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-orange-500/30 flex justify-center items-center gap-2">
-                <i class="fa-solid fa-check-circle"></i> Place Order
-            </button>
+            <button style="width: 100%; background-color: #28a745; margin-top: 10px;" onclick="alert('Order placed! Thank you.')">Confirm Order</button>
         </div>
+
     </div>
 
     <script>
-        // STATIC MENU DATA (No Firebase required)
-        const menuData = [
-            { id: 'sand1', name: "Special Sandwich", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=300&q=80", desc: "Grilled to perfection with fresh veggies.", variants: [{ id: 'sand1_f', name: "Regular", price: 60 }] },
-            { id: 'burg1', name: "Crispy Burger", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80", desc: "Aloo tikki loaded with cheese.", variants: [{ id: 'burg1_f', name: "Regular", price: 50 }] },
-            { id: 'momo1', name: "Veg Momos", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?auto=format&fit=crop&w=300&q=80", desc: "Steamed hot momos served with chutney.", variants: [{ id: 'momo1_f', name: "Full Plate", price: 80 }, { id: 'momo1_h', name: "Half Plate", price: 40 }] },
-            { id: 'pav1', name: "Mumbai Pav Bhaji", img: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=300&q=80", desc: "Buttery paav with extra spicy bhaji.", variants: [{ id: 'pav1_f', name: "Full Plate", price: 90 }, { id: 'pav1_h', name: "Half Plate", price: 50 }] },
-            { id: 'chow1', name: "Hakka Chowmein", img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=300&q=80", desc: "Wok-tossed noodles with veggies.", variants: [{ id: 'chow1_f', name: "Full Plate", price: 70 }, { id: 'chow1_h', name: "Half Plate", price: 40 }] },
-            { id: 'bhel1', name: "Chatpati Bhel Puri", img: "https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&w=300&q=80", desc: "Sweet, sour, and spicy mixture.", variants: [{ id: 'bhel1_f', name: "Full Plate", price: 50 }, { id: 'bhel1_h', name: "Half Plate", price: 30 }] }
-        ];
-
         let cart = [];
 
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            const icon = document.getElementById('toast-icon');
+        function addToCart(name, price) {
+            cart.push({ name: name, price: price });
+            updateCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCart();
+        }
+
+        function updateCart() {
+            let subtotal = 0;
+            let cartHtml = '';
             
-            if(isError) {
-                icon.className = 'fa-solid fa-circle-exclamation text-red-400';
-                toast.classList.add('bg-red-900'); toast.classList.remove('bg-gray-900');
+            if (cart.length === 0) {
+                cartHtml = 'Cart is empty';
             } else {
-                icon.className = 'fa-solid fa-circle-check text-green-400';
-                toast.classList.add('bg-gray-900'); toast.classList.remove('bg-red-900');
-            }
-
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function toggleSheet(id) {
-            const sheet = document.getElementById(id);
-            const overlay = document.getElementById('sheet-overlay');
-            if (sheet.classList.contains('open')) {
-                sheet.classList.remove('open');
-                overlay.classList.remove('!block'); setTimeout(() => overlay.classList.remove('opacity-100'), 10);
-            } else {
-                closeAllSheets();
-                sheet.classList.add('open');
-                overlay.classList.add('!block'); setTimeout(() => overlay.classList.add('opacity-100'), 10);
-            }
-        }
-
-        function closeAllSheets() {
-            document.querySelectorAll('.bottom-sheet').forEach(el => el.classList.remove('open'));
-            const overlay = document.getElementById('sheet-overlay');
-            overlay.classList.remove('opacity-100'); setTimeout(() => overlay.classList.remove('!block'), 300);
-        }
-
-        function renderMenu() {
-            const grid = document.getElementById('menu-grid');
-            grid.innerHTML = menuData.map((item, index) => {
-                let variantHTML = '';
-                if(item.variants.length > 1) {
-                    let options = item.variants.map(v => `<option value="${v.id}" data-price="${v.price}">${v.name}</option>`).join('');
-                    variantHTML = `<div class="relative bg-gray-50 rounded-xl mb-4 border border-gray-200"><select id="select-${item.id}" onchange="updatePrice('${item.id}')" class="w-full bg-transparent py-3 px-4 font-medium text-gray-700 outline-none text-sm">${options}</select></div>`;
-                } else {
-                    variantHTML = `<input type="hidden" id="select-${item.id}" value="${item.variants[0].id}"><div class="bg-gray-50 rounded-xl mb-4 border border-gray-100 py-3 px-4 text-sm font-medium text-gray-500">${item.variants[0].name}</div>`;
+                for (let i = 0; i < cart.length; i++) {
+                    subtotal += cart[i].price;
+                    cartHtml += '<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>' + cart[i].name + '</span><span>₹' + cart[i].price + '</span></div>';
                 }
-                return `
-                <div class="food-card bg-white rounded-[2rem] p-4 border border-gray-100 shadow-sm flex flex-col group fade-in-up" style="animation-delay: ${0.1 * index}s">
-                    <div class="h-48 rounded-2xl overflow-hidden relative mb-4">
-                        <img src="${item.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                    </div>
-                    <div class="flex justify-between items-start mb-2 px-1">
-                        <h4 class="font-bold text-xl text-gray-900">${item.name}</h4>
-                        <span id="price-disp-${item.id}" class="font-extrabold text-orange-600 text-xl">₹${item.variants[0].price}</span>
-                    </div>
-                    <p class="text-sm text-gray-500 mb-5 flex-grow px-1">${item.desc}</p>
-                    ${variantHTML}
-                    <button onclick="addToCart('${item.id}')" class="w-full bg-orange-50 text-orange-600 font-bold py-3.5 rounded-xl hover:bg-orange-500 hover:text-white transition duration-300">
-                        <i class="fa-solid fa-plus mr-2"></i> Add to Cart
-                    </button>
-                </div>`;
-            }).join('');
-        }
+                cartHtml += '<button onclick="clearCart()" style="background:#dc3545; padding:4px 8px; font-size:12px; margin-top:10px;">Clear Cart</button>';
+            }
 
-        function updatePrice(itemId) {
-            const selectEl = document.getElementById(`select-${itemId}`);
-            const price = selectEl.options[selectEl.selectedIndex].getAttribute('data-price');
-            document.getElementById(`price-disp-${itemId}`).innerText = `₹${price}`;
-        }
+            document.getElementById('cart-items').innerHTML = cartHtml;
 
-        function addToCart(itemId) {
-            const baseItem = menuData.find(m => m.id === itemId);
-            const variantId = document.getElementById(`select-${itemId}`).value;
-            const variant = baseItem.variants.find(v => v.id === variantId);
+            // Delivery Logic
+            let delivery = 0;
+            if (subtotal > 0 && subtotal < 200) {
+                delivery = 20;
+            }
 
-            cart.push({ cartId: Date.now(), baseName: baseItem.name, variantName: variant.name, price: Number(variant.price) });
-            updateCartUI();
-            showToast(`${baseItem.name} added!`);
+            let total = subtotal + delivery;
+
+            document.getElementById('subtotal').innerText = '₹' + subtotal;
+            document.getElementById('delivery').innerText = '₹' + delivery;
+            document.getElementById('total').innerText = '₹' + total;
+            document.getElementById('final-amt').innerText = '₹' + total;
+
+            // Free Drink Logic
+            if (subtotal >= 100) {
+                document.getElementById('free-drink').style.display = 'block';
+            } else {
+                document.getElementById('free-drink').style.display = 'none';
+            }
+
+            // Min Order Logic
+            let btn = document.getElementById('checkout-btn');
+            let minOrderMsg = document.getElementById('min-order');
             
-            const badge = document.getElementById('cart-badge');
-            badge.classList.remove('hidden'); badge.classList.add('animate-bounce');
-            setTimeout(() => badge.classList.remove('animate-bounce'), 1000);
+            if (subtotal > 0 && subtotal < 100) {
+                minOrderMsg.style.display = 'block';
+                btn.disabled = true;
+            } else if (subtotal >= 100) {
+                minOrderMsg.style.display = 'none';
+                btn.disabled = false;
+            } else {
+                minOrderMsg.style.display = 'none';
+                btn.disabled = true;
+            }
+
+            // Hide checkout box if cart changes
+            document.getElementById('checkout-box').style.display = 'none';
         }
 
-        function removeFromCart(cartId) {
-            cart = cart.filter(item => item.cartId !== cartId);
-            updateCartUI();
+        function showCheckout() {
+            document.getElementById('checkout-box').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
         }
+    </script>
 
-        function updateCartUI() {
-            const cartContainer = document.getElementById('cart-items');
-            const subtotal = cart.reduce((sum, item
+</body>
+</html>
