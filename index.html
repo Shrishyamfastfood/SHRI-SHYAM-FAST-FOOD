@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shri Shyam Fast Food</title>
-    <!-- Tailwind CSS for clean, modern UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        /* Smooth scrolling for the cart */
         .sticky-cart { position: sticky; top: 20px; }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- Header -->
     <header class="bg-red-600 text-white shadow-md sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
             <div>
@@ -29,19 +31,14 @@
         </div>
     </header>
 
-    <!-- Main Layout -->
     <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
-
-        <!-- Menu Section (Left Side) -->
+        <!-- Menu Section -->
         <div class="w-full md:w-2/3">
             <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-red-200 pb-2">Our Menu</h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="menu-container">
-                <!-- JavaScript will load items here -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="menu-container"></div>
         </div>
 
-        <!-- Cart Section (Right Side) -->
+        <!-- Cart Section -->
         <div class="w-full md:w-1/3">
             <div class="bg-white rounded-xl shadow-lg p-6 sticky-cart border border-gray-100">
                 <h2 class="text-xl font-bold mb-4 flex justify-between items-center text-gray-800">
@@ -49,12 +46,10 @@
                     <span id="cart-count" class="bg-red-100 text-red-600 px-2 py-1 rounded text-sm">0 Items</span>
                 </h2>
 
-                <!-- Cart Items List -->
                 <div id="cart-items" class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2">
                     <p class="text-gray-400 text-center py-4">Cart is empty</p>
                 </div>
 
-                <!-- Bill Details -->
                 <div class="border-t border-gray-200 pt-4 space-y-2 text-sm text-gray-600 mb-4">
                     <div class="flex justify-between"><span>Subtotal</span><span id="subtotal" class="font-semibold text-gray-800">₹0</span></div>
                     <div class="flex justify-between items-center">
@@ -70,18 +65,16 @@
                     <span>Total</span><span id="total" class="text-red-600">₹0</span>
                 </div>
 
-                <!-- Customer Details Form -->
                 <div id="checkout-form" class="hidden space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Your Name</label>
-                        <input type="text" id="cust-name" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500" placeholder="Enter full name">
+                        <input type="text" id="cust-name" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-500" placeholder="Enter full name">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-                        <input type="tel" id="cust-phone" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500" placeholder="Enter phone number">
+                        <input type="tel" id="cust-phone" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-red-500" placeholder="Enter phone number">
                     </div>
                     
-                    <!-- Payment Info -->
                     <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-sm mb-2">
                         <p class="font-bold text-blue-900 mb-1">UPI Payment Details:</p>
                         <p class="text-gray-700">Number: <span class="font-mono font-bold">+918058733741</span></p>
@@ -91,27 +84,37 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Method</label>
                         <select id="payment-method" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
-                            <option value="Paid via UPI">I will pay via UPI (Send screenshot on WhatsApp)</option>
+                            <option value="Paid via UPI">I will pay via UPI</option>
                             <option value="Cash on Delivery">Cash on Delivery (COD)</option>
                         </select>
                     </div>
 
-                    <button onclick="sendOrderToWhatsApp()" class="w-full bg-green-500 text-white font-bold py-3.5 rounded-lg hover:bg-green-600 transition flex justify-center items-center gap-2 shadow-lg shadow-green-500/30">
-                        <i class="fa-brands fa-whatsapp text-xl"></i> Send Order to WhatsApp
+                    <button id="order-btn" onclick="processOrder()" class="w-full bg-green-500 text-white font-bold py-3.5 rounded-lg hover:bg-green-600 transition flex justify-center items-center gap-2 shadow-lg">
+                        <i class="fa-brands fa-whatsapp text-xl"></i> Order & Send to WhatsApp
                     </button>
                 </div>
 
                 <div id="min-order-warning" class="text-red-500 text-center text-sm font-bold py-2 bg-red-50 rounded mt-4">
                     Minimum order is ₹100
                 </div>
-
             </div>
         </div>
-
     </div>
 
     <script>
-        // Simple, flat menu data to avoid any loading issues
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
+            authDomain: "shri-shyam-fast-food.firebaseapp.com",
+            projectId: "shri-shyam-fast-food",
+            storageBucket: "shri-shyam-fast-food.firebasestorage.app",
+            messagingSenderId: "828353855950",
+            appId: "1:828353855950:web:96d62828e8e410e8812b9f"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Static Menu Data
         const menuItems = [
             { id: 1, name: "Special Sandwich", price: 60, icon: "🥪" },
             { id: 2, name: "Crispy Burger", price: 50, icon: "🍔" },
@@ -127,7 +130,6 @@
 
         let cart = [];
 
-        // Render the menu to the page
         const menuContainer = document.getElementById('menu-container');
         menuItems.forEach(item => {
             menuContainer.innerHTML += `
@@ -146,16 +148,8 @@
             `;
         });
 
-        // Cart Logic
-        function addToCart(id, name, price) {
-            cart.push({ id, name, price });
-            updateCart();
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCart();
-        }
+        function addToCart(id, name, price) { cart.push({ id, name, price }); updateCart(); }
+        function removeFromCart(index) { cart.splice(index, 1); updateCart(); }
 
         function updateCart() {
             const cartItemsDiv = document.getElementById('cart-items');
@@ -169,10 +163,7 @@
                     subtotal += item.price;
                     return `
                         <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100">
-                            <div>
-                                <p class="text-sm font-bold text-gray-800">${item.name}</p>
-                                <p class="text-sm text-red-600 font-bold">₹${item.price}</p>
-                            </div>
+                            <div><p class="text-sm font-bold text-gray-800">${item.name}</p><p class="text-sm text-red-600 font-bold">₹${item.price}</p></div>
                             <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 px-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     `;
@@ -180,7 +171,6 @@
                 document.getElementById('cart-count').innerText = `${cart.length} Items`;
             }
 
-            // Calculation Rules
             const delivery = (subtotal > 0 && subtotal < 200) ? 20 : 0;
             const total = subtotal + delivery;
             const isMinMet = subtotal >= 100;
@@ -189,11 +179,9 @@
             document.getElementById('delivery').innerText = delivery === 0 && subtotal > 0 ? "FREE" : `₹${delivery}`;
             document.getElementById('total').innerText = `₹${total}`;
 
-            // Toggles
             document.getElementById('free-drink-msg').style.display = isMinMet ? 'block' : 'none';
             document.getElementById('min-order-warning').style.display = (subtotal > 0 && !isMinMet) ? 'block' : 'none';
             
-            // Show checkout form only if minimum order is met
             if (isMinMet) {
                 document.getElementById('checkout-form').classList.remove('hidden');
                 document.getElementById('min-order-warning').classList.add('hidden');
@@ -203,30 +191,25 @@
             }
         }
 
-        // WhatsApp Integration
-        function sendOrderToWhatsApp() {
+        function processOrder() {
             const name = document.getElementById('cust-name').value.trim();
             const phone = document.getElementById('cust-phone').value.trim();
             const payment = document.getElementById('payment-method').value;
 
-            if (!name || !phone) {
-                alert("Please enter your Name and Phone Number.");
-                return;
-            }
+            if (!name || !phone) { alert("Please enter your Name and Phone Number."); return; }
+
+            const btn = document.getElementById('order-btn');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xl"></i> Processing...`;
+            btn.disabled = true;
 
             let subtotal = 0;
             let itemListText = "";
-            
-            // Count items to format the message nicely
             let itemCounts = {};
+            
             cart.forEach(item => {
                 subtotal += item.price;
-                if(itemCounts[item.name]) {
-                    itemCounts[item.name].qty += 1;
-                    itemCounts[item.name].price += item.price;
-                } else {
-                    itemCounts[item.name] = { qty: 1, price: item.price };
-                }
+                if(itemCounts[item.name]) { itemCounts[item.name].qty += 1; itemCounts[item.name].price += item.price; } 
+                else { itemCounts[item.name] = { qty: 1, price: item.price }; }
             });
 
             for (const [itemName, data] of Object.entries(itemCounts)) {
@@ -235,41 +218,45 @@
 
             const delivery = subtotal < 200 ? 20 : 0;
             const total = subtotal + delivery;
-            const freeDrinkText = subtotal >= 100 ? "🎁 Yes (1 Free Cold Drink)" : "No";
+            const hasFreeDrink = subtotal >= 100;
 
-            // Format the final message
-            const message = `
-*🍔 NEW ORDER - Shri Shyam Fast Food*
+            // 1. SAVE TO ADMIN PANEL (FIREBASE)
+            const orderData = {
+                customerName: name,
+                customerPhone: phone,
+                orderDetails: itemListText,
+                totalAmount: total,
+                paymentMethod: payment,
+                hasFreeDrink: hasFreeDrink,
+                status: "Pending",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
 
-*Customer Details:*
-👤 Name: ${name}
-📞 Phone: ${phone}
+            // Silently save, then trigger WhatsApp regardless of success/fail
+            db.collection("orders").add(orderData).then(() => {
+                openWhatsApp(name, phone, itemListText, subtotal, delivery, total, hasFreeDrink, payment);
+                resetCart(btn);
+            }).catch(error => {
+                // If database rules block it, still open WhatsApp for the customer!
+                console.log("Admin Panel save error (Check Rules): ", error);
+                openWhatsApp(name, phone, itemListText, subtotal, delivery, total, hasFreeDrink, payment);
+                resetCart(btn);
+            });
+        }
 
-*Order Summary:*
-${itemListText}
-------------------------
-💰 Subtotal: ₹${subtotal}
-🛵 Delivery: ₹${delivery}
-🎁 Free Gift: ${freeDrinkText}
-------------------------
-*🛒 TOTAL PAYABLE: ₹${total}*
-
-💳 Payment Mode: ${payment}
-
-_(Please reply to confirm this order. If paying by UPI, attach the screenshot here.)_
-            `.trim();
-
-            // Your provided WhatsApp Number
-            const vendorPhoneNumber = "918058733741"; 
-            
-            // Encode the message for the URL
-            const whatsappUrl = `https://wa.me/${vendorPhoneNumber}?text=${encodeURIComponent(message)}`;
-            
-            // Open WhatsApp
+        function openWhatsApp(name, phone, items, sub, del, tot, drink, pay) {
+            const drinkText = drink ? "🎁 Yes (1 Free Cold Drink)" : "No";
+            const message = `*🍔 NEW ORDER - Shri Shyam Fast Food*\n\n*Customer Details:*\n👤 Name: ${name}\n📞 Phone: ${phone}\n\n*Order Summary:*\n${items}------------------------\n💰 Subtotal: ₹${sub}\n🛵 Delivery: ₹${del}\n🎁 Free Gift: ${drinkText}\n------------------------\n*🛒 TOTAL PAYABLE: ₹${tot}*\n\n💳 Payment Mode: ${pay}\n\n_(Please reply to confirm this order. If paying by UPI, attach the screenshot here.)_`.trim();
+            const whatsappUrl = `https://wa.me/918058733741?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
-            
-            // Optional: clear cart after sending
-            // cart = []; updateCart();
+        }
+
+        function resetCart(btn) {
+            cart = []; updateCart();
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-phone').value = '';
+            btn.innerHTML = `<i class="fa-brands fa-whatsapp text-xl"></i> Order & Send to WhatsApp`;
+            btn.disabled = false;
         }
     </script>
 </body>
