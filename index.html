@@ -1,213 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Fast Food - Order Online</title>
-    <meta name="google-site-verification" content="LpUYJVosMIE5qw2zFybFtpN3uhG7VjtGH5bLDA3asaU" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; }
-        .gradient-nav { background: linear-gradient(90deg, #cc0000 0%, #ff5722 100%); }
-        .logo-img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid white; object-fit: cover; }
-        .admin-panel { display: none; background: white; border-top: 5px solid #cc0000; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
-        .sticky-cart { position: sticky; top: 100px; }
-    </style>
-</head>
-<body>
-
-    <!-- Header -->
-    <header class="gradient-nav text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" alt="Logo" class="logo-img shadow-lg">
-                <div>
-                    <h1 class="text-xl font-black leading-none">Shri Shyam Fast Food</h1>
-                    <p class="text-xs font-bold mt-1 text-white/90 underline decoration-white/40"><i class="fa-solid fa-phone text-[10px]"></i> 8058733741</p>
-                </div>
-            </div>
-            <button onclick="showLogin()" class="text-white/30 hover:text-white"><i class="fa-solid fa-lock"></i></button>
-        </div>
-    </header>
-
-    <div class="max-w-6xl mx-auto px-4 py-8">
+<!-- Is hisse ko Checkout Form ke button ke niche add karein -->
+<div id="payment-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex flex-col items-center justify-center p-6 text-white">
+    <div class="bg-white text-gray-800 p-6 rounded-3xl max-w-xs w-full text-center">
+        <h3 class="text-xl font-black mb-2">Scan & Pay</h3>
+        <p class="text-xs text-gray-500 mb-4">Payment karke screenshot WhatsApp par bhejein</p>
         
-        <!-- ADMIN PANEL -->
-        <div id="admin-section" class="admin-panel p-6 mb-10">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black text-red-600 uppercase">Admin Dashboard</h2>
-                <button onclick="logout()" class="text-gray-400 text-xs font-bold">LOGOUT</button>
-            </div>
-            <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
-
-        <div class="flex flex-col md:flex-row gap-8">
-            <!-- MENU SECTION -->
-            <div class="w-full md:w-2/3">
-                <h2 class="text-2xl font-black mb-6 italic text-gray-800">Fresh Menu</h2>
-                <div id="menu-container" class="grid grid-cols-1 gap-4">
-                    <p class="text-gray-400">Loading food items...</p>
-                </div>
-            </div>
-
-            <!-- CART SECTION -->
-            <div class="w-full md:w-1/3">
-                <div class="bg-white rounded-3xl shadow-xl p-6 sticky-cart border border-gray-100">
-                    <h2 class="text-xl font-bold mb-4 flex justify-between items-center">
-                        <span>Your Selection</span>
-                        <span id="cart-count" class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">0</span>
-                    </h2>
-                    <div id="cart-items" class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2">
-                        <p class="text-gray-400 text-center py-4 italic">Cart is empty...</p>
-                    </div>
-                    <div class="border-t pt-4 mb-6">
-                        <div class="flex justify-between items-center text-2xl font-black">
-                            <span>Total Bill</span><span id="total" class="text-red-600">₹0</span>
-                        </div>
-                    </div>
-                    <div id="checkout-form" class="hidden space-y-4">
-                        <input type="text" id="cust-name" class="w-full border rounded-xl p-3 outline-none focus:border-red-500 bg-gray-50" placeholder="Aapka Naam">
-                        <input type="tel" id="cust-phone" class="w-full border rounded-xl p-3 outline-none focus:border-red-500 bg-gray-50" placeholder="Mobile Number">
-                        <select id="pickup-time" class="w-full border rounded-xl p-3 bg-gray-100 font-bold text-gray-700">
-                            <option value="15 Minutes">15 Minutes Mein Aaunga</option>
-                            <option value="30 Minutes">30 Minutes Mein Aaunga</option>
-                            <option value="Just reached">Dukaan par khada hu</option>
-                        </select>
-                        <button onclick="processOrder()" class="w-full bg-green-600 text-white font-black py-4 rounded-xl flex justify-center items-center gap-2 shadow-lg hover:bg-green-700 active:scale-95 transition">
-                            <i class="fa-brands fa-whatsapp text-xl"></i> ORDER ON WHATSAPP
-                        </button>
-                    </div>
-                    <p id="min-warning" class="text-orange-600 text-center font-bold text-xs mt-2 bg-orange-50 p-2 rounded-lg">Minimum ₹100 required to order</p>
-                </div>
-            </div>
+        <!-- Aapka Bheja Hua QR Code -->
+        <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" alt="UPI QR" class="w-full rounded-xl mb-4 shadow-inner">
+        
+        <div class="flex flex-col gap-2">
+            <button onclick="finalSubmit('WhatsApp')" class="bg-green-600 text-white font-bold py-3 rounded-xl">Confirm & Send Message</button>
+            <button onclick="closePayment()" class="text-gray-400 text-xs font-bold uppercase py-2">Back to Cart</button>
         </div>
     </div>
+</div>
 
-    <!-- Mobile Cart Tab -->
-    <div id="mobile-cart" class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t p-4 flex justify-between items-center shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transform translate-y-full transition-transform z-40">
-        <p class="text-2xl font-black text-red-600" id="mobile-total">₹0</p>
-        <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-red-600 text-white px-8 py-3 rounded-xl font-bold">VIEW ORDER</button>
-    </div>
+<script>
+// Purane processOrder() function ko isse replace karein
+function processOrder() {
+    const name = document.getElementById('cust-name').value.trim();
+    const phone = document.getElementById('cust-phone').value.trim();
+    if(!name || !phone) return alert("Please enter name and phone number!");
+    
+    // Payment Modal dikhao
+    document.getElementById('payment-modal').classList.remove('hidden');
+}
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
-            authDomain: "shri-shyam-fast-food.firebaseapp.com",
-            projectId: "shri-shyam-fast-food",
-            storageBucket: "shri-shyam-fast-food.firebasestorage.app",
-            messagingSenderId: "828353855950",
-            appId: "1:828353855950:web:96d62828e8e410e8812b9f"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+function closePayment() {
+    document.getElementById('payment-modal').classList.add('hidden');
+}
 
-        let cart = [];
-        // Updated prices as per request
-        const currentMenu = [
-            { id: "item1", name: "Special Sandwich", price: 60, available: true, icon: "🥪" },
-            { id: "item2", name: "Crispy Burger", price: 50, available: true, icon: "🍔" },
-            { id: "item3", name: "Veg Momos", price: 50, available: true, icon: "🥟" },
-            { id: "item4", name: "Veg Chowmein", price: 50, available: true, icon: "🍝" },
-            { id: "item5", name: "Bhelpuri Premium", price: 40, available: true, icon: "🥣" },
-            { id: "item6", name: "Bhelpuri Economy", price: 30, available: true, icon: "🥣" }
-        ];
+function finalSubmit() {
+    const name = document.getElementById('cust-name').value.trim();
+    const phone = document.getElementById('cust-phone').value.trim();
+    const time = document.getElementById('pickup-time').value;
 
-        function syncMenu() {
-            db.collection("menu").onSnapshot(snapshot => {
-                let menuData = [];
-                if (snapshot.empty) {
-                    currentMenu.forEach(item => db.collection("menu").doc(item.id).set(item));
-                    menuData = currentMenu;
-                } else {
-                    snapshot.forEach(doc => menuData.push({ id: doc.id, ...doc.data() }));
-                }
-                renderUI(menuData);
-            });
-        }
-
-        function renderUI(data) {
-            const container = document.getElementById('menu-container');
-            const adminBox = document.getElementById('admin-controls');
-            container.innerHTML = ''; adminBox.innerHTML = '';
-
-            data.forEach(item => {
-                container.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm ${!item.available ? 'opacity-40 pointer-events-none' : 'hover:shadow-md transition'}">
-                        <div class="flex items-center gap-4">
-                            <span class="text-3xl bg-gray-50 p-2 rounded-xl">${item.icon}</span>
-                            <div>
-                                <p class="font-bold text-gray-800">${item.name} ${!item.available ? '<span class="text-red-500 text-[10px] ml-2">(OFF)</span>' : ''}</p>
-                                <p class="text-red-600 font-black">₹${item.price}</p>
-                            </div>
-                        </div>
-                        <button onclick="addToCart('${item.name}', ${item.price})" class="bg-red-50 text-red-600 font-bold px-6 py-2 rounded-xl active:scale-90 transition">ADD</button>
-                    </div>`;
-
-                adminBox.innerHTML += `
-                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="font-bold text-xs uppercase text-gray-500">${item.name}</p>
-                            <button onclick="toggleStock('${item.id}', ${item.available})" class="px-3 py-1 rounded-md text-[9px] font-black ${item.available ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}">${item.available ? 'ON' : 'OFF'}</button>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-gray-400">Price: ₹</span>
-                            <input type="number" value="${item.price}" onchange="updatePrice('${item.id}', this.value)" class="w-full p-2 border rounded-lg text-sm font-bold">
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function addToCart(name, price) { cart.push({name, price}); updateCartUI(); }
-        function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); }
-
-        function updateCartUI() {
-            const list = document.getElementById('cart-items');
-            let subtotal = cart.reduce((acc, item) => acc + item.price, 0);
-            
-            list.innerHTML = cart.length === 0 ? '<p class="text-gray-400 text-center py-4 italic">Cart is empty...</p>' : 
-                cart.map((item, index) => `
-                <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg text-sm">
-                    <p class="font-bold text-gray-700">${item.name} - ₹${item.price}</p>
-                    <button onclick="removeFromCart(${index})" class="text-red-300 hover:text-red-600 transition p-1"><i class="fa-solid fa-circle-xmark"></i></button>
-                </div>`).join('');
-
-            document.getElementById('cart-count').innerText = cart.length;
-            document.getElementById('total').innerText = `₹${subtotal}`;
-            document.getElementById('mobile-total').innerText = `₹${subtotal}`;
-            
-            const isMin = subtotal >= 100;
-            document.getElementById('checkout-form').classList.toggle('hidden', !isMin);
-            document.getElementById('min-warning').classList.toggle('hidden', isMin || subtotal === 0);
-            
-            const mobileCart = document.getElementById('mobile-cart');
-            cart.length > 0 ? mobileCart.classList.remove('translate-y-full') : mobileCart.classList.add('translate-y-full');
-        }
-
-        function processOrder() {
-            const name = document.getElementById('cust-name').value.trim();
-            const phone = document.getElementById('cust-phone').value.trim();
-            const time = document.getElementById('pickup-time').value;
-            if(!name || !phone) return alert("Please enter name and phone number!");
-
-            let itemsTxt = "";
-            let subtotal = cart.reduce((acc, item) => { itemsTxt += `▫️ ${item.name} - ₹${item.price}\n`; return acc + item.price; }, 0);
-            
-            const arrivalHindi = time === "15 Minutes" ? "15 मिनट में" : (time === "30 Minutes" ? "30 मिनट में" : "दुकान पर पहुँच गया हूँ");
-            const msg = `*🍔 नया पिकअप ऑर्डर*\n\n*ग्राहक:* ${name}\n*नंबर:* ${phone}\n*कब आएँगे:* ${arrivalHindi}\n\n*ऑर्डर आइटम्स:*\n${itemsTxt}-------------------\n*कुल बिल: ₹${subtotal}*\n-------------------\n_(भाई मेरा ऑर्डर तैयार रखना, मैं ऊपर दिए समय पर आ रहा हूँ!)_`;
-            
-            window.location.href = `https://wa.me/918058733741?text=${encodeURIComponent(msg)}`;
-            cart = []; updateCartUI();
-        }
-
-        function toggleStock(id, status) { db.collection("menu").doc(id).update({ available: !status }); }
-        function updatePrice(id, price) { db.collection("menu").doc(id).update({ price: parseInt(price) }); }
-        function showLogin() { if(prompt("Password:") === "jitu8087") document.getElementById('admin-section').style.display = 'block'; }
-        function logout() { document.getElementById('admin-section').style.display = 'none'; }
-
-        syncMenu();
-    </script>
-</body>
-</html>
+    let itemsTxt = "";
+    let subtotal = cart.reduce((acc, item) => { itemsTxt += `▫️ ${item.name} - ₹${item.price}\n`; return acc + item.price; }, 0);
+    
+    const arrivalHindi = time === "15 Minutes" ? "15 मिनट में" : (time === "30 Minutes" ? "30 मिनट में" : "दुकान पर पहुँच गया हूँ");
+    
+    // Order Message with Payment Info
+    const msg = `*🍔 नया पिकअप ऑर्डर (PAID)*\n\n*ग्राहक:* ${name}\n*नंबर:* ${phone}\n*कब आएँगे:* ${arrivalHindi}\n\n*ऑर्डर आइटम्स:*\n${itemsTxt}-------------------\n*कुल बिल: ₹${subtotal}*\n-------------------\n_(भाई मैंने ₹${subtotal} का पेमेंट कर दिया है, स्क्रीनशॉट भेज रहा हूँ!)_`;
+    
+    window.location.href = `https://wa.me/918058733741?text=${encodeURIComponent(msg)}`;
+    cart = []; 
+    updateCartUI();
+    closePayment();
+}
+</script>
