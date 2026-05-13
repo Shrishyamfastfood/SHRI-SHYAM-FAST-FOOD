@@ -5,202 +5,257 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jay Shri Shyam Fast Food</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
     <style>
-        body { background-color: #f8fafc; scroll-behavior: smooth; font-family: 'Poppins', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); }
-        .gradient-btn { background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%); transition: all 0.3s ease; }
-        .gradient-btn:hover { background: linear-gradient(135deg, #e64a19 0%, #f57c00 100%); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(255, 87, 34, 0.4); }
-        .modal-enter { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        select { -webkit-appearance: none; appearance: none; background: url('data:image/svg+xml;utf8,<svg fill="gray" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 8px center; background-size: 16px; }
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; overflow-x: hidden; }
+        
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .gradient-text { background: linear-gradient(135deg, #ff5722, #ff9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-primary { background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(255, 87, 34, 0.4); }
+        
+        .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .bottom-sheet.open { transform: translateY(0); }
+        
+        .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        .food-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .food-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+        
+        select { -webkit-appearance: none; appearance: none; background: url('data:image/svg+xml;utf8,<svg fill="%23ff5722" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 12px center; background-size: 18px; }
+        
+        .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen pb-24">
+<body class="text-gray-800 antialiased min-h-screen pb-28">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-medium pointer-events-none w-max max-w-[90vw]">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-msg">Success!</span>
+    </div>
 
     <!-- NAVBAR -->
-    <nav class="glass sticky top-0 z-40 px-6 py-4 shadow-sm flex justify-between items-center border-b border-gray-100">
-        <div class="flex items-center gap-3">
-            <div class="gradient-btn text-white w-10 h-10 flex items-center justify-center rounded-xl text-xl shadow-md">
-                <i class="fa-solid fa-utensils"></i>
+    <nav class="glass-nav sticky top-0 z-40 px-6 py-4 border-b border-gray-100 shadow-sm flex justify-between items-center transition-all">
+        <div class="flex items-center gap-3 cursor-pointer">
+            <div class="btn-primary text-white w-10 h-10 flex items-center justify-center rounded-xl text-xl shadow-lg shadow-orange-500/30">
+                <i class="fa-solid fa-fire-burner"></i>
             </div>
-            <h1 class="text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-yellow-600">Jay Shri Shyam</h1>
+            <h1 class="text-2xl font-extrabold tracking-tight gradient-text">Shri Shyam</h1>
+        </div>
+        <div class="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-xs font-bold border border-orange-100">
+            <i class="fa-solid fa-leaf mr-1"></i> Pure Veg
         </div>
     </nav>
 
-    <!-- HERO -->
-    <header class="relative bg-gray-900 text-white overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Food" class="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay">
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
-        <div class="relative z-10 px-6 py-20 max-w-4xl mx-auto text-center modal-enter">
-            <span class="bg-[#ff5722] text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block">100% Pure Veg</span>
-            <h2 class="text-4xl md:text-6xl font-extrabold mb-6 drop-shadow-lg">Taste the <span class="text-[#ffc107]">Magic</span> of Street Food!</h2>
-            <div class="inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-3 rounded-full font-semibold shadow-xl">
-                <i class="fa-solid fa-gift text-[#ffc107] mr-3 text-xl"></i> Free Cold Drink on orders above ₹100
-            </div>
+    <!-- HERO SECTION -->
+    <header class="relative px-6 py-12 md:py-20 max-w-5xl mx-auto text-center fade-in-up">
+        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-full bg-gradient-to-b from-orange-50 to-transparent -z-10 rounded-b-[3rem]"></div>
+        <h2 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight text-gray-900">
+            Craving <span class="gradient-text">Magic?</span><br>We Deliver.
+        </h2>
+        <div class="inline-flex items-center bg-white border border-gray-100 px-6 py-3.5 rounded-2xl font-semibold shadow-xl shadow-gray-200/50 transform hover:scale-105 transition duration-300">
+            <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3"><i class="fa-solid fa-gift text-green-600 text-lg"></i></div>
+            <span class="text-gray-700">Free Cold Drink on orders above <span class="text-orange-500 font-extrabold">₹100</span></span>
         </div>
     </header>
 
-    <!-- MENU -->
-    <main class="max-w-6xl mx-auto px-6 py-12">
-        <div class="flex items-center gap-4 mb-8">
-            <div class="h-1 w-12 bg-[#ff5722] rounded-full"></div>
-            <h3 class="text-3xl font-bold text-gray-800">Our Menu</h3>
+    <!-- MENU SECTION -->
+    <main class="max-w-6xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between mb-8 fade-in-up" style="animation-delay: 0.1s;">
+            <h3 class="text-3xl font-extrabold text-gray-900">Explore Menu</h3>
+            <div class="h-1 w-16 bg-orange-500 rounded-full"></div>
         </div>
-        <div id="loading" class="text-center text-gray-500 py-10 font-bold"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>Loading Menu...</div>
+        
         <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </main>
 
-    <!-- FLOATING CART -->
-    <div class="fixed bottom-6 w-full px-6 z-30 max-w-6xl mx-auto left-0 right-0 pointer-events-none flex justify-end">
-        <button onclick="toggleModal('cart-modal')" class="pointer-events-auto gradient-btn text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 group">
-            <div class="relative">
-                <i class="fa-solid fa-cart-shopping text-xl group-hover:scale-110 transition duration-300"></i>
-                <span id="cart-badge" class="absolute -top-3 -right-3 bg-white text-[#e64a19] text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full shadow-md hidden">0</span>
+    <!-- FLOATING CART BUTTON -->
+    <div class="fixed bottom-6 w-full px-6 z-30 max-w-6xl mx-auto left-0 right-0 pointer-events-none flex justify-center fade-in-up" style="animation-delay: 0.3s;">
+        <button onclick="toggleSheet('cart-sheet')" class="pointer-events-auto btn-primary text-white px-8 py-4 rounded-full shadow-2xl flex items-center justify-between gap-6 w-full max-w-sm group overflow-hidden relative">
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="relative bg-white/20 p-2 rounded-full">
+                    <i class="fa-solid fa-bag-shopping text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-white text-orange-600 text-[10px] font-extrabold w-5 h-5 flex items-center justify-center rounded-full shadow-md hidden">0</span>
+                </div>
+                <span class="font-bold text-lg">View Order</span>
             </div>
-            <span class="font-bold text-lg border-l border-white/30 pl-4" id="floating-total">₹0</span>
+            <span class="font-extrabold text-xl bg-white text-orange-600 px-4 py-1.5 rounded-full shadow-inner relative z-10" id="floating-total">₹0</span>
         </button>
     </div>
 
-    <!-- CART MODAL -->
-    <div id="cart-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden flex justify-end">
-        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col modal-enter">
-            <div class="px-6 py-5 border-b flex justify-between items-center">
-                <h2 class="text-xl font-bold"><i class="fa-solid fa-basket-shopping text-[#ff5722] mr-2"></i> Your Order</h2>
-                <button onclick="toggleModal('cart-modal')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-3 bg-gray-50/50"></div>
-            <div class="border-t p-6 bg-white">
-                <div class="space-y-3 text-sm text-gray-600 mb-4">
-                    <div class="flex justify-between"><span>Subtotal</span><span id="cart-subtotal" class="font-semibold text-gray-800">₹0</span></div>
-                    <div class="flex justify-between items-center">
-                        <span>Delivery Charge <br><span class="text-xs text-[#ff5722]">(Free above ₹200)</span></span>
-                        <span id="cart-delivery" class="font-semibold text-gray-800">₹0</span>
-                    </div>
-                    <div id="free-gift-banner" class="hidden bg-green-50 text-green-700 p-3 rounded-lg border border-green-200 text-sm font-bold flex items-center gap-3 mt-3">
-                        <i class="fa-solid fa-glass-water text-xl"></i> 1 Free Cold Drink added!
-                    </div>
+    <!-- OVERLAY FOR BOTTOM SHEETS -->
+    <div id="sheet-overlay" onclick="closeAllSheets()" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- CART BOTTOM SHEET -->
+    <div id="cart-sheet" class="bottom-sheet fixed bottom-0 left-0 w-full bg-white z-50 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] flex flex-col max-w-3xl mx-auto right-0">
+        <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-4 mb-2"></div>
+        <div class="px-6 pb-4 flex justify-between items-center border-b border-gray-100">
+            <h2 class="text-2xl font-extrabold text-gray-900">Your Cart</h2>
+            <button onclick="toggleSheet('cart-sheet')" class="bg-gray-100 text-gray-500 hover:bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50"></div>
+        
+        <div class="p-6 bg-white border-t border-gray-100">
+            <div class="space-y-3 text-sm font-medium text-gray-600 mb-6">
+                <div class="flex justify-between"><span>Subtotal</span><span id="cart-subtotal" class="text-gray-900 font-bold">₹0</span></div>
+                <div class="flex justify-between items-center">
+                    <span>Delivery <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded ml-1">Free > ₹200</span></span>
+                    <span id="cart-delivery" class="text-gray-900 font-bold">₹0</span>
                 </div>
-                <div class="flex justify-between items-center text-2xl font-bold mb-4 border-t pt-4">
-                    <span>Total</span><span id="cart-total" class="text-[#ff5722]">₹0</span>
+                <div id="free-gift-banner" class="hidden bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 p-3 rounded-xl border border-green-200 text-sm font-bold flex items-center gap-3 mt-2 shadow-sm">
+                    <div class="bg-white p-1.5 rounded-lg shadow-sm"><i class="fa-solid fa-glass-water text-green-500"></i></div>
+                    1 Free Cold Drink Unlocked!
                 </div>
-                <p id="min-order-warning" class="text-red-500 text-sm text-center mb-4 hidden"><i class="fa-solid fa-circle-exclamation"></i> Min order ₹100</p>
-                <button id="checkout-btn" onclick="openCheckout()" class="w-full gradient-btn text-white py-4 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                    Proceed to Pay
-                </button>
             </div>
+            
+            <button id="checkout-btn" onclick="openCheckout()" class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-between items-center px-6">
+                <span id="min-order-warning">Min Order ₹100</span>
+                <div class="flex items-center gap-3">
+                    <span id="cart-total" class="text-xl">₹0</span>
+                    <i class="fa-solid fa-arrow-right bg-white/20 p-2 rounded-full"></i>
+                </div>
+            </button>
         </div>
     </div>
 
-    <!-- CHECKOUT MODAL -->
-    <div id="checkout-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden modal-enter my-8">
-            <div class="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-6 py-5 flex justify-between items-center">
-                <h2 class="text-xl font-bold">Complete Payment</h2>
-                <button onclick="toggleModal('checkout-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <!-- CHECKOUT BOTTOM SHEET -->
+    <div id="checkout-sheet" class="bottom-sheet fixed bottom-0 left-0 w-full bg-white z-50 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[90vh] overflow-y-auto max-w-3xl mx-auto right-0 pb-6">
+        <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-4 mb-2"></div>
+        <div class="px-6 pb-4 flex justify-between items-center border-b border-gray-100 sticky top-0 bg-white z-10">
+            <h2 class="text-2xl font-extrabold text-gray-900">Checkout</h2>
+            <button onclick="closeAllSheets()" class="bg-gray-100 text-gray-500 hover:bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="p-6">
+            <div class="bg-orange-50 border border-orange-100 rounded-2xl p-5 mb-6 text-center shadow-inner">
+                <p class="text-orange-600 text-sm font-bold mb-1 uppercase tracking-wider">Amount to Pay</p>
+                <h3 class="text-4xl font-extrabold text-gray-900" id="final-pay-amount">₹0</h3>
             </div>
-            <div class="p-6">
-                <input type="text" id="cust-name" placeholder="Your Name" class="w-full mb-3 p-3 border rounded-lg focus:ring-2 focus:ring-orange-200 outline-none" required>
-                <input type="tel" id="cust-phone" placeholder="Your Phone Number" class="w-full mb-6 p-3 border rounded-lg focus:ring-2 focus:ring-orange-200 outline-none" required>
 
-                <div class="flex justify-between items-center mb-6 bg-orange-50 border border-orange-100 p-4 rounded-xl">
-                    <span class="font-semibold text-gray-700">Total Amount:</span>
-                    <span class="text-3xl font-extrabold text-[#ff5722]" id="final-pay-amount">₹0</span>
+            <div class="space-y-4 mb-6">
+                <div class="relative">
+                    <i class="fa-regular fa-user absolute left-4 top-4 text-gray-400"></i>
+                    <input type="text" id="cust-name" placeholder="Your Full Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition" required>
                 </div>
+                <div class="relative">
+                    <i class="fa-solid fa-mobile-screen absolute left-4 top-4 text-gray-400"></i>
+                    <input type="tel" id="cust-phone" placeholder="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition" required>
+                </div>
+            </div>
 
-                <div class="mb-6 bg-gray-50 border border-gray-200 rounded-xl p-5 text-center">
-                    <p class="text-sm font-bold mb-4">Pay via UPI App</p>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4 inline-block text-left w-full">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs text-gray-500 uppercase font-bold">UPI Number</span>
-                            <span class="font-mono font-bold">+918058733741</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-gray-500 uppercase font-bold">UPI ID</span>
-                            <span class="font-mono font-bold text-[#e64a19] text-sm">8058733741@ybl</span>
+            <h4 class="font-bold text-gray-900 mb-3 text-lg">Payment Method</h4>
+            
+            <div class="bg-white border-2 border-blue-100 rounded-2xl p-4 mb-4 relative overflow-hidden">
+                <label class="flex items-start gap-4 cursor-pointer w-full">
+                    <input type="radio" name="payment_method" value="UPI" checked class="mt-1 w-5 h-5 accent-blue-600">
+                    <div class="w-full">
+                        <span class="font-bold text-gray-900 block mb-1">Pay via UPI</span>
+                        <div class="bg-blue-50 p-3 rounded-xl mt-2 border border-blue-100">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-gray-500 font-semibold">UPI No:</span>
+                                <span class="font-mono font-bold text-blue-900 bg-white px-2 py-0.5 rounded shadow-sm">+918058733741</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500 font-semibold">UPI ID:</span>
+                                <span class="font-mono font-bold text-blue-900 bg-white px-2 py-0.5 rounded shadow-sm">8058733741@ybl</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="space-y-3">
-                    <label class="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#ff5722]">
-                        <input type="radio" name="payment_method" value="UPI" checked class="w-5 h-5 accent-[#ff5722]">
-                        <span class="font-bold text-gray-800">I have paid via UPI</span>
-                    </label>
-                    <label class="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#ff5722]">
-                        <input type="radio" name="payment_method" value="COD" class="w-5 h-5 accent-[#ff5722]">
-                        <span class="font-bold text-gray-800">Cash on Delivery (COD)</span>
-                    </label>
-                </div>
-
-                <button onclick="submitOrder()" id="submit-order-btn" class="w-full bg-green-500 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-600 transition mt-6">
-                    Confirm Order <i class="fa-solid fa-check-circle"></i>
-                </button>
+                </label>
             </div>
+
+            <div class="bg-white border-2 border-gray-100 rounded-2xl p-4 mb-8">
+                <label class="flex items-center gap-4 cursor-pointer w-full">
+                    <input type="radio" name="payment_method" value="COD" class="w-5 h-5 accent-orange-500">
+                    <span class="font-bold text-gray-900">Cash on Delivery (COD)</span>
+                </label>
+            </div>
+
+            <button onclick="submitOrder()" id="submit-order-btn" class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-orange-500/30 flex justify-center items-center gap-2">
+                <i class="fa-solid fa-check-circle"></i> Place Order
+            </button>
         </div>
     </div>
 
     <script>
-        // FIREBASE SETUP
-        const firebaseConfig = {
-            apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
-            authDomain: "shri-shyam-fast-food.firebaseapp.com",
-            projectId: "shri-shyam-fast-food",
-            storageBucket: "shri-shyam-fast-food.firebasestorage.app",
-            messagingSenderId: "828353855950",
-            appId: "1:828353855950:web:96d62828e8e410e8812b9f",
-            measurementId: "G-38J1Y2M8LD"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // STATIC MENU DATA (No Firebase required)
+        const menuData = [
+            { id: 'sand1', name: "Special Sandwich", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=300&q=80", desc: "Grilled to perfection with fresh veggies.", variants: [{ id: 'sand1_f', name: "Regular", price: 60 }] },
+            { id: 'burg1', name: "Crispy Burger", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80", desc: "Aloo tikki loaded with cheese.", variants: [{ id: 'burg1_f', name: "Regular", price: 50 }] },
+            { id: 'momo1', name: "Veg Momos", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?auto=format&fit=crop&w=300&q=80", desc: "Steamed hot momos served with chutney.", variants: [{ id: 'momo1_f', name: "Full Plate", price: 80 }, { id: 'momo1_h', name: "Half Plate", price: 40 }] },
+            { id: 'pav1', name: "Mumbai Pav Bhaji", img: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=300&q=80", desc: "Buttery paav with extra spicy bhaji.", variants: [{ id: 'pav1_f', name: "Full Plate", price: 90 }, { id: 'pav1_h', name: "Half Plate", price: 50 }] },
+            { id: 'chow1', name: "Hakka Chowmein", img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=300&q=80", desc: "Wok-tossed noodles with veggies.", variants: [{ id: 'chow1_f', name: "Full Plate", price: 70 }, { id: 'chow1_h', name: "Half Plate", price: 40 }] },
+            { id: 'bhel1', name: "Chatpati Bhel Puri", img: "https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&w=300&q=80", desc: "Sweet, sour, and spicy mixture.", variants: [{ id: 'bhel1_f', name: "Full Plate", price: 50 }, { id: 'bhel1_h', name: "Half Plate", price: 30 }] }
+        ];
 
-        let menuData = [];
         let cart = [];
 
-        // FETCH MENU FROM FIREBASE
-        db.collection("menu").get().then((querySnapshot) => {
-            document.getElementById("loading").style.display = "none";
-            querySnapshot.forEach((doc) => {
-                let item = doc.data();
-                item.id = doc.id;
-                menuData.push(item);
-            });
-            renderMenu();
-        }).catch(error => {
-            document.getElementById("loading").innerHTML = "Error loading menu. Admin needs to initialize it.";
-            console.error(error);
-        });
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            const icon = document.getElementById('toast-icon');
+            
+            if(isError) {
+                icon.className = 'fa-solid fa-circle-exclamation text-red-400';
+                toast.classList.add('bg-red-900'); toast.classList.remove('bg-gray-900');
+            } else {
+                icon.className = 'fa-solid fa-circle-check text-green-400';
+                toast.classList.add('bg-gray-900'); toast.classList.remove('bg-red-900');
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function toggleSheet(id) {
+            const sheet = document.getElementById(id);
+            const overlay = document.getElementById('sheet-overlay');
+            if (sheet.classList.contains('open')) {
+                sheet.classList.remove('open');
+                overlay.classList.remove('!block'); setTimeout(() => overlay.classList.remove('opacity-100'), 10);
+            } else {
+                closeAllSheets();
+                sheet.classList.add('open');
+                overlay.classList.add('!block'); setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            }
+        }
+
+        function closeAllSheets() {
+            document.querySelectorAll('.bottom-sheet').forEach(el => el.classList.remove('open'));
+            const overlay = document.getElementById('sheet-overlay');
+            overlay.classList.remove('opacity-100'); setTimeout(() => overlay.classList.remove('!block'), 300);
+        }
 
         function renderMenu() {
             const grid = document.getElementById('menu-grid');
-            grid.innerHTML = menuData.map(item => {
+            grid.innerHTML = menuData.map((item, index) => {
                 let variantHTML = '';
-                if(item.variants && item.variants.length > 1) {
+                if(item.variants.length > 1) {
                     let options = item.variants.map(v => `<option value="${v.id}" data-price="${v.price}">${v.name}</option>`).join('');
-                    variantHTML = `<select id="select-${item.id}" onchange="updatePrice('${item.id}')" class="w-full bg-gray-50 border border-gray-200 py-2 px-3 rounded-lg text-sm mb-3">${options}</select>`;
+                    variantHTML = `<div class="relative bg-gray-50 rounded-xl mb-4 border border-gray-200"><select id="select-${item.id}" onchange="updatePrice('${item.id}')" class="w-full bg-transparent py-3 px-4 font-medium text-gray-700 outline-none text-sm">${options}</select></div>`;
                 } else {
-                    variantHTML = `<input type="hidden" id="select-${item.id}" value="${item.variants[0].id}"><div class="text-sm text-gray-500 mb-3 py-2">${item.variants[0].name}</div>`;
+                    variantHTML = `<input type="hidden" id="select-${item.id}" value="${item.variants[0].id}"><div class="bg-gray-50 rounded-xl mb-4 border border-gray-100 py-3 px-4 text-sm font-medium text-gray-500">${item.variants[0].name}</div>`;
                 }
                 return `
-                <div class="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition border border-gray-100 flex flex-col group">
-                    <div class="h-48 overflow-hidden"><img src="${item.img}" class="w-full h-full object-cover group-hover:scale-105 transition"></div>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-lg text-gray-800">${item.name}</h4>
-                            <span id="price-disp-${item.id}" class="font-extrabold text-[#ff5722] text-xl">₹${item.variants[0].price}</span>
-                        </div>
-                        <p class="text-sm text-gray-500 mb-4 flex-grow line-clamp-2">${item.desc}</p>
-                        ${variantHTML}
-                        <button onclick="addToCart('${item.id}')" class="w-full bg-orange-50 text-[#e64a19] font-bold py-3 rounded-xl hover:bg-[#ff5722] hover:text-white transition border border-orange-100">
-                            Add Item
-                        </button>
+                <div class="food-card bg-white rounded-[2rem] p-4 border border-gray-100 shadow-sm flex flex-col group fade-in-up" style="animation-delay: ${0.1 * index}s">
+                    <div class="h-48 rounded-2xl overflow-hidden relative mb-4">
+                        <img src="${item.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                     </div>
+                    <div class="flex justify-between items-start mb-2 px-1">
+                        <h4 class="font-bold text-xl text-gray-900">${item.name}</h4>
+                        <span id="price-disp-${item.id}" class="font-extrabold text-orange-600 text-xl">₹${item.variants[0].price}</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-5 flex-grow px-1">${item.desc}</p>
+                    ${variantHTML}
+                    <button onclick="addToCart('${item.id}')" class="w-full bg-orange-50 text-orange-600 font-bold py-3.5 rounded-xl hover:bg-orange-500 hover:text-white transition duration-300">
+                        <i class="fa-solid fa-plus mr-2"></i> Add to Cart
+                    </button>
                 </div>`;
             }).join('');
         }
@@ -218,6 +273,11 @@
 
             cart.push({ cartId: Date.now(), baseName: baseItem.name, variantName: variant.name, price: Number(variant.price) });
             updateCartUI();
+            showToast(`${baseItem.name} added!`);
+            
+            const badge = document.getElementById('cart-badge');
+            badge.classList.remove('hidden'); badge.classList.add('animate-bounce');
+            setTimeout(() => badge.classList.remove('animate-bounce'), 1000);
         }
 
         function removeFromCart(cartId) {
@@ -227,78 +287,4 @@
 
         function updateCartUI() {
             const cartContainer = document.getElementById('cart-items');
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-            const delivery = (subtotal > 0 && subtotal < 200) ? 20 : 0;
-            const total = subtotal + delivery;
-            const isMinMet = subtotal >= 100;
-
-            document.getElementById('cart-badge').innerText = cart.length;
-            document.getElementById('cart-badge').classList.toggle('hidden', cart.length === 0);
-            document.getElementById('floating-total').innerText = `₹${total}`;
-
-            if (cart.length === 0) {
-                cartContainer.innerHTML = `<div class="text-center text-gray-400 py-10"><p class="font-medium">Cart is empty</p></div>`;
-            } else {
-                cartContainer.innerHTML = cart.map(item => `
-                    <div class="flex justify-between items-center bg-white p-4 rounded-xl border mb-2">
-                        <div><p class="font-bold">${item.baseName}</p><span class="text-xs bg-gray-100 px-2 py-0.5 rounded">${item.variantName}</span> <span class="text-[#ff5722] font-bold text-sm">₹${item.price}</span></div>
-                        <button onclick="removeFromCart(${item.cartId})" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                `).join('');
-            }
-
-            document.getElementById('cart-subtotal').innerText = `₹${subtotal}`;
-            document.getElementById('cart-delivery').innerText = delivery === 0 && subtotal > 0 ? "FREE" : `₹${delivery}`;
-            document.getElementById('cart-total').innerText = `₹${total}`;
-            document.getElementById('free-gift-banner').classList.toggle('hidden', !isMinMet);
-            
-            const btn = document.getElementById('checkout-btn');
-            btn.disabled = !isMinMet;
-            document.getElementById('min-order-warning').classList.toggle('hidden', isMinMet || subtotal === 0);
-        }
-
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
-
-        function openCheckout() {
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('final-pay-amount').innerText = `₹${subtotal + (subtotal < 200 ? 20 : 0)}`;
-            toggleModal('cart-modal'); toggleModal('checkout-modal');
-        }
-
-        // SEND ORDER TO FIREBASE
-        function submitOrder() {
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-
-            if(!name || !phone) return alert("Please enter Name and Phone Number");
-
-            document.getElementById('submit-order-btn').innerText = "Processing...";
-            
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-            const delivery = subtotal < 200 ? 20 : 0;
-            
-            const orderData = {
-                customerName: name,
-                customerPhone: phone,
-                items: cart,
-                subtotal: subtotal,
-                deliveryCharge: delivery,
-                totalAmount: subtotal + delivery,
-                hasFreeDrink: subtotal >= 100,
-                paymentMethod: paymentMethod,
-                status: "Pending",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            db.collection("orders").add(orderData).then((docRef) => {
-                alert(`Order Placed Successfully! Order ID: ${docRef.id.slice(-5).toUpperCase()}`);
-                cart = []; updateCartUI();
-                toggleModal('checkout-modal');
-                document.getElementById('submit-order-btn').innerText = "Confirm Order";
-                document.getElementById('cust-name').value = ''; document.getElementById('cust-phone').value = '';
-            }).catch(error => alert("Error placing order: " + error.message));
-        }
-    </script>
-</body>
-</html>
+            const subtotal = cart.reduce((sum, item
