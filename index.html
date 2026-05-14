@@ -39,10 +39,10 @@
 
     <div id="closed-screen" class="hidden fixed inset-0 bg-white/95 backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
         <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
-        <h2 class="text-4xl font-black text-gray-800">Dukaan Band Hai</h2>
+        <h2 class="text-4xl font-black text-gray-800"> Shop Off Kindly Wait to open</h2>
         <p class="text-gray-500 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
         <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">
-            Admin Login
+            Owner Login
         </button>
     </div>
 
@@ -66,7 +66,7 @@
         
         <div id="admin-panel" class="hidden slide-up bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white relative">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i> MASTER CONTROL</h2>
+                <h2 class="text-xl font-black"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i> Owner Control [ Jitu ]</h2>
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
@@ -75,7 +75,7 @@
             <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
                 <p class="font-bold text-gray-300 text-xs mb-3 uppercase tracking-wider">Naya Item Add Karein</p>
                 <div class="grid grid-cols-12 gap-2">
-                    <input id="new-i" placeholder="Emoji" class="col-span-3 p-3 bg-black/30 rounded-xl text-center outline-none border border-white/10 text-xs">
+                    <input id="new-i" placeholder="link" class="col-span-3 p-3 bg-black/30 rounded-xl text-center outline-none border border-white/10 text-xs">
                     <input id="new-n" placeholder="Item Name" class="col-span-9 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
                     <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/30 rounded-xl outline-none border border-white/10">
                     <button onclick="addItem()" class="col-span-6 bg-gradient-to-r from-red-600 to-orange-500 text-white font-black rounded-xl btn-press shadow-lg">ADD +</button>
@@ -120,7 +120,7 @@
                 <div class="space-y-3">
                     <input id="u-n" placeholder="Aapka Naam" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
                     <input id="u-p" type="tel" placeholder="Mobile Number" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
-                    <input id="u-a" placeholder="Pura Address (Ya Self Pickup)" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
+                    <input id="u-a" placeholder=" Type : Self Pickup" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
                     <select id="u-t" class="w-full p-4 bg-gray-50 border rounded-xl outline-none font-bold">
                         <option>15 मिनट में</option>
                         <option>30 मिनट में</option>
