@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Fast Food - Moulasar</title>
+    <title>Shri Shyam Fast Food - Admin Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -292,7 +292,7 @@
         function updateOrderStatus(orderId, newStatus, phone, custName) {
             if(!newStatus) return;
             rdb.ref(`orders/${orderId}/status`).set(newStatus).then(() => {
-                const statusMsg = `*Hello ${custName}*! %0A%0A*Shri Shyam Fast Food* se aapka order ab *${newStatus}* Per hai Kripya Jaldi se Aaye our Aaka Parcel 📦 Receive kre. %0A%0ADhanyawad! 🙏`;
+                const statusMsg = `*Hello ${custName}*! %0A%0A*Shri Shyam Fast Food* se aapka order ab *${newStatus}* hai. %0A%0ADhanyawad! 🙏`;
                 if(confirm("Status WhatsApp par bhejein?")) {
                     window.open(`https://wa.me/91${phone}?text=${statusMsg}`, '_blank');
                 }
