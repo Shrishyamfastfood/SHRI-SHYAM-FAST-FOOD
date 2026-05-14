@@ -292,11 +292,12 @@
         function updateOrderStatus(orderId, newStatus, phone, custName) {
             if(!newStatus) return;
             rdb.ref(`orders/${orderId}/status`).set(newStatus).then(() => {
-                
-                // ORDER KI DETAILS MANGWA RAHE HAIN BINA APP KO CRASH KIYE
-                rdb.ref(`orders/${orderId}`).once('value').then(snap => {
-                    const order = snap.val();
-                    if(order) {
-                        const statusMsg = `🛒 *Order Summary:*%0A👤 *Customer Name:* ${order.customerName}%0A📦 *Item:*%0A${order.items}%0A💰 *Rate:* ₹${order.total}%0A🔄 *Current Status:* ${newStatus}%0A💳 *Payment Status:* ${order.payType}%0A🚚 *Estimated Delivery:* ${order.orderTime}%0A📍 *Tracking/Support:* https://wa.me/918058733741`;
-                        
-  
+                const statusMsg = `*Hello ${custName}*! %0A%0A*Shri Shyam Fast Food* se aapka order ab *${newStatus}* hai. %0A%0ADhanyawad! 🙏`;
+                if(confirm("Status WhatsApp par bhejein?")) {
+                    window.open(`https://wa.me/91${phone}?text=${statusMsg}`, '_blank');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
