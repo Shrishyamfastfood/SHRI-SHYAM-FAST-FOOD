@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDKs (v8) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -40,8 +40,8 @@
             <div>
                 <h1 class="font-black text-lg gradient-text uppercase tracking-tight">Shri Shyam Fast Food</h1>
                 <div class="flex items-center gap-2 mt-0.5">
-                    <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
-                        <span class="status-dot bg-gray-400"></span> <span id="shop-text">Checking...</span>
+                    <span id="shop-indicator" class="text-green-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
+                        <span class="status-dot bg-green-500"></span> <span id="shop-text">SHOP OPEN</span>
                     </span>
                     <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
                 </div>
@@ -78,7 +78,7 @@
                 <h2 class="text-xl font-black text-yellow-400">Admin Panel</h2>
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase btn-press">Loading...</button>
+            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase btn-press bg-red-600 text-white">TURN OFF SHOP</button>
             <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
                 <p class="font-bold text-gray-300 text-xs mb-3 uppercase">Add Item</p>
                 <div class="grid grid-cols-12 gap-2">
@@ -96,7 +96,9 @@
         </div>
 
         <h2 class="text-2xl font-black text-gray-800 mb-4 border-b-2 border-red-100 pb-2 border-dashed">Today's Menu</h2>
-        <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p class="text-gray-400 font-bold text-sm col-span-full">Menu load ho raha hai...</p>
+        </div>
     </div>
 
     <!-- UI Elements -->
@@ -166,23 +168,35 @@
         let cart = [];
         let isShopOpen = true;
 
-        // Force check database
+        // --- ERROR CATCHER LOGIC ---
+        // Agar Rules galat hue toh screen par alert dega
         rdb.ref('shop_status').on('value', snap => {
-            if (snap.val() === null) rdb.ref('shop_status').set(true);
-            isShopOpen = (snap.val() !== false);
-            document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
-            document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
-            const btn = document.getElementById('toggle-shop-btn');
-            btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
-            btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white" : "w-full py-4 rounded-xl font-black bg-green-500 text-white";
+            if(snap.val() !== null) {
+                isShopOpen = snap.val();
+                document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
+                document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
+                const btn = document.getElementById('toggle-shop-btn');
+                btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
+                btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white" : "w-full py-4 rounded-xl font-black bg-green-500 text-white";
+            }
+        }, (error) => {
+            // Yahan se pata chalega connection kyu ruk raha hai
+            console.error(error);
+            alert("Firebase Connection Error: Please apne Firebase Console me 'Realtime Database' ke 'Rules' check karein aur unhe true karein.");
+            document.getElementById('shop-text').innerText = "DB ERROR";
+            document.getElementById('menu-box').innerHTML = "<p class='text-red-500 font-bold'>Database se connect nahi ho paaya. Rules check karein.</p>";
         });
 
+        // Menu Sync
         rdb.ref('menu').on('value', snap => {
             const data = snap.val() || {};
             const box = document.getElementById('menu-box');
             const adminBox = document.getElementById('admin-menu-list');
             box.innerHTML = ''; adminBox.innerHTML = '';
+            
             const items = Object.keys(data).map(id => ({ id, ...data[id] }));
+            if(items.length === 0) { box.innerHTML = '<p class="text-gray-400 font-bold col-span-full">Main menu abhi khali hai.</p>'; return; }
+            
             items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
             items.forEach(i => {
                 const isAvail = i.available !== false;
@@ -267,15 +281,4 @@
         });
 
         function loginAdmin() { if(prompt("PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
-        function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
-        function addItem() {
-            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍔";
-            if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; }
-        }
-        function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
-        function updateCartUI() {
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            const floatBar = document.getElementById('floating-cart');
-            if(cart.length > 0) floatBar.classList.remove('translate-y-32'); else floatBar.classList.add('translate-y-32');
-            document.getElementById('float-items').innerText = `${cart.length} ITEMS`;
-       
+        function toggleShop() { rdb.ref('shop_status').s
