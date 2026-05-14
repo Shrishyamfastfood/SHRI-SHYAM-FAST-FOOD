@@ -20,6 +20,11 @@
         .cart-sheet { transition: transform 0.4s; transform: translateY(110%); }
         .cart-sheet.active { transform: translateY(0); }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        
+        /* New Tracking Bar Styles */
+        .track-card { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 1.5rem; margin-bottom: 1.5rem; overflow: hidden; position: relative; }
+        .pulse-orange { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -50,6 +55,29 @@
     </header>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
+
+        <!-- LIVE TRACKING BAR (New) -->
+        <div id="user-tracking-box" class="hidden track-card p-5 text-white shadow-xl">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Active Order Status</p>
+                    <h3 id="track-status-text" class="text-xl font-black uppercase italic">Pending...</h3>
+                </div>
+                <div class="text-right">
+                    <p id="track-id" class="text-[9px] text-gray-400">#----</p>
+                    <button onclick="requestCancel()" id="cancel-btn" class="text-[10px] font-black text-red-400 uppercase mt-1 border border-red-400/30 px-2 py-0.5 rounded-lg btn-press">Cancel Order</button>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center relative px-2 py-4">
+                <div class="absolute h-1 bg-white/10 left-6 right-6 top-1/2 -translate-y-1/2 z-0"></div>
+                <div id="bar-progress" class="absolute h-1 bg-blue-500 left-6 w-0 top-1/2 -translate-y-1/2 z-0 transition-all duration-1000"></div>
+                
+                <div class="z-10 bg-slate-800 p-2 rounded-full border-2 border-blue-500 shadow-lg text-xs" title="Pending"><i class="fa-solid fa-clock pulse-orange"></i></div>
+                <div id="step-prep" class="z-10 bg-slate-900 p-2 rounded-full border-2 border-white/20 text-xs" title="Preparing"><i class="fa-solid fa-fire-burner"></i></div>
+                <div id="step-ready" class="z-10 bg-slate-900 p-2 rounded-full border-2 border-white/20 text-xs" title="Ready"><i class="fa-solid fa-utensils"></i></div>
+            </div>
+        </div>
         
         <!-- Admin Dashboard -->
         <div id="admin-panel" class="hidden bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white">
@@ -180,15 +208,12 @@
             
             const items = Object.keys(data).map(id => ({ id, ...data[id] }));
             
-            // Sort: In Stock (true) first, Out of Stock (false) last
             items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
 
             if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai.</p>';
 
             items.forEach(i => {
                 const isAvail = i.available !== false;
-                
-                // User Menu
                 box.innerHTML += `
                 <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
                     <div class="flex items-center gap-3">
@@ -198,7 +223,6 @@
                     ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}
                 </div>`;
                 
-                // Admin List
                 adminBox.innerHTML += `
                 <div class="bg-white/5 p-3 rounded-xl border border-white/10">
                     <div class="flex justify-between items-center mb-2">
@@ -225,19 +249,19 @@
             keys.forEach(id => {
                 const o = orders[id];
                 const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const statusColor = o.status === 'Pending' ? 'text-yellow-400' : (o.status === 'Preparing' ? 'text-blue-400' : 'text-green-400');
+                const statusColor = o.status === 'Pending' ? 'text-yellow-400' : (o.status === 'Preparing' ? 'text-blue-400' : (o.status === 'Cancelled' ? 'text-red-500' : 'text-green-400'));
                 
                 orderList.innerHTML += `
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm mb-4">
                     <div class="flex justify-between items-start mb-2">
-                        <div><p class="font-black text-orange-400 text-base">${o.customerName}</p><p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType}</p></div>
+                        <div><p class="font-black text-orange-400 text-base">${o.customerName}</p><p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} ${o.cancelRequest ? '⚠️ <span class="text-red-500">REFUND REQUEST</span>' : ''}</p></div>
                         <span class="font-black ${statusColor}">${o.status}</span>
                     </div>
                     <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg">${o.items.replace(/%0A/g, '<br>')}</div>
                     <div class="flex gap-2">
                         <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">
                             <option value="">Status Update</option>
-                            <option value="Preparing">Preparing</option><option value="Ready">Ready</option><option value="Completed">Done</option><option value="Cancelled">Cancel</option>
+                            <option value="Preparing">Preparing</option><option value="Ready">Ready</option><option value="Completed">Done</option><option value="Cancelled">Cancel/Refunded</option>
                         </select>
                         <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
                     </div>
@@ -245,45 +269,30 @@
             });
         });
 
-        function loginAdmin() { if(prompt("PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
-        function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
-        function addItem() {
-            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍔";
-            if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; }
-        }
-        function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
-        function updateCartUI() {
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            const floatBar = document.getElementById('floating-cart');
-            if(cart.length > 0) floatBar.classList.remove('translate-y-32'); else floatBar.classList.add('translate-y-32');
-            document.getElementById('float-items').innerText = `${cart.length} ITEMS`;
-            document.getElementById('float-total').innerText = `₹${total}`;
-            document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between text-sm font-bold text-gray-700"><span>${i.name}</span><span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-red-400 ml-2"></i></span></div>`).join('');
-            document.getElementById('sheet-total').innerText = `₹${total}`;
-        }
-        function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
-        function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
-        function processPayment() {
-            if(!document.getElementById('u-n').value || !document.getElementById('u-p').value) { alert("Details bhariye!"); return; }
-            if(document.getElementById('u-pay').value === "PAID") document.getElementById('qr-modal').classList.remove('hidden');
-            else confirmOrderAndSave("COD");
-        }
-        function confirmOrderAndSave(type) {
-            const name = document.getElementById('u-n').value, phone = document.getElementById('u-p').value;
-            let itemsMsg = cart.map(i => `▫️ ${i.name} - ₹${i.price}`).join('%0A');
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            rdb.ref('orders').push({ customerName: name, customerPhone: phone, items: itemsMsg, total, payType: type, status: 'Pending', timestamp: Date.now() })
-            .then(() => {
-                window.location.href = `https://wa.me/918058733741?text=*नया ऑर्डर (${type})*%0A*नाम:* ${name}%0A*आइटम्स:*%0A${itemsMsg}%0A*टोटल:* ₹${total}`;
-                cart = []; updateCartUI(); closeCheckout(); document.getElementById('qr-modal').classList.add('hidden');
+        // USER TRACKING LOGIC
+        const activeOrderId = localStorage.getItem('last_shyam_order');
+        if(activeOrderId) {
+            rdb.ref(`orders/${activeOrderId}`).on('value', snap => {
+                const o = snap.val();
+                const box = document.getElementById('user-tracking-box');
+                if(!o || o.status === 'Completed' || o.status === 'Cancelled') {
+                    box.classList.add('hidden');
+                    return;
+                }
+                
+                box.classList.remove('hidden');
+                document.getElementById('track-id').innerText = `#${activeOrderId.slice(-5)}`;
+                document.getElementById('track-status-text').innerText = o.status;
+                
+                const bar = document.getElementById('bar-progress');
+                const sPrep = document.getElementById('step-prep');
+                const sReady = document.getElementById('step-ready');
+                
+                if(o.status === 'Pending') { bar.style.width = '0%'; }
+                if(o.status === 'Preparing') { bar.style.width = '50%'; sPrep.classList.add('border-blue-500', 'bg-slate-800'); sPrep.innerHTML = '<i class="fa-solid fa-fire-burner pulse-orange"></i>'; }
+                if(o.status === 'Ready') { bar.style.width = '100%'; sReady.classList.add('border-blue-500', 'bg-slate-800'); sReady.innerHTML = '<i class="fa-solid fa-utensils pulse-orange"></i>'; }
+                if(o.cancelRequest) { document.getElementById('track-status-text').innerText = "Refund Pending..."; document.getElementById('cancel-btn').classList.add('hidden'); }
             });
         }
-        function updateOrderStatus(id, status, phone, name) {
-            if(!status) return;
-            rdb.ref(`orders/${id}/status`).set(status).then(() => {
-                if(confirm("WhatsApp alert bhejein?")) window.open(`https://wa.me/91${phone}?text=Hello ${name}, aapka order ab ${status} hai.`, '_blank');
-            });
-        }
-    </script>
-</body>
-</html>
+
+        function requestCanc
