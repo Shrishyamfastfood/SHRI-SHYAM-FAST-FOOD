@@ -125,6 +125,7 @@
                         <option>15 मिनट में</option>
                         <option>30 मिनट में</option>
                         <option>1 घंटे में</option>
+                        <option>On The Shop</option>
                     </select>
                 </div>
                 <div class="space-y-3 pb-6">
@@ -285,7 +286,7 @@
             let items = cart.map(i => `▫️ ${i.name} - ₹${i.price}`).join('%0A');
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             
-            let footerMsg = type === "PAID" ? `_(भाई मैंने ₹${total} का पेमेंट QR से कर दिया है, स्क्रीनशॉट भेज रहा हूँ!)_` : `_(Cash on Delivery - पैसे डिलीवरी पर दूंगा)_`;
+            let footerMsg = type === "PAID" ? `_( Paid ₹${total})_` : `_(Cash on Delivery -_`;
             const msg = `*🍔 नया ${type} ऑर्डर (MOULASAR)*%0A%0A*ग्राहक:* ${n}%0A*नंबर:* ${p}%0A*समय:* ${t}%0A*एड्रेस:* ${a}%0A%0A*आइटम्स:*%0A${items}%0A-------------------%0A*कुल बिल: ₹${total}*%0A-------------------%0A${footerMsg}`;
             
             window.location.href = `https://wa.me/918058733741?text=${msg}`;
