@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -23,6 +24,7 @@
 </head>
 <body>
 
+    <!-- Closed Screen -->
     <div id="closed-screen" class="hidden fixed inset-0 bg-white/95 backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
         <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
         <h2 class="text-4xl font-black text-gray-800">Shop Closed</h2>
@@ -37,7 +39,7 @@
                 <h1 class="font-black text-lg gradient-text uppercase tracking-tight">Shri Shyam Fast Food</h1>
                 <div class="flex items-center gap-2 mt-0.5">
                     <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
-                        <span class="status-dot bg-red-500"></span> <span id="shop-text">Checking...</span>
+                        <span class="status-dot bg-gray-400"></span> <span id="shop-text">Checking...</span>
                     </span>
                     <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
                 </div>
@@ -48,13 +50,14 @@
 
     <div class="max-w-2xl mx-auto px-4 py-6">
         
+        <!-- Admin Panel -->
         <div id="admin-panel" class="hidden bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-black text-yellow-400">Admin Dashboard</h2>
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase btn-press"></button>
+            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase btn-press">Loading...</button>
 
             <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
                 <p class="font-bold text-gray-300 text-xs mb-3 uppercase">Naya Item Add Karein</p>
@@ -71,9 +74,7 @@
 
             <div class="mt-8 border-t border-white/10 pt-6">
                 <h3 class="text-lg font-black mb-4 text-orange-400"><i class="fa-solid fa-receipt mr-2"></i> Live Orders</h3>
-                <div id="admin-orders-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
-                    <p class="text-gray-500 text-center text-sm font-bold">Koi naya order nahi hai.</p>
-                </div>
+                <div id="admin-orders-list" class="space-y-4 max-h-96 overflow-y-auto pr-2"></div>
             </div>
         </div>
 
@@ -81,6 +82,7 @@
         <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
+    <!-- Floating Cart & Modals (Checkout, QR) same as before -->
     <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-transform duration-300 translate-y-32">
         <div onclick="openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
             <div>
@@ -142,19 +144,27 @@
             projectId: "shri-shyam-fast-food",
             storageBucket: "shri-shyam-fast-food.firebasestorage.app",
             messagingSenderId: "828353855950",
-            appId: "1:828353855950:web:96d62828e8e410e8812b9f"
+            appId: "1:828353855950:web:96d62828e8e410e8812b9f",
+            measurementId: "G-38J1Y2M8LD"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const rdb = firebase.database();
 
         let cart = [];
         let isShopOpen = true;
 
+        // Auto-fix: Agar database khali hai toh status initialize karein
+        rdb.ref('shop_status').once('value', snap => {
+            if (snap.val() === null) rdb.ref('shop_status').set(true);
+        });
+
         // Sync Shop Status
         rdb.ref('shop_status').on('value', snap => {
-            isShopOpen = snap.val() ?? true;
+            isShopOpen = (snap.val() !== false);
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
             document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
+            
             const btn = document.getElementById('toggle-shop-btn');
             btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
@@ -167,11 +177,15 @@
             const adminBox = document.getElementById('admin-menu-list');
             box.innerHTML = ''; adminBox.innerHTML = '';
             
-            Object.keys(data).forEach(id => {
+            const keys = Object.keys(data);
+            if(keys.length === 0) {
+                box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu is empty. Add items from Admin.</p>';
+            }
+
+            keys.forEach(id => {
                 const i = data[id];
                 const isAvail = i.available !== false;
                 
-                // User Side Menu
                 box.innerHTML += `
                 <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
                     <div class="flex items-center gap-3">
@@ -181,32 +195,22 @@
                     ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-bold uppercase">OUT</span>`}
                 </div>`;
                 
-                // Admin Side Menu with Price Edit
                 adminBox.innerHTML += `
                 <div class="bg-white/5 p-3 rounded-xl border border-white/10">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-xs font-bold text-white truncate w-32">${i.name}</span>
                         <div class="flex gap-2">
                             <button onclick="rdb.ref('menu/${id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
-                            <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 btn-press p-1"><i class="fa fa-trash"></i></button>
+                            <button onclick="if(confirm('Delete?')) rdb.ref('menu/${id}').remove()" class="text-red-400 btn-press p-1"><i class="fa fa-trash"></i></button>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="text-[10px] text-gray-400 font-bold">PRICE (₹):</span>
-                        <input type="number" value="${i.price}" 
-                            onchange="updatePrice('${id}', this.value)" 
-                            class="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none focus:border-yellow-400">
+                        <span class="text-[10px] text-gray-400 font-bold">PRICE:</span>
+                        <input type="number" value="${i.price}" onchange="rdb.ref('menu/${id}/price').set(parseInt(this.value))" class="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none focus:border-yellow-400">
                     </div>
                 </div>`;
             });
         });
-
-        // Update Price Function
-        function updatePrice(id, newPrice) {
-            if(newPrice && !isNaN(newPrice)) {
-                rdb.ref(`menu/${id}/price`).set(parseInt(newPrice));
-            }
-        }
 
         // SYNC LIVE ORDERS
         rdb.ref('orders').on('value', snap => {
@@ -216,7 +220,7 @@
             
             const keys = Object.keys(orders);
             if(keys.length === 0) {
-                orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">Koi naya order nahi hai.</p>';
+                orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No active orders.</p>';
                 return;
             }
 
@@ -226,35 +230,33 @@
                 const statusColor = o.status === 'Pending' ? 'text-yellow-400' : (o.status === 'Preparing' ? 'text-blue-400' : 'text-green-400');
                 
                 orderList.innerHTML += `
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm">
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm mb-4">
                     <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <p class="font-black text-orange-400 text-base">${o.customerName}</p>
-                            <p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} | ${o.orderTime}</p>
-                        </div>
+                        <div><p class="font-black text-orange-400 text-base">${o.customerName}</p><p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType}</p></div>
                         <span class="font-black ${statusColor}">${o.status}</span>
                     </div>
-                    <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg font-bold">
-                        ${o.items.replace(/%0A/g, '<br>')}
-                        <p class="mt-2 pt-2 border-t border-white/10 font-black text-white">Total: ₹${o.total}</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-white/10">
-                            <option value="">Update Status</option>
-                            <option value="Preparing">Preparing 👨‍🍳</option>
-                            <option value="Ready">Ready for Pickup ✅</option>
-                            <option value="Completed">Completed 🏁</option>
-                            <option value="Cancelled">Cancel ❌</option>
+                    <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg">${o.items.replace(/%0A/g, '<br>')}</div>
+                    <div class="flex gap-2">
+                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">
+                            <option value="">Status Update</option>
+                            <option value="Preparing">Preparing</option>
+                            <option value="Ready">Ready</option>
+                            <option value="Completed">Done</option>
+                            <option value="Cancelled">Cancel</option>
                         </select>
-                        <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 p-2 rounded-lg text-xs font-black text-white btn-press shadow-lg"><i class="fa-brands fa-whatsapp text-sm"></i> Chat</button>
+                        <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
                     </div>
                 </div>`;
             });
         });
 
-        function loginAdmin() { if(prompt("Enter PIN:") === "8087jitu") { document.getElementById('closed-screen').style.display='none'; document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
+        // Functions
+        function loginAdmin() { if(prompt("Enter PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
         function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
-        function addItem() { const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍔"; if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; } }
+        function addItem() {
+            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍔";
+            if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; }
+        }
         
         function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
         function updateCartUI() {
@@ -263,7 +265,7 @@
             if(cart.length > 0) floatBar.classList.remove('translate-y-32'); else floatBar.classList.add('translate-y-32');
             document.getElementById('float-items').innerText = `${cart.length} ITEMS`;
             document.getElementById('float-total').innerText = `₹${total}`;
-            document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between text-sm font-bold text-gray-700"><span>${i.name}</span><span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-red-400 ml-2 cursor-pointer btn-press"></i></span></div>`).join('');
+            document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between text-sm font-bold text-gray-700"><span>${i.name}</span><span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-red-400 ml-2"></i></span></div>`).join('');
             document.getElementById('sheet-total').innerText = `₹${total}`;
         }
 
@@ -272,33 +274,33 @@
 
         function processPayment() {
             if(!document.getElementById('u-n').value || !document.getElementById('u-p').value) { alert("Details bhariye!"); return; }
-            if(document.getElementById('u-pay').value === "PAID") {
-                document.getElementById('qr-modal').classList.remove('hidden');
-            } else {
-                confirmOrderAndSave("COD");
-            }
+            if(document.getElementById('u-pay').value === "PAID") document.getElementById('qr-modal').classList.remove('hidden');
+            else confirmOrderAndSave("COD");
         }
 
         function confirmOrderAndSave(type) {
             const name = document.getElementById('u-n').value;
             const phone = document.getElementById('u-p').value;
-            const address = document.getElementById('u-a').value;
-            const timePref = document.getElementById('u-t').value;
             let itemsMsg = cart.map(i => `▫️ ${i.name} - ₹${i.price}`).join('%0A');
             let total = cart.reduce((sum, i) => sum + i.price, 0);
 
-            const orderData = {
-                customerName: name,
-                customerPhone: phone,
-                items: itemsMsg,
-                total: total,
-                payType: type,
-                orderTime: timePref,
-                address: address,
-                status: 'Pending',
-                timestamp: Date.now()
-            };
+            rdb.ref('orders').push({
+                customerName: name, customerPhone: phone, items: itemsMsg,
+                total: total, payType: type, status: 'Pending', timestamp: Date.now()
+            }).then(() => {
+                window.location.href = `https://wa.me/918058733741?text=*🍔 नया ${type} ऑर्डर*%0A*नाम:* ${name}%0A*आइटम्स:*%0A${itemsMsg}%0A*टोटल:* ₹${total}`;
+                cart = []; updateCartUI(); closeCheckout(); document.getElementById('qr-modal').classList.add('hidden');
+            });
+        }
 
-            rdb.ref('orders').push(orderData).then(() => {
-                const msg = `*🍔 नया ${type} ऑर्डर*%0A%0A*नाम:* ${name}%0A*नंबर:* ${phone}%0A*आइटम्स:*%0A${itemsMsg}%0A*कुल बिल:* ₹${total}%0A-------------------%0A_Order ID save ho gaya hai. Kripya process karein._`;
-             
+        function updateOrderStatus(orderId, newStatus, phone, custName) {
+            if(!newStatus) return;
+            rdb.ref(`orders/${orderId}/status`).set(newStatus).then(() => {
+                if(confirm("WhatsApp par alert bhejein?")) {
+                    window.open(`https://wa.me/91${phone}?text=Hello ${custName}, Aapka order ab ${newStatus} hai.`, '_blank');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
