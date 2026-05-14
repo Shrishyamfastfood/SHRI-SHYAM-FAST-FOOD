@@ -148,111 +148,88 @@
         let cart = [];
         let isShopOpen = true;
 
-        // HELPER: Anti-Crash Functions
-        function getSafeStr(val) { return val ? String(val) : ''; }
-        function getSafePrice(val) { return Number(val) || 0; }
-
         // Sync Shop Status
         rdb.ref('shop_status').on('value', snap => {
-            try {
-                isShopOpen = snap.val() !== null ? snap.val() : true;
-                document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
-                document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
-                const btn = document.getElementById('toggle-shop-btn');
-                btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
-                btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
-            } catch(e) {}
+            isShopOpen = snap.val() ?? true;
+            document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
+            document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
+            const btn = document.getElementById('toggle-shop-btn');
+            btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
+            btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
         });
 
-        // Sync Menu Safely
+        // Sync Menu
         rdb.ref('menu').on('value', snap => {
-            try {
-                const data = snap.val() || {};
-                const box = document.getElementById('menu-box');
-                const adminBox = document.getElementById('admin-menu-list');
-                box.innerHTML = ''; adminBox.innerHTML = '';
+            const data = snap.val() || {};
+            const box = document.getElementById('menu-box');
+            const adminBox = document.getElementById('admin-menu-list');
+            box.innerHTML = ''; adminBox.innerHTML = '';
+            
+            Object.keys(data).forEach(id => {
+                const i = data[id];
+                const isAvail = i.available !== false;
+                box.innerHTML += `
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️'}</div>
+                        <div><p class="font-black text-gray-800">${i.name}</p><p class="text-red-500 font-black text-sm">₹${i.price}</p></div>
+                    </div>
+                    ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-bold uppercase">OUT</span>`}
+                </div>`;
                 
-                Object.keys(data).forEach(id => {
-                    const i = data[id];
-                    if(!i) return;
-                    
-                    const isAvail = i.available !== false;
-                    const safeName = getSafeStr(i.name);
-                    const btnName = safeName.replace(/['"]/g, "");
-                    const price = getSafePrice(i.price);
-                    const icon = getSafeStr(i.icon) || '🍽️';
-
-                    box.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl border">${icon}</div>
-                            <div><p class="font-black text-gray-800">${safeName}</p><p class="text-red-500 font-black text-sm">₹${price}</p></div>
-                        </div>
-                        ${isAvail ? `<button onclick="addToCart('${btnName}', ${price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-bold uppercase">OUT</span>`}
-                    </div>`;
-                    
-                    adminBox.innerHTML += `
-                    <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg">
-                        <span class="text-xs truncate w-24 text-white">${safeName}</span>
-                        <div class="flex gap-2">
-                            <button onclick="rdb.ref('menu/${id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
-                            <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 btn-press"><i class="fa fa-trash"></i></button>
-                        </div>
-                    </div>`;
-                });
-            } catch(e) {}
+                adminBox.innerHTML += `
+                <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg">
+                    <span class="text-xs truncate w-24 text-white">${i.name}</span>
+                    <div class="flex gap-2">
+                        <button onclick="rdb.ref('menu/${id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
+                        <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 btn-press"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
         });
 
-        // SYNC LIVE ORDERS Safely
+        // SYNC LIVE ORDERS
         rdb.ref('orders').on('value', snap => {
-            try {
-                const orders = snap.val() || {};
-                const orderList = document.getElementById('admin-orders-list');
-                orderList.innerHTML = '';
+            const orders = snap.val() || {};
+            const orderList = document.getElementById('admin-orders-list');
+            orderList.innerHTML = '';
+            
+            const keys = Object.keys(orders);
+            if(keys.length === 0) {
+                orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">Koi naya order nahi hai.</p>';
+                return;
+            }
+
+            keys.reverse().forEach(id => {
+                const o = orders[id];
+                const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const statusColor = o.status === 'Pending' ? 'text-yellow-400' : (o.status === 'Preparing' ? 'text-blue-400' : 'text-green-400');
                 
-                const keys = Object.keys(orders);
-                if(keys.length === 0) {
-                    orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">Koi naya order nahi hai.</p>';
-                    return;
-                }
-
-                keys.reverse().forEach(id => {
-                    const o = orders[id];
-                    if(!o) return;
-
-                    const time = o.timestamp ? new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A';
-                    const status = getSafeStr(o.status) || 'Pending';
-                    const statusColor = status === 'Pending' ? 'text-yellow-400' : (status === 'Preparing' ? 'text-blue-400' : 'text-green-400');
-                    
-                    // Error Yahan Aa Rahi Thi Purane Code Mein, Ise Fix Kar Diya Hai
-                    const safeItemsHTML = getSafeStr(o.items).replace(/%0A/g, '<br>');
-
-                    orderList.innerHTML += `
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <p class="font-black text-orange-400 text-base">${getSafeStr(o.customerName)}</p>
-                                <p class="text-[10px] text-gray-400 font-bold">${time} | ${getSafeStr(o.payType)} | ${getSafeStr(o.orderTime)}</p>
-                            </div>
-                            <span class="font-black ${statusColor}">${status}</span>
+                orderList.innerHTML += `
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-black text-orange-400 text-base">${o.customerName}</p>
+                            <p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} | ${o.orderTime}</p>
                         </div>
-                        <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg font-bold">
-                            ${safeItemsHTML}
-                            <p class="mt-2 pt-2 border-t border-white/10 font-black text-white">Total: ₹${getSafePrice(o.total)}</p>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <select onchange="updateOrderStatus('${id}', this.value)" class="bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-white/10">
-                                <option value="">Update Status</option>
-                                <option value="Preparing">Preparing 👨‍🍳</option>
-                                <option value="Ready">Ready for Pickup ✅</option>
-                                <option value="Completed">Completed 🏁</option>
-                                <option value="Cancelled">Cancel ❌</option>
-                            </select>
-                            <button onclick="window.location.href='https://wa.me/91${getSafeStr(o.customerPhone)}'" class="bg-green-600 p-2 rounded-lg text-xs font-black text-white btn-press shadow-lg"><i class="fa-brands fa-whatsapp text-sm"></i> Chat</button>
-                        </div>
-                    </div>`;
-                });
-            } catch(e) {}
+                        <span class="font-black ${statusColor}">${o.status}</span>
+                    </div>
+                    <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg font-bold">
+                        ${o.items.replace(/%0A/g, '<br>')}
+                        <p class="mt-2 pt-2 border-t border-white/10 font-black text-white">Total: ₹${o.total}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-white/10">
+                            <option value="">Update Status</option>
+                            <option value="Preparing">Preparing 👨‍🍳</option>
+                            <option value="Ready">Ready for Pickup ✅</option>
+                            <option value="Completed">Completed 🏁</option>
+                            <option value="Cancelled">Cancel ❌</option>
+                        </select>
+                        <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 p-2 rounded-lg text-xs font-black text-white btn-press shadow-lg"><i class="fa-brands fa-whatsapp text-sm"></i> Chat</button>
+                    </div>
+                </div>`;
+            });
         });
 
         function loginAdmin() { if(prompt("Enter PIN:") === "8087jitu") { document.getElementById('closed-screen').style.display='none'; document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
@@ -303,4 +280,23 @@
             };
 
             rdb.ref('orders').push(orderData).then(() => {
-                const msg = `*🍔 नया ${type} ऑर्डर*%0A%0A*नाम:* ${name}%0A*नंबर:* ${phone}%0A*आइटम्स:*
+                const msg = `*🍔 नया ${type} ऑर्डर*%0A%0A*नाम:* ${name}%0A*नंबर:* ${phone}%0A*आइटम्स:*%0A${itemsMsg}%0A*कुल बिल:* ₹${total}%0A-------------------%0A_Order ID save ho gaya hai. Kripya process karein._`;
+                window.location.href = `https://wa.me/918058733741?text=${msg}`;
+                
+                cart = []; updateCartUI();
+                document.getElementById('qr-modal').classList.add('hidden');
+                closeCheckout();
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus, phone, custName) {
+            if(!newStatus) return;
+            rdb.ref(`orders/${orderId}/status`).set(newStatus).then(() => {
+                
+                // ORDER KI DETAILS MANGWA RAHE HAIN BINA APP KO CRASH KIYE
+                rdb.ref(`orders/${orderId}`).once('value').then(snap => {
+                    const order = snap.val();
+                    if(order) {
+                        const statusMsg = `🛒 *Order Summary:*%0A👤 *Customer Name:* ${order.customerName}%0A📦 *Item:*%0A${order.items}%0A💰 *Rate:* ₹${order.total}%0A🔄 *Current Status:* ${newStatus}%0A💳 *Payment Status:* ${order.payType}%0A🚚 *Estimated Delivery:* ${order.orderTime}%0A📍 *Tracking/Support:* https://wa.me/918058733741`;
+                        
+  
