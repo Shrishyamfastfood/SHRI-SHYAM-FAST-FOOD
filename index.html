@@ -219,7 +219,8 @@
                         <p class="mt-2 pt-2 border-t border-white/10 font-black text-white">Total: ₹${o.total}</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-white/10">
+                        <!-- YAHAN CHANGE KIYA HAI: sirf id aur value pass kar rahe hain -->
+                        <select onchange="updateOrderStatus('${id}', this.value)" class="bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-white/10">
                             <option value="">Update Status</option>
                             <option value="Preparing">Preparing 👨‍🍳</option>
                             <option value="Ready">Ready for Pickup ✅</option>
@@ -289,15 +290,16 @@
             });
         }
 
-        function updateOrderStatus(orderId, newStatus, phone, custName) {
+        // YAHAN CHANGE KIYA HAI: Safe tarike se Data fetch karke naya format banaya gaya hai.
+        function updateOrderStatus(orderId, newStatus) {
             if(!newStatus) return;
+            
             rdb.ref(`orders/${orderId}/status`).set(newStatus).then(() => {
-                const statusMsg = `*Hello ${custName}*! %0A%0A*Shri Shyam Fast Food* se aapka order ab *${newStatus}* hai. %0A%0ADhanyawad! 🙏`;
-                if(confirm("Status WhatsApp par bhejein?")) {
-                    window.open(`https://wa.me/91${phone}?text=${statusMsg}`, '_blank');
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+                
+                // Database se order nikalna taaki HTML strings crash na hon
+                rdb.ref(`orders/${orderId}`).once('value').then(snap => {
+                    const o = snap.val();
+                    if(!o) return;
+
+                    // AAPKA NAYA WALA MESSAGE TEMPLATE
+                    const msg = `🛒 *Order Summary:*%0A👤 *Customer Name:* ${o.customerName}%0A📦 *Item:*%0A${o.items}%0A💰 *Rate:* ₹${o.total}%0A🔄 *Current Status:* ${ne
