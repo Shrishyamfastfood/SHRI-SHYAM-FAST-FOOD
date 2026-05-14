@@ -64,7 +64,9 @@
                     <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/30 rounded-xl">
                     <button onclick="addItem()" class="col-span-6 bg-red-600 text-white font-black rounded-xl btn-press">ADD +</button>
                 </div>
-                <div id="admin-menu-list" class="mt-4 space-y-2 max-h-40 overflow-y-auto pr-2"></div>
+                
+                <p class="font-bold text-gray-300 text-[10px] mt-6 mb-2 uppercase tracking-widest">Manage Menu & Prices</p>
+                <div id="admin-menu-list" class="space-y-3 max-h-60 overflow-y-auto pr-2"></div>
             </div>
 
             <div class="mt-8 border-t border-white/10 pt-6">
@@ -168,6 +170,8 @@
             Object.keys(data).forEach(id => {
                 const i = data[id];
                 const isAvail = i.available !== false;
+                
+                // User Side Menu
                 box.innerHTML += `
                 <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
                     <div class="flex items-center gap-3">
@@ -177,16 +181,32 @@
                     ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-bold uppercase">OUT</span>`}
                 </div>`;
                 
+                // Admin Side Menu with Price Edit
                 adminBox.innerHTML += `
-                <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg">
-                    <span class="text-xs truncate w-24 text-white">${i.name}</span>
-                    <div class="flex gap-2">
-                        <button onclick="rdb.ref('menu/${id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
-                        <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 btn-press"><i class="fa fa-trash"></i></button>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-white truncate w-32">${i.name}</span>
+                        <div class="flex gap-2">
+                            <button onclick="rdb.ref('menu/${id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
+                            <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 btn-press p-1"><i class="fa fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-gray-400 font-bold">PRICE (₹):</span>
+                        <input type="number" value="${i.price}" 
+                            onchange="updatePrice('${id}', this.value)" 
+                            class="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none focus:border-yellow-400">
                     </div>
                 </div>`;
             });
         });
+
+        // Update Price Function
+        function updatePrice(id, newPrice) {
+            if(newPrice && !isNaN(newPrice)) {
+                rdb.ref(`menu/${id}/price`).set(parseInt(newPrice));
+            }
+        }
 
         // SYNC LIVE ORDERS
         rdb.ref('orders').on('value', snap => {
@@ -281,23 +301,4 @@
 
             rdb.ref('orders').push(orderData).then(() => {
                 const msg = `*🍔 नया ${type} ऑर्डर*%0A%0A*नाम:* ${name}%0A*नंबर:* ${phone}%0A*आइटम्स:*%0A${itemsMsg}%0A*कुल बिल:* ₹${total}%0A-------------------%0A_Order ID save ho gaya hai. Kripya process karein._`;
-                window.location.href = `https://wa.me/918058733741?text=${msg}`;
-                
-                cart = []; updateCartUI();
-                document.getElementById('qr-modal').classList.add('hidden');
-                closeCheckout();
-            });
-        }
-
-        function updateOrderStatus(orderId, newStatus, phone, custName) {
-            if(!newStatus) return;
-            rdb.ref(`orders/${orderId}/status`).set(newStatus).then(() => {
-                const statusMsg = `*Hello ${custName}*! %0A%0A*Shri Shyam Fast Food* se aapka order ab *${newStatus}* hai. %0A%0ADhanyawad! 🙏`;
-                if(confirm("Status WhatsApp par bhejein?")) {
-                    window.open(`https://wa.me/91${phone}?text=${statusMsg}`, '_blank');
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+             
