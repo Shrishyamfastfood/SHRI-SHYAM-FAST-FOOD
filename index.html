@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Fast Food - Moulasar</title>
+    <title>Shri Shyam Fast Food - Admin Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -148,9 +148,9 @@
         let cart = [];
         let isShopOpen = true;
 
-        // Sync Shop Status (Safe Null Check)
+        // Sync Shop Status
         rdb.ref('shop_status').on('value', snap => {
-            isShopOpen = (snap.val() !== null) ? snap.val() : true;
+            isShopOpen = snap.val() ?? true;
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
             document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
             const btn = document.getElementById('toggle-shop-btn');
@@ -158,7 +158,7 @@
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
         });
 
-        // Sync Menu (Safety Wrappers Added Back)
+        // Sync Menu
         rdb.ref('menu').on('value', snap => {
             const data = snap.val() || {};
             const box = document.getElementById('menu-box');
@@ -167,27 +167,19 @@
             
             Object.keys(data).forEach(id => {
                 const i = data[id];
-                if(!i) return;
-
                 const isAvail = i.available !== false;
-                
-                // CRASH PREVENTION: Make sure name is a string before replacing
-                const itemName = String(i.name || 'Unnamed Item');
-                const safeName = itemName.replace(/['"]/g, ""); 
-                const itemPrice = Number(i.price) || 0;
-
                 box.innerHTML += `
                 <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️'}</div>
-                        <div><p class="font-black text-gray-800">${itemName}</p><p class="text-red-500 font-black text-sm">₹${itemPrice}</p></div>
+                        <div><p class="font-black text-gray-800">${i.name}</p><p class="text-red-500 font-black text-sm">₹${i.price}</p></div>
                     </div>
-                    ${isAvail ? `<button onclick="addToCart('${safeName}', ${itemPrice})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-bold uppercase">OUT</span>`}
+                    ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-bold uppercase">OUT</span>`}
                 </div>`;
                 
                 adminBox.innerHTML += `
                 <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg">
-                    <span class="text-xs truncate w-24 text-white">${itemName}</span>
+                    <span class="text-xs truncate w-24 text-white">${i.name}</span>
                     <div class="flex gap-2">
                         <button onclick="rdb.ref('menu/${id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
                         <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400 btn-press"><i class="fa fa-trash"></i></button>
@@ -196,7 +188,7 @@
             });
         });
 
-        // SYNC LIVE ORDERS (Safety string check added)
+        // SYNC LIVE ORDERS
         rdb.ref('orders').on('value', snap => {
             const orders = snap.val() || {};
             const orderList = document.getElementById('admin-orders-list');
@@ -210,30 +202,24 @@
 
             keys.reverse().forEach(id => {
                 const o = orders[id];
-                if(!o) return;
-
-                const time = new Date(o.timestamp || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 const statusColor = o.status === 'Pending' ? 'text-yellow-400' : (o.status === 'Preparing' ? 'text-blue-400' : 'text-green-400');
                 
-                // CRASH PREVENTION: Safely replace formatting
-                const safeItemsHTML = String(o.items || '').replace(/%0A/g, '<br>');
-                const safeCustomerName = String(o.customerName || 'Unknown');
-
                 orderList.innerHTML += `
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <p class="font-black text-orange-400 text-base">${safeCustomerName}</p>
-                            <p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType || 'COD'} | ${o.orderTime || 'N/A'}</p>
+                            <p class="font-black text-orange-400 text-base">${o.customerName}</p>
+                            <p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} | ${o.orderTime}</p>
                         </div>
-                        <span class="font-black ${statusColor}">${o.status || 'Pending'}</span>
+                        <span class="font-black ${statusColor}">${o.status}</span>
                     </div>
                     <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg font-bold">
-                        ${safeItemsHTML}
-                        <p class="mt-2 pt-2 border-t border-white/10 font-black text-white">Total: ₹${o.total || 0}</p>
+                        ${o.items.replace(/%0A/g, '<br>')}
+                        <p class="mt-2 pt-2 border-t border-white/10 font-black text-white">Total: ₹${o.total}</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <select onchange="updateOrderStatus('${id}', this.value)" class="bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-white/10">
+                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-white/10">
                             <option value="">Update Status</option>
                             <option value="Preparing">Preparing 👨‍🍳</option>
                             <option value="Ready">Ready for Pickup ✅</option>
@@ -303,7 +289,15 @@
             });
         }
 
-        function updateOrderStatus(orderId, newStatus) {
+        function updateOrderStatus(orderId, newStatus, phone, custName) {
             if(!newStatus) return;
-            
-            rdb.ref(`orders/${order
+            rdb.ref(`orders/${orderId}/status`).set(newStatus).then(() => {
+                const statusMsg = `*Hello ${custName}*! %0A%0A*Shri Shyam Fast Food* se aapka order ab *${newStatus}* hai. %0A%0ADhanyawad! 🙏`;
+                if(confirm("Status WhatsApp par bhejein?")) {
+                    window.open(`https://wa.me/91${phone}?text=${statusMsg}`, '_blank');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
