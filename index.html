@@ -11,58 +11,14 @@
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
-
-    *{
-        scroll-behavior:smooth;
-    }
-
-    body {
-        font-family: 'Outfit', sans-serif;
-        background: #f8fafc;
-        padding-bottom: 140px;
-    }
-
-    .glass-header {
-        background: rgba(255,255,255,0.95);
-        backdrop-filter: blur(18px);
-        border-bottom:1px solid rgba(255,0,0,0.08);
-    }
-
-    .gradient-text {
-        background: linear-gradient(90deg,#dc2626,#ea580c);
-        -webkit-background-clip:text;
-        -webkit-text-fill-color:transparent;
-    }
-
-    .btn-press:active {
-        transform: scale(0.95);
-    }
-
-    .cart-sheet {
-        transition: 0.4s;
-        transform: translateY(110%);
-    }
-
-    .cart-sheet.active {
-        transform: translateY(0);
-    }
-
-    .status-dot {
-        width:10px;
-        height:10px;
-        border-radius:50%;
-        display:inline-block;
-    }
-
-    .loader {
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        100%{
-            transform:rotate(360deg);
-        }
-    }
+    body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; padding-bottom: 140px; }
+    .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,0,0,0.1); }
+    .gradient-text { background: linear-gradient(90deg, #dc2626, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn-press:active { transform: scale(0.95); transition: 0.2s; }
+    .cart-sheet { transition: transform 0.4s; transform: translateY(110%); }
+    .cart-sheet.active { transform: translateY(0); }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .hide-scroll::-webkit-scrollbar{display:none;}
 </style>
 
 </head>
@@ -565,4 +521,18 @@ function processPayment(){
     }
 
     if(!document.getElementById('u-n').value || !phone){
-        alert('Details
+        alert('Details bhariye');
+        return;
+    }
+
+    if(document.getElementById('u-pay').value === 'PAID'){
+        document.getElementById('qr-modal').classList.remove('hidden');
+    }
+    else{
+        confirmOrderAndSave('CASH');
+    }
+}
+
+function confirmOrderAndSave(type){
+
+    const na
