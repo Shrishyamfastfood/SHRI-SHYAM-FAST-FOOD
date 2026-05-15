@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shri Shyam Fast Food - Premium</title>
+    <title>Shri Shyam Fast Food</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -14,221 +14,117 @@
         body { font-family: 'Outfit', sans-serif; background-color: #f1f5f9; padding-bottom: 160px; }
         .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
         .category-pill.active { background: #dc2626; color: white; transform: scale(1.05); }
-        .cart-sheet { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; }
-        .cart-sheet:not(.active) { transform: translateY(100%); }
-        .order-card { border-left: 4px solid #e2e8f0; }
-        .order-card.Pending { border-left-color: #f59e0b; }
-        .order-card.Preparing { border-left-color: #3b82f6; }
-        .order-card.Ready { border-left-color: #10b981; }
-        .animate-pop { animation: pop 0.3s ease-out; }
-        @keyframes pop { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
+        .cart-sheet { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; }
+        .cart-sheet:not(.active) { pointer-events: none; }
+        .cart-sheet:not(.active) > div { transform: translateY(100%); }
+        .cart-sheet > div { transition: transform 0.4s ease; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
-<!-- Notification Sound -->
-<audio id="adminSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
-
-<!-- Loader -->
 <div id="loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
     <div class="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
     <p class="font-bold text-gray-600">Shri Shyam Kitchen Loading...</p>
 </div>
 
-<!-- Header -->
 <header class="sticky top-0 z-50 glass px-4 py-3 flex justify-between items-center shadow-sm">
     <div class="flex items-center gap-3">
         <div class="relative">
             <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full object-cover border-2 border-red-500">
-            <div id="status-dot" class="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>
+            <div id="status-dot" class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
         </div>
         <div>
             <h1 class="font-black text-lg text-red-600 leading-none">SHRI SHYAM</h1>
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Moulasar • Pickup App</p>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Moulasar • Pickup</p>
         </div>
     </div>
-    <div class="flex gap-2">
-        <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-white shadow-sm border flex items-center justify-center text-gray-600 active:scale-90 transition-transform">
-            <i class="fa-solid fa-user-shield"></i>
-        </button>
-    </div>
+    <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-white shadow-sm border flex items-center justify-center text-gray-600"><i class="fa-solid fa-user-shield"></i></button>
 </header>
 
-<!-- Main Container -->
 <main class="max-w-2xl mx-auto px-4 mt-6">
-    
-    <!-- Hero Section / Search -->
     <div class="mb-6">
-        <h2 class="text-3xl font-black text-gray-800 mb-2">Kya khana hai <span class="text-red-600">aaj?</span></h2>
         <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-gray-400"></i>
-            <input id="searchBox" onkeyup="filterMenu()" type="text" placeholder="Search Momos, Burgers, Pizza..." 
-                class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-md outline-none focus:ring-2 ring-red-500 transition-all font-medium">
+            <input id="searchBox" onkeyup="filterMenu()" type="text" placeholder="Search Momos, Burgers..." class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-md outline-none focus:ring-2 ring-red-500 font-medium">
         </div>
     </div>
 
-    <!-- Category Tabs -->
     <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar" id="category-bar">
-        <button onclick="filterCategory('All')" class="category-pill active px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap transition-all">All Items</button>
-        <button onclick="filterCategory('Fast Food')" class="category-pill px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap transition-all">🍔 Fast Food</button>
-        <button onclick="filterCategory('Pizza')" class="category-pill px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap transition-all">🍕 Pizza</button>
-        <button onclick="filterCategory('Drinks')" class="category-pill px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap transition-all">🥤 Drinks</button>
+        <button onclick="filterCategory('All')" class="category-pill active px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap">All Items</button>
+        <button onclick="filterCategory('Fast Food')" class="category-pill px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap">🍔 Fast Food</button>
+        <button onclick="filterCategory('Pizza')" class="category-pill px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap">🍕 Pizza</button>
+        <button onclick="filterCategory('Drinks')" class="category-pill px-6 py-2 rounded-full shadow-sm bg-white font-bold whitespace-nowrap">🥤 Drinks</button>
     </div>
 
-    <!-- Menu Grid -->
-    <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Items injected here -->
-    </div>
-
-    <!-- User Order Tracking (Visible if order exists) -->
-    <div id="user-tracking" class="mt-10 hidden">
-        <h3 class="font-black text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-clock-rotate-left text-red-500"></i> Your Recent Order
-        </h3>
-        <div id="tracking-card" class="bg-white p-5 rounded-2xl shadow-sm border border-red-100">
-            <!-- Tracking info -->
-        </div>
-    </div>
+    <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    <div id="user-tracking" class="mt-10 hidden"></div>
 </main>
 
-<!-- Floating Cart -->
 <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-[60] translate-y-32 transition-transform duration-500">
-    <button onclick="openCheckout()" class="w-full bg-gray-900 text-white p-4 rounded-[2rem] shadow-2xl flex justify-between items-center px-8 active:scale-95 transition-transform">
+    <button onclick="openCheckout()" class="w-full bg-gray-900 text-white p-4 rounded-[2rem] shadow-2xl flex justify-between items-center px-8">
         <div class="flex items-center gap-4">
-            <div class="relative">
-                <i class="fa-solid fa-bag-shopping text-2xl"></i>
-                <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">0</span>
-            </div>
-            <div class="text-left">
-                <p id="cart-total" class="font-black text-xl leading-none">₹0</p>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">View Cart & Checkout</p>
-            </div>
+            <div class="relative"><i class="fa-solid fa-bag-shopping text-2xl"></i><span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">0</span></div>
+            <div class="text-left"><p id="cart-total" class="font-black text-xl leading-none">₹0</p><p class="text-[10px] text-gray-400 font-bold uppercase">View Cart</p></div>
         </div>
         <i class="fa-solid fa-chevron-right"></i>
     </button>
 </div>
 
-<!-- Checkout Sheet -->
-<div id="checkout-sheet" class="cart-sheet fixed inset-0 bg-black/60 backdrop-blur-sm flex flex-col justify-end">
-    <div class="bg-white rounded-t-[3rem] w-full max-w-2xl mx-auto max-h-[90vh] overflow-hidden flex flex-col">
+<div id="checkout-sheet" class="cart-sheet bg-black/60 backdrop-blur-sm">
+    <div class="bg-white rounded-t-[3rem] w-full max-w-2xl mx-auto max-h-[90vh] flex flex-col">
         <div class="p-6 border-b flex justify-between items-center">
             <h3 class="text-2xl font-black text-gray-800">Your Order</h3>
             <button onclick="closeCheckout()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        
-        <div class="p-6 overflow-y-auto flex-1">
-            <div id="cart-items" class="space-y-4 mb-8">
-                <!-- Cart items -->
-            </div>
-
+        <div class="p-6 overflow-y-auto flex-1"><div id="cart-items" class="space-y-4 mb-8"></div>
             <div class="space-y-4">
-                <h4 class="font-black text-gray-800 border-b pb-2">Pickup Details</h4>
-                <input id="user-name" type="text" placeholder="Aapka Naam" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 ring-red-500 font-bold">
-                <input id="user-phone" type="tel" placeholder="Mobile Number" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 ring-red-500 font-bold">
-                
+                <input id="user-name" placeholder="Aapka Naam" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 ring-red-500 font-bold">
+                <input id="user-phone" type="tel" placeholder="Mobile Number" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 ring-red-500 font-bold">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="pickup-time" class="p-4 bg-gray-50 rounded-2xl border-none outline-none font-bold">
-                        <option>10-15 Mins</option>
-                        <option>20-30 Mins</option>
-                        <option>Direct Pickup</option>
-                    </select>
-                    <select id="pay-method" class="p-4 bg-green-50 text-green-700 rounded-2xl border-none outline-none font-bold">
-                        <option value="CASH">Cash on Pickup</option>
-                        <option value="ONLINE">Pay Online (QR)</option>
-                    </select>
+                    <select id="pickup-time" class="p-4 bg-gray-50 rounded-2xl font-bold outline-none"><option>10-15 Mins</option><option>20-30 Mins</option><option>Direct Pickup</option></select>
+                    <select id="pay-method" class="p-4 bg-green-50 text-green-700 rounded-2xl font-bold outline-none"><option value="CASH">Cash</option><option value="ONLINE">Online (QR)</option></select>
                 </div>
             </div>
         </div>
-
         <div class="p-6 bg-gray-50">
-            <div class="flex justify-between items-center mb-4 px-2">
-                <span class="font-bold text-gray-500">To Pay</span>
-                <span id="final-total" class="text-2xl font-black text-red-600">₹0</span>
-            </div>
-            <button onclick="placeOrder()" class="w-full bg-red-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-xl shadow-red-200 active:scale-95 transition-transform">
-                CONFIRM ORDER
-            </button>
+            <div class="flex justify-between mb-4"><span class="font-bold">Total</span><span id="final-total" class="text-2xl font-black text-red-600">₹0</span></div>
+            <button onclick="placeOrder()" class="w-full bg-red-600 text-white py-5 rounded-[2rem] font-black text-lg">CONFIRM ORDER</button>
         </div>
     </div>
 </div>
 
-<!-- Admin Panel (Improved) -->
-<div id="admin-panel" class="hidden fixed inset-0 bg-gray-950 z-[100] text-white p-6 overflow-y-auto">
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h2 class="text-2xl font-black text-yellow-400">Owner Dashboard</h2>
-            <p id="admin-status" class="text-xs font-bold text-gray-500 uppercase tracking-widest">Store Management</p>
-        </div>
-        <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-            <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
+<div id="admin-panel" class="hidden fixed inset-0 bg-gray-950 z-[9999] text-white p-6 overflow-y-auto">
+    <div class="flex justify-between mb-8">
+        <h2 class="text-2xl font-black text-yellow-400">Owner Panel</h2>
+        <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="text-2xl"><i class="fa-solid fa-xmark"></i></button>
     </div>
-
-    <!-- Analytics Cards -->
     <div class="grid grid-cols-2 gap-4 mb-8">
-        <div class="bg-white/5 p-4 rounded-[2rem] border border-white/10">
-            <p class="text-[10px] font-bold text-gray-500 uppercase">Today's Sales</p>
-            <h3 id="admin-revenue" class="text-2xl font-black text-green-400">₹0</h3>
-        </div>
-        <div class="bg-white/5 p-4 rounded-[2rem] border border-white/10">
-            <p class="text-[10px] font-bold text-gray-500 uppercase">Live Orders</p>
-            <h3 id="admin-pending" class="text-2xl font-black text-orange-400">0</h3>
-        </div>
+        <div class="bg-white/5 p-4 rounded-2xl">Revenue: <h3 id="admin-revenue" class="text-xl font-bold">₹0</h3></div>
+        <div class="bg-white/5 p-4 rounded-2xl">Orders: <h3 id="admin-pending" class="text-xl font-bold">0</h3></div>
     </div>
-
-    <button id="shop-toggle" onclick="toggleShopStatus()" class="w-full py-4 rounded-2xl font-black mb-8 uppercase transition-all"></button>
-
-    <!-- Orders Management -->
-    <div class="mb-8">
-        <h3 class="text-lg font-black mb-4 flex items-center justify-between">
-            Live Orders <span id="new-order-badge" class="hidden bg-red-600 text-[10px] px-2 py-1 rounded-full animate-bounce">NEW</span>
-        </h3>
-        <div id="admin-orders-list" class="space-y-4">
-            <!-- Admin orders -->
-        </div>
-    </div>
-
-    <!-- Item Management -->
-    <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10">
-        <h3 class="text-lg font-black mb-4">Manage Menu</h3>
-        <div class="grid grid-cols-12 gap-2 mb-6">
-            <input id="add-icon" placeholder="🍔" class="col-span-3 p-3 bg-black/40 rounded-xl outline-none border border-white/10 text-center">
-            <input id="add-name" placeholder="Item Name" class="col-span-9 p-3 bg-black/40 rounded-xl outline-none border border-white/10">
-            <input id="add-price" type="number" placeholder="Price" class="col-span-6 p-3 bg-black/40 rounded-xl outline-none border border-white/10">
-            <select id="add-cat" class="col-span-6 p-3 bg-black/40 rounded-xl outline-none border border-white/10">
-                <option value="Fast Food">Fast Food</option>
-                <option value="Pizza">Pizza</option>
-                <option value="Drinks">Drinks</option>
-            </select>
-            <button onclick="addNewItem()" class="col-span-12 bg-yellow-500 text-black font-black py-3 rounded-xl mt-2">ADD ITEM</button>
-        </div>
-        <div id="admin-menu-list" class="space-y-3">
-            <!-- Items list -->
-        </div>
+    <button id="shop-toggle" onclick="toggleShopStatus()" class="w-full py-4 rounded-2xl font-black mb-8 transition-all"></button>
+    <div id="admin-orders-list" class="space-y-4 mb-10"></div>
+    <div class="bg-white/5 p-6 rounded-3xl border border-white/10">
+        <h3 class="mb-4 font-bold">Add Item</h3>
+        <input id="add-icon" placeholder="🍔" class="w-full mb-2 p-3 bg-black/40 rounded-xl">
+        <input id="add-name" placeholder="Item Name" class="w-full mb-2 p-3 bg-black/40 rounded-xl">
+        <input id="add-price" type="number" placeholder="Price" class="w-full mb-2 p-3 bg-black/40 rounded-xl">
+        <button onclick="addNewItem()" class="w-full bg-yellow-500 text-black font-black py-3 rounded-xl">SAVE ITEM</button>
     </div>
 </div>
 
-<!-- QR Payment Modal -->
-<div id="qr-modal" class="hidden fixed inset-0 bg-black/95 z-[2000] flex items-center justify-center p-6">
+<div id="qr-modal" class="hidden fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center p-6">
     <div class="bg-white rounded-[3rem] p-8 max-w-sm w-full text-center">
-        <h3 class="font-black text-2xl mb-2">Scan to Pay</h3>
-        <p class="text-sm text-gray-500 mb-6">Please pay total amount and click 'Done'</p>
-        <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl mb-6 shadow-xl">
-        <button onclick="finishOrderProcess('PAID')" class="w-full bg-green-600 text-white py-4 rounded-2xl font-black text-lg mb-3">I HAVE PAID</button>
-        <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="text-gray-400 font-bold text-xs uppercase underline">Cancel Payment</button>
+        <h3 class="font-black text-2xl mb-6">Scan to Pay</h3>
+        <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl mb-6">
+        <button onclick="finishOrderProcess('PAID')" class="w-full bg-green-600 text-white py-4 rounded-2xl font-black">I HAVE PAID</button>
     </div>
 </div>
 
-<!-- Shop Closed Screen -->
-<div id="shop-closed-overlay" class="hidden fixed inset-0 bg-white/95 z-[1000] flex flex-col items-center justify-center p-8 text-center">
-    <div class="w-32 h-32 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-5xl mb-6">🏪</div>
-    <h2 class="text-4xl font-black text-gray-800">Shop is Closed</h2>
-    <p class="text-gray-500 font-bold mt-4">Hum abhi orders nahi le rahe hain. Kripya baad mein check karein.</p>
-    <button onclick="loginAdmin()" class="mt-8 text-gray-400 font-bold underline uppercase text-xs tracking-widest">Admin Login</button>
-</div>
+<audio id="adminSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 <script>
-// --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
     apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
     authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -241,92 +137,54 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+let cart = [], menuData = [], isShopOpen = true, currentCategory = 'All';
 
-// --- STATE MANAGEMENT ---
-let cart = [];
-let menuData = [];
-let isShopOpen = true;
-let currentCategory = 'All';
+// Helper function to hide loader
+function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
+}
 
-// --- INITIALIZATION ---
-window.onload = () => {
-    // Listen to Shop Status
-    db.ref('shop_status').on('value', snap => {
-        isShopOpen = snap.val() !== false;
-        const overlay = document.getElementById('shop-closed-overlay');
-        const statusDot = document.getElementById('status-dot');
-        
-        if(!isShopOpen) {
-            overlay.classList.remove('hidden');
-            statusDot.classList.replace('bg-green-500', 'bg-red-500');
-        } else {
-            overlay.classList.add('hidden');
-            statusDot.classList.replace('bg-red-500', 'bg-green-500');
-            statusDot.classList.add('bg-green-500');
-        }
-
-        const btn = document.getElementById('shop-toggle');
+// Store Status
+db.ref('shop_status').on('value', snap => {
+    isShopOpen = snap.val() !== false;
+    document.getElementById('status-dot').className = `absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}`;
+    const btn = document.getElementById('shop-toggle');
+    if(btn) {
         btn.innerText = isShopOpen ? 'Turn Shop OFF' : 'Turn Shop ON';
-        btn.className = `w-full py-4 rounded-2xl font-black mb-8 uppercase transition-all ${isShopOpen ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`;
-    });
+        btn.className = `w-full py-4 rounded-2xl font-black mb-8 uppercase ${isShopOpen ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`;
+    }
+    hideLoader(); // Hide loader if store status is received
+});
 
-    // Listen to Menu
-    db.ref('menu').on('value', snap => {
-        document.getElementById('loader').classList.add('hidden');
-        const data = snap.val() || {};
-        menuData = Object.keys(data).map(id => ({ id, ...data[id] }));
-        renderMenu();
-        renderAdminMenu();
-    });
+// Menu
+db.ref('menu').on('value', snap => {
+    const data = snap.val() || {};
+    menuData = Object.keys(data).map(id => ({ id, ...data[id] }));
+    renderMenu();
+    hideLoader();
+});
 
-    // Listen to Orders (Admin)
-    db.ref('orders').on('value', snap => {
-        const orders = snap.val() || {};
-        renderAdminOrders(orders);
-        updateAnalytics(orders);
-        
-        // Play sound for new orders
-        const orderIds = Object.keys(orders);
-        if(window.lastOrderCount && orderIds.length > window.lastOrderCount) {
-            document.getElementById('adminSound').play();
-            document.getElementById('new-order-badge').classList.remove('hidden');
-        }
-        window.lastOrderCount = orderIds.length;
-    });
+// Admin Orders
+db.ref('orders').on('value', snap => {
+    const orders = snap.val() || {};
+    renderAdminOrders(orders);
+    updateAnalytics(orders);
+});
 
-    // Restore Cart or user data from localStorage
-    checkRecentOrder();
-};
-
-// --- USER FUNCTIONS ---
 function renderMenu() {
     const box = document.getElementById('menu-box');
     box.innerHTML = '';
-    
-    const filtered = currentCategory === 'All' 
-        ? menuData 
-        : menuData.filter(item => item.category === currentCategory);
-
+    const filtered = currentCategory === 'All' ? menuData : menuData.filter(i => i.category === currentCategory);
     filtered.forEach(item => {
-        const isAvailable = item.available !== false;
+        const avail = item.available !== false;
         box.innerHTML += `
-            <div class="bg-white p-4 rounded-3xl shadow-sm flex justify-between items-center transition-all hover:shadow-md border border-white ${!isAvailable ? 'grayscale opacity-60' : ''}">
+            <div class="bg-white p-4 rounded-3xl shadow-sm flex justify-between items-center ${!avail ? 'grayscale opacity-60' : ''}">
                 <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl border shadow-inner">
-                        ${item.icon || '🍔'}
-                    </div>
-                    <div>
-                        <h4 class="font-black text-gray-800">${item.name}</h4>
-                        <p class="text-red-600 font-black">₹${item.price}</p>
-                    </div>
+                    <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl border">${item.icon}</div>
+                    <div><h4 class="font-black text-gray-800">${item.name}</h4><p class="text-red-600 font-black">₹${item.price}</p></div>
                 </div>
-                ${isAvailable ? `
-                <button onclick="addToCart('${item.id}')" class="bg-red-50 text-red-600 w-10 h-10 rounded-full flex items-center justify-center active:scale-75 transition-all">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                ` : `<span class="text-[10px] font-black bg-gray-100 px-2 py-1 rounded">SOLD OUT</span>`}
-            </div>
-        `;
+                ${avail ? `<button onclick="addToCart('${item.id}')" class="bg-red-50 text-red-600 w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all"><i class="fa-solid fa-plus"></i></button>` : ''}
+            </div>`;
     });
 }
 
@@ -334,76 +192,94 @@ function addToCart(id) {
     const item = menuData.find(m => m.id === id);
     cart.push(item);
     updateCartUI();
-    // Animation effect
-    const cartBtn = document.getElementById('floating-cart');
-    cartBtn.classList.add('animate-pop');
-    setTimeout(() => cartBtn.classList.remove('animate-pop'), 300);
 }
 
 function updateCartUI() {
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
-    const count = cart.length;
-    
-    document.getElementById('cart-count').innerText = count;
+    const total = cart.reduce((s, i) => s + i.price, 0);
+    document.getElementById('cart-count').innerText = cart.length;
     document.getElementById('cart-total').innerText = `₹${total}`;
     document.getElementById('final-total').innerText = `₹${total}`;
+    document.getElementById('floating-cart').style.transform = cart.length > 0 ? 'translateY(0)' : 'translateY(128px)';
     
-    const floatCart = document.getElementById('floating-cart');
-    if(count > 0) floatCart.classList.remove('translate-y-32');
-    else floatCart.classList.add('translate-y-32');
-
-    // Update list in sheet
     const list = document.getElementById('cart-items');
-    list.innerHTML = cart.length ? '' : '<p class="text-center text-gray-400 py-10">Your bag is empty 🍔</p>';
-    
-    cart.forEach((item, index) => {
-        list.innerHTML += `
-            <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
-                <div class="flex items-center gap-3">
-                    <span class="text-xl">${item.icon}</span>
-                    <p class="font-bold text-gray-700">${item.name}</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="font-black text-gray-800">₹${item.price}</span>
-                    <button onclick="removeFromCart(${index})" class="text-red-500 w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
-                </div>
-            </div>
-        `;
-    });
+    list.innerHTML = cart.map((item, idx) => `
+        <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
+            <p class="font-bold">${item.name}</p>
+            <div class="flex items-center gap-4"><span class="font-black">₹${item.price}</span>
+            <button onclick="cart.splice(${idx},1);updateCartUI()" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>
+        </div>`).join('');
 }
 
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCartUI();
-}
-
-function openCheckout() {
-    document.getElementById('checkout-sheet').classList.add('active');
-}
-
-function closeCheckout() {
-    document.getElementById('checkout-sheet').classList.remove('active');
-}
-
-function filterCategory(cat) {
-    currentCategory = cat;
-    document.querySelectorAll('.category-pill').forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.innerText.includes(cat) || (cat === 'All' && btn.innerText === 'All Items')) btn.classList.add('active');
-    });
-    renderMenu();
-}
-
-function filterMenu() {
-    const query = document.getElementById('searchBox').value.toLowerCase();
-    const cards = document.querySelectorAll('#menu-box > div');
-    cards.forEach(card => {
-        const text = card.innerText.toLowerCase();
-        card.style.display = text.includes(query) ? 'flex' : 'none';
-    });
-}
+function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
+function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
 
 function placeOrder() {
     const name = document.getElementById('user-name').value;
     const phone = document.getElementById('user-phone').value;
-    const method = doc
+    if(!name || phone.length < 10) return alert('Name aur Number sahi bhariye!');
+    if(document.getElementById('pay-method').value === 'ONLINE') document.getElementById('qr-modal').classList.remove('hidden');
+    else finishOrderProcess('CASH');
+}
+
+function finishOrderProcess(payType) {
+    const token = Math.floor(1000 + Math.random() * 9000);
+    const total = cart.reduce((s, i) => s + i.price, 0);
+    const orderData = {
+        token, customerName: document.getElementById('user-name').value, customerPhone: document.getElementById('user-phone').value,
+        pickupTime: document.getElementById('pickup-time').value, items: cart.map(i => i.name).join(', '),
+        total, payType, status: 'Pending', timestamp: Date.now()
+    };
+
+    db.ref('orders').push(orderData).then(() => {
+        window.location.href = `https://wa.me/918058733741?text=Order Token: #${token}, Name: ${orderData.customerName}, Items: ${orderData.items}`;
+    });
+}
+
+function renderAdminOrders(orders) {
+    const list = document.getElementById('admin-orders-list');
+    list.innerHTML = Object.keys(orders).reverse().map(id => {
+        const o = orders[id];
+        return o.status === 'Completed' ? '' : `
+        <div class="bg-white/5 p-5 rounded-3xl border border-white/10">
+            <h4 class="font-black text-yellow-400">#${o.token} • ${o.customerName}</h4>
+            <p class="text-xs text-gray-400">${o.items}</p>
+            <div class="flex gap-2 mt-4">
+                <button onclick="db.ref('orders/${id}/status').set('Ready')" class="bg-green-600 px-4 py-2 rounded-lg text-xs">Ready</button>
+                <button onclick="db.ref('orders/${id}/status').set('Completed')" class="bg-white/10 px-4 py-2 rounded-lg text-xs">Done</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function updateAnalytics(orders) {
+    let rev = 0, pend = 0;
+    Object.values(orders).forEach(o => {
+        if(o.status !== 'Cancelled') rev += o.total;
+        if(o.status === 'Pending') pend++;
+    });
+    document.getElementById('admin-revenue').innerText = `₹${rev}`;
+    document.getElementById('admin-pending').innerText = pend;
+}
+
+function loginAdmin() { if(prompt('Admin PIN:') === '8087jitu') document.getElementById('admin-panel').classList.remove('hidden'); }
+function toggleShopStatus() { db.ref('shop_status').set(!isShopOpen); }
+function addNewItem() {
+    const name = document.getElementById('add-name').value;
+    const price = document.getElementById('add-price').value;
+    if(name && price) db.ref('menu').push({ name, icon: document.getElementById('add-icon').value, price: parseInt(price), available: true });
+}
+function filterCategory(cat) { 
+    currentCategory = cat; 
+    document.querySelectorAll('.category-pill').forEach(b => b.classList.toggle('active', b.innerText.includes(cat)));
+    renderMenu(); 
+}
+function filterMenu() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    document.querySelectorAll('#menu-box > div').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none');
+}
+
+// Initial safety: hide loader after 5 seconds even if Firebase fails
+setTimeout(hideLoader, 5000);
+</script>
+</body>
+</html>
