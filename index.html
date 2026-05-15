@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase (Same version you used) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -18,7 +19,7 @@
         .btn-press:active { transform: scale(0.95); transition: 0.2s; }
         .cart-sheet { transition: transform 0.4s; transform: translateY(110%); }
         .cart-sheet.active { transform: translateY(0); }
-        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        input[type="time"] { color-scheme: dark; } /* Mobile timing fix */
     </style>
 </head>
 <body>
@@ -36,7 +37,7 @@
             <div>
                 <h1 class="font-black text-lg gradient-text uppercase tracking-tight">Shri Shyam Fast Food</h1>
                 <div class="flex items-center gap-2 mt-0.5">
-                    <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest">
+                    <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
                         <span id="shop-text">Checking...</span>
                     </span>
                 </div>
@@ -48,110 +49,94 @@
     <div class="max-w-2xl mx-auto px-4 py-6">
         
         <!-- ADMIN DASHBOARD -->
-        <div id="admin-panel" class="hidden bg-gray-900 rounded-[2.5rem] shadow-2xl p-6 mb-8 text-white border border-white/10">
+        <div id="admin-panel" class="hidden bg-gray-900 rounded-[2.5rem] shadow-2xl p-6 mb-8 text-white">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black text-yellow-400">Admin Pro Panel</h2>
+                <h2 class="text-xl font-black text-yellow-400">Admin Panel</h2>
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Shop Toggle -->
-            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-2xl font-black mb-8 uppercase btn-press text-sm tracking-widest shadow-lg"></button>
+            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-2xl font-black mb-8 uppercase btn-press"></button>
 
-            <!-- Naya Product Section -->
-            <div class="bg-white/5 p-5 rounded-[2rem] mb-6 border border-white/10">
-                <p class="font-black text-orange-400 text-[10px] mb-4 uppercase tracking-widest">Product & Timing Set Karein</p>
-                
+            <!-- PRODUCT ADD SECTION WITH TIMING -->
+            <div class="bg-white/5 p-5 rounded-[2rem] border border-white/10 mb-6">
+                <p class="font-bold text-gray-300 text-[10px] mb-4 uppercase tracking-widest">Naya Product Details</p>
                 <div class="grid grid-cols-12 gap-3">
-                    <!-- Basic Info -->
-                    <input id="new-i" placeholder="Icon (🍔)" class="col-span-3 p-4 bg-white/5 rounded-2xl text-center border border-white/10 text-xl focus:border-yellow-400 outline-none">
-                    <input id="new-n" placeholder="Item Name" class="col-span-9 p-4 bg-white/5 rounded-2xl border border-white/10 focus:border-yellow-400 outline-none font-bold">
+                    <input id="new-i" placeholder="🍔" class="col-span-3 p-4 bg-black/30 rounded-2xl text-center border border-white/10">
+                    <input id="new-n" placeholder="Item Name" class="col-span-9 p-4 bg-black/30 rounded-2xl border border-white/10 font-bold">
                     
-                    <!-- Timing Inputs (Yahan hain options) -->
+                    <!-- Timing Box -->
                     <div class="col-span-6">
-                        <label class="text-[9px] text-gray-400 font-black ml-2 uppercase">Start (Kab shuru ho?)</label>
-                        <input id="new-start" type="time" value="00:00" class="w-full p-4 bg-white/5 rounded-2xl border border-white/10 text-sm font-bold text-white outline-none">
+                        <label class="text-[9px] text-gray-400 block ml-2">Start Time</label>
+                        <input id="new-start" type="time" value="00:00" class="w-full p-3 bg-black/30 rounded-xl text-white text-xs border border-white/10">
                     </div>
                     <div class="col-span-6">
-                        <label class="text-[9px] text-gray-400 font-black ml-2 uppercase">End (Kab band ho?)</label>
-                        <input id="new-end" type="time" value="23:59" class="w-full p-4 bg-white/5 rounded-2xl border border-white/10 text-sm font-bold text-white outline-none">
+                        <label class="text-[9px] text-gray-400 block ml-2">End Time</label>
+                        <input id="new-end" type="time" value="23:59" class="w-full p-3 bg-black/30 rounded-xl text-white text-xs border border-white/10">
                     </div>
 
-                    <input id="new-p" type="number" placeholder="Price ₹" class="col-span-6 p-4 bg-white/5 rounded-2xl border border-white/10 focus:border-yellow-400 outline-none font-black text-lg">
-                    <button onclick="addItem()" class="col-span-6 bg-yellow-400 text-black font-black rounded-2xl btn-press shadow-xl hover:bg-yellow-300 transition-all">ADD ITEM +</button>
+                    <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-4 bg-black/30 rounded-2xl border border-white/10 font-black">
+                    <button onclick="addItem()" class="col-span-6 bg-red-600 text-white font-black rounded-2xl btn-press shadow-lg">ADD ITEM</button>
                 </div>
-
-                <!-- Admin List -->
-                <div id="admin-menu-list" class="mt-6 space-y-2 max-h-48 overflow-y-auto pr-2 custom-scroll"></div>
+                <div id="admin-menu-list" class="mt-6 space-y-2 max-h-48 overflow-y-auto pr-2"></div>
             </div>
 
-            <!-- Live Orders Section -->
             <div class="mt-8 border-t border-white/10 pt-6">
-                <h3 class="text-lg font-black mb-4 text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Live Orders</h3>
-                <div id="admin-orders-list" class="space-y-4 max-h-80 overflow-y-auto pr-2"></div>
+                <h3 class="text-lg font-black mb-4 text-orange-400">Live Orders</h3>
+                <div id="admin-orders-list" class="space-y-4"></div>
             </div>
         </div>
 
-        <h2 class="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
-            <span class="bg-red-500 w-2 h-8 rounded-full"></span> Aaj Ka Menu
-        </h2>
+        <h2 class="text-2xl font-black text-gray-800 mb-6 border-b-2 border-red-100 pb-2 border-dashed">Today's Menu</h2>
         <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
-    <!-- UI Elements -->
-    <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-all duration-500 translate-y-32">
-        <div onclick="openCheckout()" class="bg-black p-5 rounded-[2rem] shadow-2xl flex justify-between items-center text-white cursor-pointer btn-press border border-white/10">
-            <div class="flex items-center gap-4">
-                <div class="bg-red-500 w-12 h-12 rounded-full flex items-center justify-center font-black" id="float-items">0</div>
-                <div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Total Bill</p>
-                    <p id="float-total" class="text-xl font-black">₹0</p>
-                </div>
+    <!-- UI Elements like Cart remain same -->
+    <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-transform duration-500 translate-y-32">
+        <div onclick="openCheckout()" class="bg-green-600 p-5 rounded-[2rem] shadow-2xl flex justify-between items-center text-white cursor-pointer btn-press">
+            <div class="flex items-center gap-3">
+                <div id="float-items" class="bg-white text-green-600 px-3 py-1 rounded-full font-black">0</div>
+                <p id="float-total" class="text-lg font-black">₹0</p>
             </div>
-            <div class="flex items-center gap-2 font-black text-xs bg-white/10 px-4 py-2 rounded-full">VIEW CART <i class="fa-solid fa-arrow-right"></i></div>
+            <div class="font-black text-sm uppercase tracking-widest">View Cart <i class="fa-solid fa-basket-shopping ml-2"></i></div>
         </div>
     </div>
 
-    <div id="checkout-sheet" class="cart-sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-md">
-        <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[3rem] shadow-2xl flex flex-col max-h-[95vh]">
+    <!-- Checkout Modal -->
+    <div id="checkout-sheet" class="cart-sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[3rem] shadow-2xl flex flex-col max-h-[90vh]">
             <div class="p-6 border-b flex justify-between items-center">
-                <div>
-                    <h3 class="font-black text-2xl text-gray-800">Review Order</h3>
-                    <p class="text-xs text-gray-400 font-bold">Kripya apni details check karein</p>
-                </div>
-                <button onclick="closeCheckout()" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-chevron-down"></i></button>
+                <h3 class="font-black text-2xl text-gray-800">Checkout</h3>
+                <button onclick="closeCheckout()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-6 overflow-y-auto space-y-6">
-                <div id="cart-summary" class="space-y-3"></div>
-                <div class="flex justify-between items-center border-t border-dashed pt-4 font-black text-xl">
-                    <span>Final Amount</span><span id="sheet-total" class="text-red-600">₹0</span>
-                </div>
-                <div class="space-y-4">
-                    <input id="u-n" placeholder="Aapka Naam" class="w-full p-5 bg-gray-50 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-red-500 transition-all">
-                    <input id="u-p" type="tel" placeholder="Mobile No." class="w-full p-5 bg-gray-50 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-red-500 transition-all">
-                    <input id="u-a" placeholder="Table No / Address" class="w-full p-5 bg-gray-50 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-red-500 transition-all">
-                    <select id="u-pay" class="w-full p-5 bg-gray-900 text-white rounded-2xl outline-none font-black">
-                        <option value="PAID">QR Code (Online)</option>
-                        <option value="COD">Cash (Pay at Shop)</option>
-                    </select>
-                </div>
+            <div class="p-6 overflow-y-auto space-y-4">
+                <div id="cart-summary" class="bg-gray-50 p-4 rounded-2xl space-y-2"></div>
+                <div class="flex justify-between font-black text-xl px-2"><span>Total</span><span id="sheet-total" class="text-red-600">₹0</span></div>
+                <input id="u-n" placeholder="Naam" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none">
+                <input id="u-p" type="tel" placeholder="Mobile Number" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none">
+                <input id="u-a" placeholder="Address / Table No." class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none">
+                <select id="u-pay" class="w-full p-4 bg-gray-900 text-white rounded-xl font-black outline-none">
+                    <option value="PAID">Online Payment</option>
+                    <option value="COD">Cash (COD)</option>
+                </select>
             </div>
-            <div class="p-6 bg-white border-t">
-                <button onclick="processPayment()" class="w-full bg-red-600 text-white font-black py-5 rounded-[2rem] shadow-xl btn-press text-lg uppercase tracking-widest">Confirm Order</button>
+            <div class="p-6">
+                <button onclick="processPayment()" class="w-full bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl btn-press text-lg">PLACE ORDER</button>
             </div>
         </div>
     </div>
 
-    <div id="qr-modal" class="hidden fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-xl">
-        <div class="bg-white rounded-[3rem] p-8 max-w-xs w-full shadow-2xl">
-             <h3 class="font-black text-2xl mb-2 gradient-text uppercase">Scan & Pay</h3>
-             <p class="text-[10px] text-gray-400 font-black mb-6 uppercase">Shri Shyam Fast Food</p>
-             <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-3xl border-4 border-gray-100 mb-6 p-2">
-             <button onclick="confirmOrderAndSave('PAID')" class="w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">I HAVE PAID ✅</button>
-             <button onclick="document.getElementById('qr-modal').classList.add('hidden');" class="text-gray-400 font-black text-xs uppercase btn-press tracking-widest">Cancel</button>
+    <!-- QR Modal -->
+    <div id="qr-modal" class="hidden fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] p-8 max-w-xs w-full">
+             <h3 class="font-black text-2xl mb-4 text-gray-800">Scan & Pay</h3>
+             <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl mb-6">
+             <button onclick="confirmOrderAndSave('PAID')" class="w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3">DONE ✅</button>
+             <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="text-gray-400 font-bold text-xs">CANCEL</button>
         </div>
     </div>
 
     <script>
+        // --- YOUR ORIGINAL CONFIG (DO NOT EDIT) ---
         const firebaseConfig = {
             apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
             authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -167,10 +152,10 @@
         let cart = [];
         let isShopOpen = true;
 
-        // --- PRODUCT TIMING LOGIC ---
+        // --- PRODUCT AUTO-TIMING LOGIC ---
         function checkProductTiming() {
             const now = new Date();
-            const curTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
             rdb.ref('menu').once('value', snap => {
                 const data = snap.val();
@@ -178,13 +163,15 @@
 
                 Object.keys(data).forEach(id => {
                     const item = data[id];
+                    // Timings ko database value se check karna
                     if(item.startTime && item.endTime) {
                         let shouldBeActive = false;
                         if (item.startTime <= item.endTime) {
-                            shouldBeActive = (curTime >= item.startTime && curTime <= item.endTime);
+                            shouldBeActive = (currentTime >= item.startTime && currentTime <= item.endTime);
                         } else {
-                            shouldBeActive = (curTime >= item.startTime || curTime <= item.endTime);
+                            shouldBeActive = (currentTime >= item.startTime || currentTime <= item.endTime);
                         }
+                        // Update only if changed
                         if(item.available !== shouldBeActive) {
                             rdb.ref(`menu/${id}/available`).set(shouldBeActive);
                         }
@@ -192,19 +179,19 @@
                 });
             });
         }
-        setInterval(checkProductTiming, 20000); // Har 20 seconds mein check
+        setInterval(checkProductTiming, 20000); // Check every 20 sec
 
-        // Firebase Sync Shop
+        // Sync Shop Status
         rdb.ref('shop_status').on('value', snap => {
             isShopOpen = snap.val() ?? true;
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
             document.getElementById('shop-text').innerText = isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED';
             const btn = document.getElementById('toggle-shop-btn');
-            btn.innerText = isShopOpen ? "🔴 Close Shop Now" : "🟢 Open Shop Now";
-            btn.className = isShopOpen ? "w-full py-4 rounded-2xl font-black bg-red-600/20 text-red-500 border border-red-500/30 btn-press" : "w-full py-4 rounded-2xl font-black bg-green-500 text-white shadow-xl btn-press";
+            btn.innerText = isShopOpen ? "🔴 Turn OFF Shop" : "🟢 Turn ON Shop";
+            btn.className = isShopOpen ? "w-full py-4 rounded-2xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-2xl font-black bg-green-500 text-white shadow-lg btn-press";
         });
 
-        // Sync Menu
+        // Sync Menu & Admin Dashboard
         rdb.ref('menu').on('value', snap => {
             const data = snap.val() || {};
             const box = document.getElementById('menu-box');
@@ -215,49 +202,43 @@
                 const i = data[id];
                 const isAvail = i.available !== false;
                 
-                // User Menu
+                // User Menu Item
                 box.innerHTML += `
-                <div class="bg-white p-5 rounded-3xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? 'scale-100' : 'opacity-60 grayscale scale-95'} transition-all">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl border">${i.icon || '🍽️'}</div>
+                <div class="bg-white p-4 rounded-3xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center border">${i.icon || '🍴'}</div>
                         <div>
-                            <p class="font-black text-gray-800 text-lg">${i.name}</p>
-                            <div class="flex items-center gap-2">
-                                <p class="text-red-500 font-black">₹${i.price}</p>
-                                <span class="text-[8px] bg-gray-100 px-2 py-0.5 rounded-full font-bold text-gray-400 tracking-tighter">${i.startTime}-${i.endTime}</span>
-                            </div>
+                            <p class="font-black text-gray-800">${i.name}</p>
+                            <p class="text-red-500 font-black text-sm">₹${i.price} <span class="text-[9px] text-gray-400 font-bold ml-1">(${i.startTime}-${i.endTime})</span></p>
                         </div>
                     </div>
-                    ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="bg-red-50 text-red-500 px-6 py-3 rounded-2xl text-xs font-black btn-press border border-red-100">ADD</button>` : `<span class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Not Available</span>`}
+                    ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="bg-red-50 text-red-500 px-5 py-2 rounded-xl text-xs font-black btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase">OUT</span>`}
                 </div>`;
                 
-                // Admin List Item
+                // Admin Control Item
                 adminBox.innerHTML += `
-                <div class="flex justify-between items-center bg-white/5 p-3 rounded-2xl border border-white/5">
-                    <div class="flex flex-col">
-                        <span class="text-[11px] font-black text-white">${i.name}</span>
-                        <span class="text-[9px] text-yellow-400 font-bold uppercase">${i.startTime} to ${i.endTime}</span>
+                <div class="flex justify-between items-center bg-white/5 p-2 rounded-xl border border-white/5 text-[10px]">
+                    <span class="truncate w-32">${i.name}</span>
+                    <div class="flex gap-2">
+                        <span class="text-yellow-400">${i.startTime}-${i.endTime}</span>
+                        <button onclick="rdb.ref('menu/${id}').remove()" class="text-red-400"><i class="fa fa-trash"></i></button>
                     </div>
-                    <button onclick="rdb.ref('menu/${id}').remove()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 text-xs btn-press"><i class="fa fa-trash"></i></button>
                 </div>`;
             });
         });
 
-        // Core App Functions
+        // Functions
         function loginAdmin() { if(prompt("Enter PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
         function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
-        
+
         function addItem() {
-            const n = document.getElementById('new-n').value, 
-                  p = document.getElementById('new-p').value, 
-                  i = document.getElementById('new-i').value || "🍔",
-                  s = document.getElementById('new-start').value,
-                  e = document.getElementById('new-end').value;
+            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍔";
+            const s = document.getElementById('new-start').value, e = document.getElementById('new-end').value;
             if(n && p && s && e) {
                 rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, startTime:s, endTime:e, available:true});
                 document.getElementById('new-n').value=''; document.getElementById('new-p').value='';
                 checkProductTiming();
-            } else { alert("Sabhi fields bhariye (Time zaroori hai)"); }
+            } else { alert("Sabhi fields bhariye!"); }
         }
 
         function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
@@ -267,7 +248,7 @@
             if(cart.length > 0) floatBar.classList.remove('translate-y-32'); else floatBar.classList.add('translate-y-32');
             document.getElementById('float-items').innerText = cart.length;
             document.getElementById('float-total').innerText = `₹${total}`;
-            document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl"><div><p class="font-black text-gray-800 text-sm">${i.name}</p><p class="text-xs text-red-500 font-bold">₹${i.price}</p></div><i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-gray-300 text-xl cursor-pointer hover:text-red-500"></i></div>`).join('');
+            document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between font-bold text-sm"><span>${i.name}</span><span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa fa-circle-minus text-red-500 ml-2"></i></span></div>`).join('');
             document.getElementById('sheet-total').innerText = `₹${total}`;
         }
 
@@ -275,9 +256,9 @@
         function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
 
         function processPayment() {
-            if(!document.getElementById('u-n').value || !document.getElementById('u-p').value) { alert("Naam aur Number bhariye!"); return; }
-            if(document.getElementById('u-pay').value === "PAID") { document.getElementById('qr-modal').classList.remove('hidden'); } 
-            else { confirmOrderAndSave("COD"); }
+            if(!document.getElementById('u-n').value || !document.getElementById('u-p').value) { alert("Details bhariye!"); return; }
+            if(document.getElementById('u-pay').value === "PAID") document.getElementById('qr-modal').classList.remove('hidden');
+            else confirmOrderAndSave("COD");
         }
 
         function confirmOrderAndSave(type) {
@@ -287,17 +268,25 @@
             const orderData = { customerName: name, customerPhone: phone, items: itemsMsg, total: total, payType: type, address: addr, status: 'Pending', timestamp: Date.now() };
             
             rdb.ref('orders').push(orderData).then(() => {
-                const msg = `*🍔 Naya Order (${type})*%0A%0A*Naam:* ${name}%0A*Number:* ${phone}%0A*Table/Addr:* ${addr}%0A%0A*Items:*%0A${itemsMsg}%0A%0A*Total:* ₹${total}`;
+                const msg = `*🍔 Naya Order (${type})*%0A%0A*Naam:* ${name}%0A*Items:*%0A${itemsMsg}%0A*Total:* ₹${total}`;
                 window.location.href = `https://wa.me/918058733741?text=${msg}`;
                 cart = []; updateCartUI(); document.getElementById('qr-modal').classList.add('hidden'); closeCheckout();
             });
         }
 
-        // Live Order Sync for Admin
-        rdb.ref('orders').limitToLast(10).on('value', snap => {
+        // Live Orders Sync
+        rdb.ref('orders').on('value', snap => {
             const orders = snap.val() || {};
             const list = document.getElementById('admin-orders-list');
             list.innerHTML = '';
             Object.keys(orders).reverse().forEach(id => {
                 const o = orders[id];
-                list.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border bord
+                list.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl text-xs border border-white/5">
+                    <p class="font-black text-yellow-400">${o.customerName} - ₹${o.total}</p>
+                    <p class="text-gray-400 mt-1">${o.payType} | ${o.address}</p>
+                </div>`;
+            });
+        });
+    </script>
+</body>
+</html>
