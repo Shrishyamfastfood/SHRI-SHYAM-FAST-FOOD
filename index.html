@@ -32,6 +32,9 @@
         <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">Owner Login</button>
     </div>
 
+    <!-- Error Banner (New) -->
+    <div id="error-banner" class="hidden bg-red-600 text-white text-xs font-bold p-3 text-center"></div>
+
     <!-- Header -->
     <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
@@ -39,7 +42,7 @@
             <div>
                 <h1 class="font-black text-lg gradient-text uppercase tracking-tight">Shri Shyam Fast Food</h1>
                 <div class="flex items-center gap-2 mt-0.5">
-                    <span id="shop-indicator" class="text-red-500 flex items-center gap-1.5 text-[10px] font-black uppercase">
+                    <span id="shop-indicator" class="text-yellow-600 flex items-center gap-1.5 text-[10px] font-black uppercase">
                         <span class="status-dot bg-yellow-400" id="shop-dot"></span> <span id="shop-text">Connecting...</span>
                     </span>
                     <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
@@ -84,7 +87,7 @@
 
         <h2 class="text-2xl font-black text-gray-800 mb-4 border-b-2 border-red-100 pb-2 border-dashed">Today's Menu</h2>
         <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu load ho raha hai...</p>
+            <p id="menu-loading-text" class="col-span-full text-center text-gray-400 py-10 font-bold">Menu load ho raha hai...</p>
         </div>
     </div>
 
@@ -154,11 +157,11 @@
     </div>
 
     <script>
-        // Updated Firebase Config with proper URL format
+        // Firebase Config (Kripya Firebase Console se apna actual DB URL yahan daalein agar yeh work na kare)
         const firebaseConfig = {
           apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
           authDomain: "shri-shyam-fast-food.firebaseapp.com",
-          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/",
+          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/", // YAHAN DHYAN DEIN
           projectId: "shri-shyam-fast-food",
           storageBucket: "shri-shyam-fast-food.firebasestorage.app",
           messagingSenderId: "828353855950",
@@ -166,35 +169,59 @@
           measurementId: "G-38J1Y2M8LD"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const rdb = firebase.database();
+        // Enable Firebase Logging inside console for deep debugging
+        firebase.database.enableLogging(true);
 
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch(e) {
+            showError("Firebase Init Error: " + e.message);
+        }
+
+        const rdb = firebase.database();
         let cart = [];
         let isShopOpen = true;
+        let isConnected = false;
+
+        function showError(msg) {
+            const banner = document.getElementById('error-banner');
+            banner.innerText = msg;
+            banner.classList.remove('hidden');
+            document.getElementById('shop-text').innerText = "CONNECTION FAILED";
+            document.getElementById('shop-dot').className = "status-dot bg-red-600";
+            document.getElementById('menu-loading-text').innerText = msg;
+        }
+
+        // Connection Timeout Checker (5 seconds)
+        setTimeout(() => {
+            if(!isConnected) {
+                showError("⏳ Error: Connection Timeout! Please check your databaseURL or Network. Agar DB Asia me hai toh URL '.firebasedatabase.app' hoga.");
+            }
+        }, 5000);
 
         function generateTrackingId() {
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
-        // Connection State Monitor (Yeh solve karega 'Checking...' issue)
+        // Connection State Monitor
         rdb.ref('.info/connected').on('value', function(snap) {
             if (snap.val() === true) {
-                // Connection successful! Check if shop_status exists, if not create it
+                isConnected = true;
+                document.getElementById('error-banner').classList.add('hidden');
+                
+                // Connection successful! Setup initial status if missing
                 rdb.ref('shop_status').once('value').then(function(snapshot) {
-                    if (snapshot.val() === null) {
-                        rdb.ref('shop_status').set(true);
-                    }
-                });
+                    if (snapshot.val() === null) rdb.ref('shop_status').set(true);
+                }).catch(e => showError("Database Rules Error: Kripya Rules me .read aur .write true karein."));
             } else {
-                document.getElementById('shop-text').innerText = "Connecting...";
-                document.getElementById('shop-dot').className = "status-dot bg-yellow-500";
+                isConnected = false;
             }
         });
 
         // Shop Status Sync
         rdb.ref('shop_status').on('value', snap => {
             let val = snap.val();
-            if (val === null) return; // Wait for initial setup
+            if (val === null) return;
             
             isShopOpen = (val !== false);
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
@@ -205,7 +232,7 @@
             const btn = document.getElementById('toggle-shop-btn');
             btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
-        });
+        }, error => showError("Error reading status: " + error.message));
 
         // Menu Sync
         rdb.ref('menu').on('value', snap => {
@@ -217,7 +244,9 @@
             const items = Object.keys(data).map(id => ({ id, ...data[id] }));
             items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
 
-            if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai. Admin Panel se items add karein.</p>';
+            if(items.length === 0) {
+                box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai. Admin Panel se naya item add karein.</p>';
+            }
 
             items.forEach(i => {
                 const isAvail = i.available !== false;
@@ -245,7 +274,7 @@
                     <input type="number" value="${i.price}" onchange="rdb.ref('menu/${i.id}/price').set(parseInt(this.value))" class="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none">
                 </div>`;
             });
-        });
+        }, error => showError("Error reading menu: " + error.message));
 
         // Orders Sync
         rdb.ref('orders').on('value', snap => {
@@ -254,7 +283,10 @@
             orderList.innerHTML = '';
             const keys = Object.keys(orders).reverse();
 
-            if(keys.length === 0) orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders yet.</p>';
+            if(keys.length === 0) {
+                orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders yet.</p>';
+                return;
+            }
 
             const statusOptions = ['Pending', 'Order Accepted', 'Cooking', 'Packing', 'Ready', 'Cancel', 'Refund Requested', 'Refund Successfully'];
 
@@ -262,7 +294,6 @@
                 const o = orders[id];
                 const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
-                // Dropdown Creation
                 let optionsHtml = `<option value="">Status Update</option>`;
                 statusOptions.forEach(s => {
                     optionsHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`;
@@ -281,23 +312,4 @@
                     <div class="flex gap-2">
                         <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}', '${o.total}', '${o.trackingId}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-gray-700">
                             ${optionsHtml}
-                        </select>
-                        <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
-                    </div>
-                </div>`;
-            });
-        });
-
-        function loginAdmin() { if(prompt("PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
-        function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
-        function addItem() {
-            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍔";
-            if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; }
-        }
-        function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
-        
-        function updateCartUI() {
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            const floatBar = document.getElementById('floating-cart');
-            if(cart.length > 0) floatBar.classList.remove('translate-y-32'); else floatBar.classList.add('translate-y-32');
-            document.getElementById('float-items').innerText = `${cart
+                
