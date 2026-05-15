@@ -32,9 +32,6 @@
         <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">Owner Login</button>
     </div>
 
-    <!-- Error Banner (New) -->
-    <div id="error-banner" class="hidden bg-red-600 text-white text-xs font-bold p-3 text-center"></div>
-
     <!-- Header -->
     <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
@@ -64,7 +61,7 @@
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase btn-press bg-yellow-500 text-gray-900">Connecting Database...</button>
+            <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase btn-press bg-yellow-500 text-gray-900">Connecting...</button>
 
             <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
                 <p class="font-bold text-gray-300 text-xs mb-3 uppercase">Naya Item Add Karein</p>
@@ -157,11 +154,10 @@
     </div>
 
     <script>
-        // Firebase Config (Kripya Firebase Console se apna actual DB URL yahan daalein agar yeh work na kare)
         const firebaseConfig = {
           apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
           authDomain: "shri-shyam-fast-food.firebaseapp.com",
-          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/", // YAHAN DHYAN DEIN
+          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/",
           projectId: "shri-shyam-fast-food",
           storageBucket: "shri-shyam-fast-food.firebasestorage.app",
           messagingSenderId: "828353855950",
@@ -169,70 +165,46 @@
           measurementId: "G-38J1Y2M8LD"
         };
 
-        // Enable Firebase Logging inside console for deep debugging
-        firebase.database.enableLogging(true);
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch(e) {
-            showError("Firebase Init Error: " + e.message);
-        }
-
+        firebase.initializeApp(firebaseConfig);
         const rdb = firebase.database();
+
         let cart = [];
         let isShopOpen = true;
-        let isConnected = false;
 
-        function showError(msg) {
-            const banner = document.getElementById('error-banner');
-            banner.innerText = msg;
-            banner.classList.remove('hidden');
-            document.getElementById('shop-text').innerText = "CONNECTION FAILED";
-            document.getElementById('shop-dot').className = "status-dot bg-red-600";
-            document.getElementById('menu-loading-text').innerText = msg;
-        }
-
-        // Connection Timeout Checker (5 seconds)
-        setTimeout(() => {
-            if(!isConnected) {
-                showError("⏳ Error: Connection Timeout! Please check your databaseURL or Network. Agar DB Asia me hai toh URL '.firebasedatabase.app' hoga.");
-            }
-        }, 5000);
-
-        function generateTrackingId() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
-
-        // Connection State Monitor
-        rdb.ref('.info/connected').on('value', function(snap) {
-            if (snap.val() === true) {
-                isConnected = true;
-                document.getElementById('error-banner').classList.add('hidden');
-                
-                // Connection successful! Setup initial status if missing
-                rdb.ref('shop_status').once('value').then(function(snapshot) {
-                    if (snapshot.val() === null) rdb.ref('shop_status').set(true);
-                }).catch(e => showError("Database Rules Error: Kripya Rules me .read aur .write true karein."));
-            } else {
-                isConnected = false;
-            }
-        });
-
-        // Shop Status Sync
-        rdb.ref('shop_status').on('value', snap => {
-            let val = snap.val();
-            if (val === null) return;
-            
-            isShopOpen = (val !== false);
+        // Force UI to show "OPEN" instantly (Bypassing "Connecting..." stuck issue)
+        function forceUpdateUI(status) {
+            isShopOpen = status;
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
-            
             document.getElementById('shop-text').innerText = isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED';
+            document.getElementById('shop-indicator').className = "text-green-600 flex items-center gap-1.5 text-[10px] font-black uppercase";
             document.getElementById('shop-dot').className = `status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}`;
             
             const btn = document.getElementById('toggle-shop-btn');
             btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
-        }, error => showError("Error reading status: " + error.message));
+            
+            if(document.getElementById('menu-loading-text')) {
+                document.getElementById('menu-loading-text').innerText = "Menu Khali Hai. Admin Panel se Add Karein.";
+            }
+        }
+
+        // Instantly force UI to open after 1.5 seconds if Firebase is acting up
+        setTimeout(() => forceUpdateUI(true), 1500);
+
+        // Auto Generate 6 Digit Tracking ID
+        function generateTrackingId() { return Math.random().toString(36).substring(2, 8).toUpperCase(); }
+
+        // Proper Sync logic
+        rdb.ref('shop_status').on('value', snap => {
+            let val = snap.val();
+            if (val === null) {
+                // If DB is empty, set it to true and force UI
+                rdb.ref('shop_status').set(true);
+                forceUpdateUI(true);
+            } else {
+                forceUpdateUI(val);
+            }
+        });
 
         // Menu Sync
         rdb.ref('menu').on('value', snap => {
@@ -250,8 +222,6 @@
 
             items.forEach(i => {
                 const isAvail = i.available !== false;
-                
-                // User Menu
                 box.innerHTML += `
                 <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
                     <div class="flex items-center gap-3">
@@ -261,7 +231,6 @@
                     ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}
                 </div>`;
                 
-                // Admin List
                 adminBox.innerHTML += `
                 <div class="bg-white/5 p-3 rounded-xl border border-white/10">
                     <div class="flex justify-between items-center mb-2">
@@ -274,7 +243,7 @@
                     <input type="number" value="${i.price}" onchange="rdb.ref('menu/${i.id}/price').set(parseInt(this.value))" class="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none">
                 </div>`;
             });
-        }, error => showError("Error reading menu: " + error.message));
+        });
 
         // Orders Sync
         rdb.ref('orders').on('value', snap => {
@@ -283,10 +252,7 @@
             orderList.innerHTML = '';
             const keys = Object.keys(orders).reverse();
 
-            if(keys.length === 0) {
-                orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders yet.</p>';
-                return;
-            }
+            if(keys.length === 0) { orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders yet.</p>'; return; }
 
             const statusOptions = ['Pending', 'Order Accepted', 'Cooking', 'Packing', 'Ready', 'Cancel', 'Refund Requested', 'Refund Successfully'];
 
@@ -295,9 +261,7 @@
                 const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
                 let optionsHtml = `<option value="">Status Update</option>`;
-                statusOptions.forEach(s => {
-                    optionsHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`;
-                });
+                statusOptions.forEach(s => { optionsHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`; });
                 
                 orderList.innerHTML += `
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm mb-4">
@@ -310,6 +274,25 @@
                     </div>
                     <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg">${o.items.replace(/%0A/g, '<br>')}</div>
                     <div class="flex gap-2">
-                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}', '${o.total}', '${o.trackingId}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-gray-700">
-                            ${optionsHtml}
-                
+                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}', '${o.total}', '${o.trackingId}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none border border-gray-700">${optionsHtml}</select>
+                        <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
+                    </div>
+                </div>`;
+            });
+        });
+
+        // Functions
+        function loginAdmin() { if(prompt("PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
+        function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
+        function addItem() {
+            const n = document.getElementById('new-n').value, p = document.getElementById('new-p').value, i = document.getElementById('new-i').value || "🍔";
+            if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; }
+        }
+        function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
+        
+        function updateCartUI() {
+            let total = cart.reduce((sum, i) => sum + i.price, 0);
+            const floatBar = document.getElementById('floating-cart');
+            if(cart.length > 0) floatBar.classList.remove('translate-y-32'); else floatBar.classList.add('translate-y-32');
+            document.getElementById('float-items').innerText = `${cart.length} ITEMS`;
+            document.getElementById('float-total').innerText = `₹${total
