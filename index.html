@@ -138,29 +138,36 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-          apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
-          authDomain: "shri-shyam-fast-food.firebaseapp.com",
-          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/",
-          projectId: "shri-shyam-fast-food",
-          storageBucket: "shri-shyam-fast-food.firebasestorage.app",
-          messagingSenderId: "828353855950",
-          appId: "1:828353855950:web:96d62828e8e410e8812b9f",
-          measurementId: "G-38J1Y2M8LD"
-        };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
+      authDomain: "shri-shyam-fast-food.firebaseapp.com",
+      databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/", // Add / at the end
+      projectId: "shri-shyam-fast-food",
+      storageBucket: "shri-shyam-fast-food.firebasestorage.app",
+      messagingSenderId: "828353855950",
+      appId: "1:828353855950:web:96d62828e8e410e8812b9f",
+      measurementId: "G-38J1Y2M8LD"
+    };
 
+    // Initialize Firebase only if not already initialized
+    if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-        const rdb = firebase.database();
+    }
+    const rdb = firebase.database();
 
-        let cart = [];
-        let isShopOpen = true;
+    // Check Connection logic
+    const connectedRef = rdb.ref(".info/connected");
+    connectedRef.on("value", (snap) => {
+      if (snap.val() === true) {
+        console.log("Connected to Firebase!");
+      } else {
+        console.log("Not connected to Firebase. Check Rules or Config.");
+      }
+    });
 
-        function generateTrackingId() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
+    // --- Baki ka pura code (Menu, Orders, etc.) yahan se continue hoga ---
+</script>
 
-        rdb.ref('shop_status').on('value', snap => {
-            isShopOpen = (snap.val() !== false);
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
             document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
             const btn = document.getElementById('toggle-shop-btn');
