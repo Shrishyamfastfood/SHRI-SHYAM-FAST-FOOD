@@ -50,34 +50,28 @@
     </header>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
-        
         <div id="admin-panel" class="hidden bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-black text-yellow-400">Admin Dashboard</h2>
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-6 uppercase btn-press">Checking...</button>
-
             <div class="bg-white/5 p-4 rounded-2xl mb-6 border border-white/10">
                 <p class="font-bold text-gray-300 text-xs mb-3 uppercase">Naya Item Add Karein</p>
                 <div class="grid grid-cols-12 gap-2">
-                    <input id="new-i" placeholder="Icon" class="col-span-3 p-3 bg-black/30 rounded-xl text-center text-xs">
-                    <input id="new-n" placeholder="Item Name" class="col-span-9 p-3 bg-black/30 rounded-xl">
-                    <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/30 rounded-xl">
+                    <input id="new-i" placeholder="Icon" class="col-span-3 p-3 bg-black/30 rounded-xl text-center text-xs text-white">
+                    <input id="new-n" placeholder="Item Name" class="col-span-9 p-3 bg-black/30 rounded-xl text-white">
+                    <input id="new-p" type="number" placeholder="Price (₹)" class="col-span-6 p-3 bg-black/30 rounded-xl text-white">
                     <button onclick="addItem()" class="col-span-6 bg-red-600 text-white font-black rounded-xl btn-press">ADD +</button>
                 </div>
-                
                 <p class="font-bold text-gray-300 text-[10px] mt-6 mb-2 uppercase tracking-widest">Manage Menu & Prices</p>
                 <div id="admin-menu-list" class="space-y-3 max-h-60 overflow-y-auto pr-2"></div>
             </div>
-
             <div class="mt-8 border-t border-white/10 pt-6">
                 <h3 class="text-lg font-black mb-4 text-orange-400"><i class="fa-solid fa-receipt mr-2"></i> Live Orders</h3>
                 <div id="admin-orders-list" class="space-y-4 max-h-96 overflow-y-auto pr-2"></div>
             </div>
         </div>
-
         <h2 class="text-2xl font-black text-gray-800 mb-4 border-b-2 border-red-100 pb-2 border-dashed">Today's Menu</h2>
         <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
@@ -161,20 +155,14 @@
         let cart = [];
         let isShopOpen = true;
 
-        // Auto Generate Tracking ID
         function generateTrackingId() {
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
-
-        rdb.ref('shop_status').once('value', snap => {
-            if (snap.val() === null) rdb.ref('shop_status').set(true);
-        });
 
         rdb.ref('shop_status').on('value', snap => {
             isShopOpen = (snap.val() !== false);
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
             document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
-            
             const btn = document.getElementById('toggle-shop-btn');
             btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
@@ -185,79 +173,28 @@
             const box = document.getElementById('menu-box');
             const adminBox = document.getElementById('admin-menu-list');
             box.innerHTML = ''; adminBox.innerHTML = '';
-            
             const items = Object.keys(data).map(id => ({ id, ...data[id] }));
-            
             items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
-
-            if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai.</p>';
-
             items.forEach(i => {
                 const isAvail = i.available !== false;
-                
-                box.innerHTML += `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️'}</div>
-                        <div><p class="font-black text-gray-800">${i.name}</p><p class="text-red-500 font-black text-sm">₹${i.price}</p></div>
-                    </div>
-                    ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}
-                </div>`;
-                
-                adminBox.innerHTML += `
-                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-white truncate w-32">${i.name}</span>
-                        <div class="flex gap-2">
-                            <button onclick="rdb.ref('menu/${i.id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
-                            <button onclick="if(confirm('Delete?')) rdb.ref('menu/${i.id}').remove()" class="text-red-400"><i class="fa fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <input type="number" value="${i.price}" onchange="rdb.ref('menu/${i.id}/price').set(parseInt(this.value))" class="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none">
-                </div>`;
+                box.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️'}</div><div><p class="font-black text-gray-800">${i.name}</p><p class="text-red-500 font-black text-sm">₹${i.price}</p></div></div>${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}</div>`;
+                adminBox.innerHTML += `<div class="bg-white/5 p-3 rounded-xl border border-white/10"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-white truncate w-32">${i.name}</span><div class="flex gap-2"><button onclick="rdb.ref('menu/${i.id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button><button onclick="if(confirm('Delete?')) rdb.ref('menu/${i.id}').remove()" class="text-red-400"><i class="fa fa-trash"></i></button></div></div><input type="number" value="${i.price}" onchange="rdb.ref('menu/${i.id}/price').set(parseInt(this.value))" class="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none"></div>`;
             });
         });
 
-        // Orders Sync (Naye Status Options aur Tracking ID ke sath)
         rdb.ref('orders').on('value', snap => {
             const orders = snap.val() || {};
             const orderList = document.getElementById('admin-orders-list');
             orderList.innerHTML = '';
             const keys = Object.keys(orders).reverse();
-
-            if(keys.length === 0) orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders.</p>';
-
             const statusOptions = ['Pending', 'Order Accepted', 'Cooking', 'Packing', 'Ready', 'Cancel', 'Refund Requested', 'Refund Successfully'];
-
             keys.forEach(id => {
                 const o = orders[id];
                 const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                // Puraane orders jinme Tracking ID nahi hai, unhe "N/A" dikhayenge
-                const trackingIdText = o.trackingId ? o.trackingId : "N/A";
-                
+                const trackingIdText = o.trackingId || "N/A";
                 let optionsHtml = `<option value="">Status Update</option>`;
-                statusOptions.forEach(s => {
-                    optionsHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`;
-                });
-                
-                orderList.innerHTML += `
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm mb-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <p class="font-black text-orange-400 text-base">${o.customerName}</p>
-                            <p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} | ID: <span class="text-white">${trackingIdText}</span></p>
-                        </div>
-                        <span class="font-black text-xs bg-white/10 px-2 py-1 rounded text-white">${o.status}</span>
-                    </div>
-                    <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg">${o.items.replace(/%0A/g, '<br>')}</div>
-                    <div class="flex gap-2">
-                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}', '${o.total}', '${trackingIdText}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">
-                            ${optionsHtml}
-                        </select>
-                        <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
-                    </div>
-                </div>`;
+                statusOptions.forEach(s => { optionsHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`; });
+                orderList.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm mb-4"><div class="flex justify-between items-start mb-2"><div><p class="font-black text-orange-400 text-base">${o.customerName}</p><p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} | ID: <span class="text-white">${trackingIdText}</span></p></div><span class="font-black text-xs bg-white/10 px-2 py-1 rounded text-white">${o.status}</span></div><div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg">${o.items.replace(/%0A/g, '<br>')}</div><div class="flex gap-2"><select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}', '${o.total}', '${trackingIdText}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">${optionsHtml}</select><button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button></div></div>`;
             });
         });
 
@@ -279,10 +216,45 @@
         }
         function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
         function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
+        
         function processPayment() {
             if(!document.getElementById('u-n').value || !document.getElementById('u-p').value) { alert("Details bhariye!"); return; }
             if(document.getElementById('u-pay').value === "PAID") document.getElementById('qr-modal').classList.remove('hidden');
             else confirmOrderAndSave("COD");
         }
 
-        /
+        function confirmOrderAndSave(payMethod) {
+            const name = document.getElementById('u-n').value;
+            const phone = document.getElementById('u-p').value;
+            const addr = document.getElementById('u-a').value;
+            const timePref = document.getElementById('u-t').value;
+            const trackId = generateTrackingId();
+            const total = cart.reduce((sum, i) => sum + i.price, 0);
+            const itemsList = cart.map(i => i.name).join('%0A');
+
+            const orderData = {
+                customerName: name,
+                customerPhone: phone,
+                address: addr,
+                time: timePref,
+                items: itemsList,
+                total: total,
+                payType: payMethod,
+                status: 'Pending',
+                trackingId: trackId,
+                timestamp: Date.now()
+            };
+
+            rdb.ref('orders').push(orderData).then(() => {
+                alert("Order Successful! Tracking ID: " + trackId);
+                cart = [];
+                updateCartUI();
+                closeCheckout();
+                document.getElementById('qr-modal').classList.add('hidden');
+            });
+        }
+
+        function updateOrderStatus(id, newStatus, phone, name, amount, trackId) {
+            if (!newStatus) return;
+            rdb.ref('orders/' + id).update({ status: newStatus });
+            const msg = `Namaste ${name}! Aapke order (${trackId}) ka status ab "${newStatus}" hai. Total: Rs.${amount}. - Shri Shyam
