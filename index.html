@@ -153,10 +153,11 @@
     </div>
 
     <script>
+        // Aapka provide kiya hua exact Firebase Configuration
         const firebaseConfig = {
           apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
           authDomain: "shri-shyam-fast-food.firebaseapp.com",
-          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com/",
+          databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com",
           projectId: "shri-shyam-fast-food",
           storageBucket: "shri-shyam-fast-food.firebasestorage.app",
           messagingSenderId: "828353855950",
@@ -175,10 +176,16 @@
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
+        // Error handler for Database Rules
+        const dbErrorHandler = (error) => {
+            console.error("Firebase Error:", error);
+            alert("Database Error! Kripya Firebase Console me jaakar Database Rules ko '.read': true aur '.write': true karein.");
+        };
+
         // Force initialize if database is totally empty
         rdb.ref('shop_status').once('value', snap => {
-            if (snap.val() === null) rdb.ref('shop_status').set(true);
-        });
+            if (snap.val() === null) rdb.ref('shop_status').set(true).catch(dbErrorHandler);
+        }).catch(dbErrorHandler);
 
         // Shop Status Sync
         rdb.ref('shop_status').on('value', snap => {
@@ -189,7 +196,7 @@
             const btn = document.getElementById('toggle-shop-btn');
             btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
-        });
+        }, dbErrorHandler);
 
         // Menu Sync
         rdb.ref('menu').on('value', snap => {
@@ -201,7 +208,7 @@
             const items = Object.keys(data).map(id => ({ id, ...data[id] }));
             items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
 
-            if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai.</p>';
+            if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai. Admin Panel se items add karein.</p>';
 
             items.forEach(i => {
                 const isAvail = i.available !== false;
@@ -229,7 +236,7 @@
                     <input type="number" value="${i.price}" onchange="rdb.ref('menu/${i.id}/price').set(parseInt(this.value))" class="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none">
                 </div>`;
             });
-        });
+        }, dbErrorHandler);
 
         // Orders Sync
         rdb.ref('orders').on('value', snap => {
@@ -270,7 +277,7 @@
                     </div>
                 </div>`;
             });
-        });
+        }, dbErrorHandler);
 
         function loginAdmin() { if(prompt("PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
         function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
@@ -286,12 +293,4 @@
             if(cart.length > 0) floatBar.classList.remove('translate-y-32'); else floatBar.classList.add('translate-y-32');
             document.getElementById('float-items').innerText = `${cart.length} ITEMS`;
             document.getElementById('float-total').innerText = `₹${total}`;
-            document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between text-sm font-bold text-gray-700"><span>${i.name}</span><span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-red-400 ml-2"></i></span></div>`).join('');
-            document.getElementById('sheet-total').innerText = `₹${total}`;
-        }
-        
-        function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
-        function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
-        
-        function processPayment() {
-            if(!document.getElementById('u-n').value || !document.getElementById('u-p').valu
+            document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between text-sm font-bold text-gray-700"><span>${i.name}</span><span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-red-400 ml-2"><
