@@ -281,7 +281,8 @@
         function updateOrderStatus(id, status, phone, name) {
             if(!status) return;
             rdb.ref(`orders/${id}/status`).set(status).then(() => {
-                if(confirm("WhatsApp alert bhejein?")) window.open(`https://wa.me/91${phone}?text=Hello ${name}, aapka order ab ${status} hai.`, '_blank');
+                if(confirm("WhatsApp alert bhejein?")) window.open(`https://wa.me/91${phone}?text=Hello, Name :  ${name}, Status : ${status}
+Price : ${Price} number ${Number} Dhanyawad 📦👍.`, '_blank');
             });
         }
     </script>
