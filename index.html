@@ -46,7 +46,11 @@
                 </div>
             </div>
         </div>
-        <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press"><i class="fa-solid fa-sliders"></i></button>
+        <div class="flex gap-2">
+            <!-- Track Order Button -->
+            <button onclick="document.getElementById('track-modal').classList.remove('hidden')" class="px-3 h-10 rounded-full bg-red-50 border border-red-200 text-red-600 font-black text-[10px] flex items-center justify-center btn-press shadow-sm uppercase"><i class="fa-solid fa-location-crosshairs mr-1"></i> Track</button>
+            <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press"><i class="fa-solid fa-sliders"></i></button>
+        </div>
     </header>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
@@ -137,6 +141,17 @@
         </div>
     </div>
 
+    <!-- Track Order Modal -->
+    <div id="track-modal" class="hidden fixed inset-0 bg-black/60 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] p-6 max-w-sm w-full shadow-2xl relative">
+             <button onclick="document.getElementById('track-modal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 btn-press"><i class="fa-solid fa-xmark"></i></button>
+             <h3 class="font-black text-xl mb-4 text-gray-800 uppercase"><i class="fa-solid fa-route text-red-500 mr-2"></i> Track Order</h3>
+             <input id="track-id-input" placeholder="Enter Tracking ID" class="w-full p-4 bg-gray-50 border rounded-xl font-bold text-center uppercase mb-3 outline-none">
+             <button onclick="searchOrder()" class="w-full bg-gray-800 text-white font-black py-3 rounded-xl shadow-lg mb-2 btn-press">SEARCH ORDER</button>
+             <div id="track-result" class="mt-2"></div>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
@@ -155,6 +170,11 @@
         let cart = [];
         let isShopOpen = true;
 
+        // Auto Generate 6 Digit Tracking ID
+        function generateTrackingId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
         // Force initialize if database is totally empty
         rdb.ref('shop_status').once('value', snap => {
             if (snap.val() === null) rdb.ref('shop_status').set(true);
@@ -171,7 +191,7 @@
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
         });
 
-        // Menu Sync (Sorted: In-Stock First)
+        // Menu Sync
         rdb.ref('menu').on('value', snap => {
             const data = snap.val() || {};
             const box = document.getElementById('menu-box');
@@ -179,8 +199,6 @@
             box.innerHTML = ''; adminBox.innerHTML = '';
             
             const items = Object.keys(data).map(id => ({ id, ...data[id] }));
-            
-            // Sort: In Stock (true) first, Out of Stock (false) last
             items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
 
             if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai.</p>';
@@ -222,22 +240,31 @@
 
             if(keys.length === 0) orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders.</p>';
 
+            const statusOptions = ['Pending', 'Order Accepted', 'Cooking', 'Packing', 'Ready', 'Cancel', 'Refund Requested', 'Refund Successfully'];
+
             keys.forEach(id => {
                 const o = orders[id];
                 const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const statusColor = o.status === 'Pending' ? 'text-yellow-400' : (o.status === 'Preparing' ? 'text-blue-400' : 'text-green-400');
+                
+                // Dropdown Creation
+                let optionsHtml = `<option value="">Status Update</option>`;
+                statusOptions.forEach(s => {
+                    optionsHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`;
+                });
                 
                 orderList.innerHTML += `
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm mb-4">
                     <div class="flex justify-between items-start mb-2">
-                        <div><p class="font-black text-orange-400 text-base">${o.customerName}</p><p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType}</p></div>
-                        <span class="font-black ${statusColor}">${o.status}</span>
+                        <div>
+                            <p class="font-black text-orange-400 text-base">${o.customerName}</p>
+                            <p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} | ID: <span class="text-white">${o.trackingId}</span></p>
+                        </div>
+                        <span class="font-black text-xs bg-white/10 px-2 py-1 rounded">${o.status}</span>
                     </div>
                     <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg">${o.items.replace(/%0A/g, '<br>')}</div>
                     <div class="flex gap-2">
-                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">
-                            <option value="">Status Update</option>
-                            <option value="Preparing">Preparing</option><option value="Ready">Ready</option><option value="Completed">Done</option><option value="Cancelled">Cancel</option>
+                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}', '${o.total}', '${o.trackingId}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">
+                            ${optionsHtml}
                         </select>
                         <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
                     </div>
@@ -252,6 +279,7 @@
             if(n && p) { rdb.ref('menu').push({name:n, price:parseInt(p), icon:i, available:true}); document.getElementById('new-n').value=''; document.getElementById('new-p').value=''; }
         }
         function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
+        
         function updateCartUI() {
             let total = cart.reduce((sum, i) => sum + i.price, 0);
             const floatBar = document.getElementById('floating-cart');
@@ -261,30 +289,9 @@
             document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `<div class="flex justify-between text-sm font-bold text-gray-700"><span>${i.name}</span><span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-red-400 ml-2"></i></span></div>`).join('');
             document.getElementById('sheet-total').innerText = `₹${total}`;
         }
+        
         function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
         function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
+        
         function processPayment() {
-            if(!document.getElementById('u-n').value || !document.getElementById('u-p').value) { alert("Details bhariye!"); return; }
-            if(document.getElementById('u-pay').value === "PAID") document.getElementById('qr-modal').classList.remove('hidden');
-            else confirmOrderAndSave("COD");
-        }
-        function confirmOrderAndSave(type) {
-            const name = document.getElementById('u-n').value, phone = document.getElementById('u-p').value;
-            let itemsMsg = cart.map(i => `▫️ ${i.name} - ₹${i.price}`).join('%0A');
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            rdb.ref('orders').push({ customerName: name, customerPhone: phone, items: itemsMsg, total, payType: type, status: 'Pending', timestamp: Date.now() })
-            .then(() => {
-                window.location.href = `https://wa.me/918058733741?text=*नया ऑर्डर (${type})*%0A*नाम:* ${name}%0A*आइटम्स:*%0A${itemsMsg}%0A*टोटल:* ₹${total}`;
-                cart = []; updateCartUI(); closeCheckout(); document.getElementById('qr-modal').classList.add('hidden');
-            });
-        }
-        function updateOrderStatus(id, status, phone, name) {
-            if(!status) return;
-            rdb.ref(`orders/${id}/status`).set(status).then(() => {
-                if(confirm("WhatsApp alert bhejein?")) window.open(`https://wa.me/91${phone}?text=Hello, Name :  ${name}, Status : ${status}
-Price : ${Price} number ${Number} Dhanyawad 📦👍.`, '_blank');
-            });
-        }
-    </script>
-</body>
-</html>
+            if(!document.getElementById('u-n').value || !document.getElementById('u-p').valu
