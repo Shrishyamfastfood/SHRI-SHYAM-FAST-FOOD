@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -24,7 +23,6 @@
 </head>
 <body>
 
-    <!-- Closed Overlay -->
     <div id="closed-screen" class="hidden fixed inset-0 bg-white/95 backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
         <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
         <h2 class="text-4xl font-black text-gray-800">Shop Closed</h2>
@@ -32,7 +30,6 @@
         <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">Owner Login</button>
     </div>
 
-    <!-- Header -->
     <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
             <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full border-2 border-red-500 object-cover">
@@ -46,12 +43,14 @@
                 </div>
             </div>
         </div>
-        <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press"><i class="fa-solid fa-sliders"></i></button>
+        <div class="flex gap-2">
+            <button onclick="document.getElementById('track-modal').classList.remove('hidden')" class="px-3 h-10 rounded-full bg-red-50 border border-red-200 text-red-600 font-black text-[10px] flex items-center justify-center btn-press shadow-sm uppercase"><i class="fa-solid fa-location-crosshairs mr-1"></i> Track</button>
+            <button onclick="loginAdmin()" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press"><i class="fa-solid fa-sliders"></i></button>
+        </div>
     </header>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
         
-        <!-- Admin Dashboard -->
         <div id="admin-panel" class="hidden bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-black text-yellow-400">Admin Dashboard</h2>
@@ -83,7 +82,6 @@
         <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
-    <!-- Cart Bar -->
     <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-transform duration-300 translate-y-32">
         <div onclick="openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
             <div>
@@ -94,7 +92,6 @@
         </div>
     </div>
 
-    <!-- Checkout Sheet -->
     <div id="checkout-sheet" class="cart-sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/40 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[90vh]">
             <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-[2.5rem]">
@@ -127,13 +124,22 @@
         </div>
     </div>
 
-    <!-- QR Modal -->
     <div id="qr-modal" class="hidden fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-md">
         <div class="bg-white rounded-[2.5rem] p-8 max-w-xs w-full">
              <h3 class="font-black text-2xl mb-2 gradient-text">JAY SHREE SHYAM</h3>
              <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl border-4 mb-6">
              <button onclick="confirmOrderAndSave('PAID')" class="w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">PAYMENT DONE</button>
              <button onclick="document.getElementById('qr-modal').classList.add('hidden');" class="text-gray-400 font-bold text-xs uppercase btn-press">CANCEL</button>
+        </div>
+    </div>
+
+    <div id="track-modal" class="hidden fixed inset-0 bg-black/60 z-[3000] flex items-center justify-center p-6 text-center backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] p-6 max-w-sm w-full shadow-2xl relative">
+             <button onclick="document.getElementById('track-modal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 btn-press"><i class="fa-solid fa-xmark"></i></button>
+             <h3 class="font-black text-xl mb-4 text-gray-800 uppercase"><i class="fa-solid fa-route text-red-500 mr-2"></i> Track Order</h3>
+             <input id="track-id-input" placeholder="Enter Tracking ID" class="w-full p-4 bg-gray-50 border rounded-xl font-bold text-center uppercase mb-3 outline-none">
+             <button onclick="searchOrder()" class="w-full bg-gray-800 text-white font-black py-3 rounded-xl shadow-lg mb-2 btn-press">SEARCH ORDER</button>
+             <div id="track-result" class="mt-2"></div>
         </div>
     </div>
 
@@ -155,12 +161,15 @@
         let cart = [];
         let isShopOpen = true;
 
-        // Force initialize if database is totally empty
+        // Auto Generate Tracking ID
+        function generateTrackingId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
         rdb.ref('shop_status').once('value', snap => {
             if (snap.val() === null) rdb.ref('shop_status').set(true);
         });
 
-        // Shop Status Sync
         rdb.ref('shop_status').on('value', snap => {
             isShopOpen = (snap.val() !== false);
             document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
@@ -171,7 +180,6 @@
             btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
         });
 
-        // Menu Sync (Sorted: In-Stock First)
         rdb.ref('menu').on('value', snap => {
             const data = snap.val() || {};
             const box = document.getElementById('menu-box');
@@ -180,7 +188,6 @@
             
             const items = Object.keys(data).map(id => ({ id, ...data[id] }));
             
-            // Sort: In Stock (true) first, Out of Stock (false) last
             items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
 
             if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai.</p>';
@@ -188,7 +195,6 @@
             items.forEach(i => {
                 const isAvail = i.available !== false;
                 
-                // User Menu
                 box.innerHTML += `
                 <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
                     <div class="flex items-center gap-3">
@@ -198,7 +204,6 @@
                     ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}
                 </div>`;
                 
-                // Admin List
                 adminBox.innerHTML += `
                 <div class="bg-white/5 p-3 rounded-xl border border-white/10">
                     <div class="flex justify-between items-center mb-2">
@@ -213,7 +218,7 @@
             });
         });
 
-        // Orders Sync
+        // Orders Sync (Naye Status Options aur Tracking ID ke sath)
         rdb.ref('orders').on('value', snap => {
             const orders = snap.val() || {};
             const orderList = document.getElementById('admin-orders-list');
@@ -222,22 +227,33 @@
 
             if(keys.length === 0) orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders.</p>';
 
+            const statusOptions = ['Pending', 'Order Accepted', 'Cooking', 'Packing', 'Ready', 'Cancel', 'Refund Requested', 'Refund Successfully'];
+
             keys.forEach(id => {
                 const o = orders[id];
                 const time = new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const statusColor = o.status === 'Pending' ? 'text-yellow-400' : (o.status === 'Preparing' ? 'text-blue-400' : 'text-green-400');
+                
+                // Puraane orders jinme Tracking ID nahi hai, unhe "N/A" dikhayenge
+                const trackingIdText = o.trackingId ? o.trackingId : "N/A";
+                
+                let optionsHtml = `<option value="">Status Update</option>`;
+                statusOptions.forEach(s => {
+                    optionsHtml += `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`;
+                });
                 
                 orderList.innerHTML += `
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-sm mb-4">
                     <div class="flex justify-between items-start mb-2">
-                        <div><p class="font-black text-orange-400 text-base">${o.customerName}</p><p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType}</p></div>
-                        <span class="font-black ${statusColor}">${o.status}</span>
+                        <div>
+                            <p class="font-black text-orange-400 text-base">${o.customerName}</p>
+                            <p class="text-[10px] text-gray-400 font-bold">${time} | ${o.payType} | ID: <span class="text-white">${trackingIdText}</span></p>
+                        </div>
+                        <span class="font-black text-xs bg-white/10 px-2 py-1 rounded text-white">${o.status}</span>
                     </div>
                     <div class="text-gray-300 text-xs mb-3 bg-black/30 p-2 rounded-lg">${o.items.replace(/%0A/g, '<br>')}</div>
                     <div class="flex gap-2">
-                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">
-                            <option value="">Status Update</option>
-                            <option value="Preparing">Preparing</option><option value="Ready">Ready</option><option value="Completed">Done</option><option value="Cancelled">Cancel</option>
+                        <select onchange="updateOrderStatus('${id}', this.value, '${o.customerPhone}', '${o.customerName}', '${o.total}', '${trackingIdText}')" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-xs font-bold outline-none">
+                            ${optionsHtml}
                         </select>
                         <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
                     </div>
@@ -268,22 +284,5 @@
             if(document.getElementById('u-pay').value === "PAID") document.getElementById('qr-modal').classList.remove('hidden');
             else confirmOrderAndSave("COD");
         }
-        function confirmOrderAndSave(type) {
-            const name = document.getElementById('u-n').value, phone = document.getElementById('u-p').value;
-            let itemsMsg = cart.map(i => `▫️ ${i.name} - ₹${i.price}`).join('%0A');
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            rdb.ref('orders').push({ customerName: name, customerPhone: phone, items: itemsMsg, total, payType: type, status: 'Pending', timestamp: Date.now() })
-            .then(() => {
-                window.location.href = `https://wa.me/918058733741?text=*नया ऑर्डर (${type})*%0A*नाम:* ${name}%0A*आइटम्स:*%0A${itemsMsg}%0A*टोटल:* ₹${total}`;
-                cart = []; updateCartUI(); closeCheckout(); document.getElementById('qr-modal').classList.add('hidden');
-            });
-        }
-        function updateOrderStatus(id, status, phone, name) {
-            if(!status) return;
-            rdb.ref(`orders/${id}/status`).set(status).then(() => {
-                if(confirm("WhatsApp alert bhejein?")) window.open(`https://wa.me/91${phone}?text=Hello, Name :  ${name}, Status : ${status} Dhanyawad 📦👍.`, '_blank');
-            });
-        }
-    </script>
-</body>
-</html>
+
+        /
