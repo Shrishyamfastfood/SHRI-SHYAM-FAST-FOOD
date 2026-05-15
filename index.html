@@ -50,7 +50,6 @@
     </header>
 
     <div class="max-w-2xl mx-auto px-4 py-6">
-        
         <div id="admin-panel" class="hidden bg-gray-900 rounded-[2rem] shadow-2xl p-6 mb-8 text-white">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-black text-yellow-400">Admin Dashboard</h2>
@@ -80,7 +79,7 @@
 
         <h2 class="text-2xl font-black text-gray-800 mb-4 border-b-2 border-red-100 pb-2 border-dashed">Today's Menu</h2>
         <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <p class="col-span-full text-center text-gray-400 py-10 font-bold">Please wait...</p>
+            <p id="menu-loader-text" class="col-span-full text-center text-gray-400 py-10 font-bold">Menu aa raha hai...</p>
         </div>
     </div>
 
@@ -166,96 +165,98 @@
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
-        // --- SAFE SHOP STATUS ---
+        // 1. SHOP STATUS
         rdb.ref('shop_status').on('value', snap => {
-            isShopOpen = (snap.val() !== false);
-            document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
-            document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
-            
-            const btn = document.getElementById('toggle-shop-btn');
-            btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
-            btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
+            try {
+                isShopOpen = (snap.val() !== false); 
+                document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
+                document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
+                
+                const btn = document.getElementById('toggle-shop-btn');
+                btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
+                btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press";
+            } catch(e) { console.error("Status Update Failed", e); }
         });
 
-        // --- SAFE MENU SYNC (CRASH PROOF) ---
+        // 2. MENU SYNC (BULLETPROOF DATA PARSER)
         rdb.ref('menu').on('value', snap => {
             try {
                 const data = snap.val() || {};
                 const box = document.getElementById('menu-box');
                 const adminBox = document.getElementById('admin-menu-list');
                 box.innerHTML = ''; adminBox.innerHTML = '';
-                
-                const items = Object.keys(data).map(id => ({ id, ...data[id] }));
-                items.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
 
-                if(items.length === 0) box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai.</p>';
+                let itemsCount = 0;
 
-                items.forEach(i => {
+                // Safely iterate object (Skips garbage data)
+                for (let id in data) {
+                    let i = data[id];
+                    if (typeof i !== 'object' || i === null || !i.name) continue; // Yeh kachra data skip karega
+
+                    itemsCount++;
                     const isAvail = i.available !== false;
-                    
-                    // CRASH FIX: Name aur price agar missing ho toh handle karega
-                    const itemName = i.name ? String(i.name) : "Unnamed Item";
+                    const itemName = String(i.name).replace(/'/g, "");
                     const itemPrice = i.price || 0;
                     const itemIcon = i.icon || '🍽️';
-                    const safeName = itemName.replace(/'/g, "");
-                    
+
                     box.innerHTML += `
                     <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl border">${itemIcon}</div>
                             <div><p class="font-black text-gray-800">${itemName}</p><p class="text-red-500 font-black text-sm">₹${itemPrice}</p></div>
                         </div>
-                        ${isAvail ? `<button onclick="addToCart('${safeName}', ${itemPrice})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}
+                        ${isAvail ? `<button onclick="addToCart('${itemName}', ${itemPrice})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}
                     </div>`;
-                    
+
                     adminBox.innerHTML += `
                     <div class="bg-white/5 p-3 rounded-xl border border-white/10">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-xs font-bold text-white truncate w-32">${itemName}</span>
                             <div class="flex gap-2">
-                                <button onclick="rdb.ref('menu/${i.id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
-                                <button onclick="if(confirm('Delete?')) rdb.ref('menu/${i.id}').remove()" class="text-red-400"><i class="fa fa-trash"></i></button>
+                                <button onclick="rdb.ref('menu/${id}/available').set(${!isAvail})" class="px-2 py-1 text-[10px] rounded font-black ${isAvail ? 'bg-green-500' : 'bg-red-500'} text-white">${isAvail ? 'IN' : 'OUT'}</button>
+                                <button onclick="if(confirm('Delete?')) rdb.ref('menu/${id}').remove()" class="text-red-400"><i class="fa fa-trash"></i></button>
                             </div>
                         </div>
-                        <input type="number" value="${itemPrice}" onchange="rdb.ref('menu/${i.id}/price').set(parseInt(this.value))" class="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none">
+                        <input type="number" value="${itemPrice}" onchange="rdb.ref('menu/${id}/price').set(parseInt(this.value))" class="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-yellow-400 font-black outline-none">
                     </div>`;
-                });
-            } catch (e) {
-                console.error("Menu Render Error: ", e);
+                }
+
+                if(itemsCount === 0) {
+                    box.innerHTML = '<p class="col-span-full text-center text-gray-400 py-10 font-bold">Menu khali hai.</p>';
+                }
+
+            } catch(e) {
+                document.getElementById('menu-box').innerHTML = '<p class="text-red-500 text-center font-bold col-span-full">Data error: ' + e.message + '</p>';
             }
         });
 
-        // --- SAFE ORDERS SYNC (CRASH PROOF) ---
+        // 3. ORDERS SYNC (BULLETPROOF)
         rdb.ref('orders').on('value', snap => {
             try {
                 const orders = snap.val() || {};
                 const orderList = document.getElementById('admin-orders-list');
                 orderList.innerHTML = '';
-                const keys = Object.keys(orders).reverse();
 
-                if(keys.length === 0) {
-                    orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders.</p>';
-                    return;
-                }
-
+                let hasOrders = false;
                 const statusOptions = ['Pending', 'Order Accepted', 'Cooking', 'Packing', 'Ready', 'Cancel', 'Refund Requested', 'Refund Successfully'];
 
+                const keys = Object.keys(orders).reverse();
                 keys.forEach(id => {
                     const o = orders[id];
-                    
-                    // CRASH FIX: Handling missing data in old orders safely
-                    const cName = o.customerName || "Unknown Customer";
+                    if (typeof o !== 'object' || o === null) return; // Skip broken orders
+
+                    hasOrders = true;
+                    const cName = o.customerName || "Customer";
                     const cPhone = o.customerPhone || "";
                     const oTotal = o.total || 0;
                     const oTrackId = o.trackingId || "N/A";
                     const oStatus = o.status || "Pending";
                     const oPayType = o.payType || "COD";
-                    const time = o.timestamp ? new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "N/A";
+                    const time = o.timestamp ? new Date(o.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
                     
-                    const itemsStr = o.items ? String(o.items) : "No details";
-                    const safeItemsHtml = itemsStr.replace(/%0A/g, '<br>');
+                    const safeItemsHtml = (o.items || "").replace(/%0A/g, '<br>');
                     
-                    let optionsHtml = `<option value="">Status Update</option>`;
+                    let optionsHtml = `<option value="">Update</option>`;
                     statusOptions.forEach(s => {
                         optionsHtml += `<option value="${s}" ${oStatus === s ? 'selected' : ''}>${s}</option>`;
                     });
@@ -278,11 +279,16 @@
                         </div>
                     </div>`;
                 });
-            } catch (e) {
+
+                if(!hasOrders) {
+                    orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders.</p>';
+                }
+            } catch(e) {
                 console.error("Order Render Error: ", e);
             }
         });
 
+        // App Functions
         function loginAdmin() { if(prompt("PIN:") === "8087jitu") { document.getElementById('admin-panel').classList.remove('hidden'); window.scrollTo(0,0); } }
         function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
         function addItem() {
@@ -291,6 +297,4 @@
         }
         function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
         function updateCartUI() {
-            let total = cart.reduce((sum, i) => sum + i.price, 0);
-            const floatBar = document.getElementById('floating-cart');
-      
+            let total = cart.reduce((sum, i) => sum + i.pr
