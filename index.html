@@ -35,9 +35,11 @@
     <!-- Printing Zone -->
     <div id="print-area"></div>
 
+    <!-- Closed Screen Overlay -->
     <div id="closed-screen" class="hidden fixed inset-0 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center text-center p-6">
         <i class="fa-solid fa-store-slash text-6xl text-red-500 mb-4"></i>
-        <h2 class="text-4xl font-black text-gray-800">SHOP CLOSED</h2>
+        <h2 class="text-4xl font-black text-gray-800 uppercase">Shop Closed</h2>
+        <p class="text-gray-500 mt-2">Hum abhi band hain, kripya baad mein check karein.</p>
         <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black border btn-press uppercase">Owner Login</button>
     </div>
 
@@ -100,7 +102,7 @@
         </div>
     </div>
 
-    <!-- Checkout -->
+    <!-- Checkout Sheet -->
     <div id="checkout-sheet" class="cart-sheet fixed inset-0 z-[1000] flex flex-col justify-end bg-black/60 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[92vh]">
             <div class="p-6 border-b flex justify-between items-center"><h3 class="font-black text-2xl">Confirm Order</h3><button onclick="closeCheckout()" class="w-10 h-10 bg-gray-100 rounded-full btn-press"><i class="fa-solid fa-xmark"></i></button></div>
@@ -201,7 +203,6 @@
             if (count > lastOrderCount && lastOrderCount !== 0) document.getElementById('order-sound').play().catch(e => {});
             lastOrderCount = count;
 
-            // Stats Update
             let total = 0, today = new Date().toDateString(), todayCount = 0;
             Object.values(orders).forEach(o => { 
                 if(new Date(o.timestamp).toDateString() === today) { total += o.total; todayCount++; } 
@@ -234,8 +235,30 @@
             });
         });
 
-        // Functions
+        // App Functions
+        function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
+        function closeCheckout() { document.getElementById('checkout-sheet').classList.remove('active'); }
+        
+        function loginAdmin() {
+            const pass = prompt("Enter Admin Password:");
+            if(pass === "1234") document.getElementById('admin-panel').classList.remove('hidden');
+            else alert("Galat Password!");
+        }
+
+        function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
+
+        function addItem() {
+            const i = document.getElementById('new-i').value || '🍔';
+            const n = document.getElementById('new-n').value;
+            const p = document.getElementById('new-p').value;
+            if(n && p) {
+                rdb.ref('menu').push({ icon:i, name:n, price:parseInt(p), available:true, bestSeller:false });
+                document.getElementById('new-n').value = ''; document.getElementById('new-p').value = '';
+            }
+        }
+
         function addToCart(n, p) { cart.push({name:n, price:p}); updateCartUI(); }
+        
         function updateCartUI() {
             let total = cart.reduce((s, i) => s + i.price, 0);
             document.getElementById('floating-cart').classList.toggle('translate-y-32', cart.length === 0);
@@ -265,20 +288,4 @@
             };
 
             rdb.ref('orders').push(orderData).then(() => {
-                let note = method === "PAID" ? `\n_(भाई मैंने ₹${total} का पेमेंट QR से कर दिया है, स्क्रीनशॉट भेज रहा हूँ!)_` : `\n_(Cash on Delivery - COD)_`;
-                const msg = `*🍔 नया ${method} ऑर्डर (MOULASAR)*\n\n*ग्राहक:* ${name}\n*नंबर:* ${phone}\n*समय:* ${time}\n*एड्रेस:* ${addr}\n\n*आइटम्स:*\n${itemsFormatted}\n-------------------\n*कुल बिल: ₹${total}*\n-------------------\n*Tracking ID:* ${trackId}${note}`;
-                window.open(`https://wa.me/918058733741?text=${encodeURIComponent(msg)}`, '_blank');
-                cart = []; updateCartUI(); closeCheckout();
-                document.getElementById('qr-modal').classList.add('hidden');
-            });
-        }
-
-        // The Bill Printing Function
-        function printOrderBill(o) {
-            const pArea = document.getElementById('print-area');
-            pArea.innerHTML = `
-                <div style="text-align:center; padding:10px;">
-                    <h2 style="margin:0">SHRI SHYAM FAST FOOD</h2>
-                    <p style="margin:5px 0">MOULASAR | 80587 33741</p>
-                    <p>--------------------------------</p>
-                    <p style="text-align:left"><b>ID:</b> ${o.trackingId}<br><b>NAME:<
+                let note = method === "PAID" ? `\n_(भाई मैं
