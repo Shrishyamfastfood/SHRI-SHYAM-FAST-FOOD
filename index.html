@@ -125,7 +125,7 @@
     <!-- Search Bar -->
     <div class="relative mb-4">
         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-        <input id="search-input" oninput="renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
+        <input id="search-input" oninput="window.renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
     </div>
 
     <!-- Category Tabs -->
@@ -265,12 +265,16 @@
             
             if(!window.shopOpen) {
                 closedScreen.classList.remove('hidden');
-                toggleBtn.innerText = "Shop is CLOSED (Click to Open)";
-                toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-red-600 text-white";
+                if(toggleBtn) {
+                    toggleBtn.innerText = "Shop is CLOSED (Click to Open)";
+                    toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-red-600 text-white";
+                }
             } else {
                 closedScreen.classList.add('hidden');
-                toggleBtn.innerText = "Shop is OPEN (Click to Close)";
-                toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white";
+                if(toggleBtn) {
+                    toggleBtn.innerText = "Shop is OPEN (Click to Close)";
+                    toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white";
+                }
             }
         });
 
@@ -323,5 +327,4 @@
                 <div class="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-4xl border">${item.icon || '🍔'}</div>
                 <div class="flex-1 flex flex-col justify-between">
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm leading-tight">${item.name}</h3>
-                        <p class="text-red-600 font-black text-
+                        <h3 class="font-
