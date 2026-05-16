@@ -20,20 +20,11 @@
         .t-step { position: relative; }
         .t-step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 32px; width: 2px; height: calc(100% + 4px); background: #e5e7eb; z-index: 0; }
         .t-step.done:not(:last-child)::after { background: #22c55e; }
-        .stars { display: flex; flex-direction: row-reverse; gap: 4px; }
-        .stars input { display: none; }
-        .stars label { cursor: pointer; font-size: 2rem; color: #d1d5db; line-height: 1; transition: color 0.2s; }
-        .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f59e0b; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-up { animation: fadeUp 0.3s ease forwards; }
-        @keyframes ping2 { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.25); opacity: 0.7; } }
-        .live-pulse { animation: ping2 1.4s infinite; }
         .scroll-hide::-webkit-scrollbar { display: none; }
         @media print {
             body > *:not(#print-slip) { display: none !important; }
             #print-slip { display: block !important; }
         }
-        .chart-bar { transition: height 0.6s ease; }
     </style>
 </head>
 <body>
@@ -43,7 +34,7 @@
 </div>
 
 <!-- Shop Closed Overlay -->
-<div id="closed-screen" class="hidden fixed inset-0 bg-white/97 backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
+<div id="closed-screen" class="hidden fixed inset-0 bg-white/[0.97] backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
     <i class="fa-solid fa-store-slash text-7xl text-red-500 mb-5"></i>
     <h2 class="text-4xl font-black text-gray-800">Shop Closed</h2>
     <p class="text-gray-500 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
@@ -58,7 +49,7 @@
             <h1 class="font-black text-lg gradient-text uppercase tracking-tight leading-tight">Shri Shyam Fast Food</h1>
             <div class="flex items-center gap-2 mt-0.5">
                 <span id="shop-indicator" class="flex items-center gap-1.5 text-[10px] font-black uppercase text-gray-500">
-                    <span id="firebase-dot" class="status-dot bg-gray-400"></span> <span id="firebase-text">Checking...</span>
+                    <span id="firebase-dot" class="status-dot bg-green-500"></span> <span id="firebase-text">Live</span>
                 </span>
                 <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
             </div>
@@ -99,7 +90,7 @@
 
         <div class="bg-white/5 rounded-2xl p-4 mb-5 border border-white/10">
             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Weekly Revenue Chart</p>
-            <div id="revenue-chart" class="flex items-end gap-1.5 h-20 items-baseline justify-between px-2"></div>
+            <div id="revenue-chart" class="flex items-end gap-1.5 h-20 justify-between px-2"></div>
             <div id="revenue-labels" class="flex justify-between mt-1.5 px-2 text-[10px] text-gray-400 font-bold"></div>
         </div>
 
@@ -135,17 +126,12 @@
             </div>
             <div id="admin-orders-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1 scroll-hide"></div>
         </div>
-
-        <div class="border-t border-white/10 pt-5 mt-5">
-            <h3 class="font-black text-purple-400 mb-4"><i class="fa-solid fa-star mr-2"></i>Customer Reviews</h3>
-            <div id="admin-reviews" class="space-y-3 max-h-60 overflow-y-auto pr-1 scroll-hide"></div>
-        </div>
     </div>
 
     <!-- Search Bar -->
     <div class="relative mb-4">
         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-        <input id="search-input" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
+        <input id="search-input" oninput="renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
     </div>
 
     <!-- Category Tabs -->
@@ -154,9 +140,6 @@
     <!-- Menu Header -->
     <div class="flex justify-between items-center mb-4 border-b-2 border-red-100 pb-2 border-dashed">
         <h2 class="text-xl font-black text-gray-800">Today's Menu</h2>
-        <button onclick="openFavs()" class="text-xs font-black text-red-400 flex items-center gap-1 bg-red-50 px-3 py-1.5 rounded-full border border-red-100 btn-press">
-            <i class="fa-solid fa-heart"></i> Favourites
-        </button>
     </div>
     <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
 </div>
@@ -176,31 +159,12 @@
 <div id="checkout-sheet" class="sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/50 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[92vh]">
         <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-[2.5rem] flex-shrink-0">
-            <div>
-                <h3 class="font-black text-2xl text-gray-800">Checkout</h3>
-                <div id="loyalty-bar-checkout" class="hidden mt-1">
-                    <span class="text-xs font-black text-yellow-600">🏆 <span id="pts-display">0</span> Points Available</span>
-                </div>
-            </div>
+            <h3 class="font-black text-2xl text-gray-800">Checkout</h3>
             <button onclick="closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
         </div>
         <div class="p-5 overflow-y-auto space-y-4 scroll-hide">
-            <div id="redeem-box" class="hidden bg-yellow-50 border border-yellow-200 rounded-2xl p-3 flex items-center justify-between">
-                <div>
-                    <p class="font-black text-yellow-700 text-sm">🏆 Points se discount lo!</p>
-                    <p class="text-xs text-yellow-600 font-bold">100 pts = ₹10 off</p>
-                </div>
-                <label class="flex items-center gap-2 cursor-pointer select-none">
-                    <input type="checkbox" id="use-pts" class="w-5 h-5 accent-yellow-500 rounded">
-                    <span class="text-sm font-black text-yellow-700">USE</span>
-                </label>
-            </div>
-
             <div class="bg-gray-50 p-4 rounded-2xl border">
                 <div id="cart-summary" class="space-y-2 mb-3 max-h-40 overflow-y-auto scroll-hide"></div>
-                <div id="discount-row" class="hidden justify-between items-center text-sm font-black text-green-600 pb-2">
-                    <span>🏆 Points Discount</span><span id="discount-val">-₹0</span>
-                </div>
                 <div class="flex justify-between items-center border-t pt-3 font-black text-lg">
                     <span class="text-gray-700">Total Pay</span>
                     <span id="sheet-total" class="text-red-600 text-xl">₹0</span>
@@ -208,9 +172,9 @@
             </div>
 
             <div class="space-y-3">
-                <input id="u-n" placeholder="Aapka Naam *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
-                <input id="u-p" type="tel" placeholder="Mobile Number *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
-                <input id="u-a" placeholder="Address / Table No." class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
+                <input id="u-n" placeholder="Aapka Naam *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
+                <input id="u-p" type="tel" placeholder="Mobile Number *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
+                <input id="u-a" placeholder="Address / Table No." class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
                 <select id="u-t" class="w-full p-4 bg-gray-50 border rounded-xl font-bold text-gray-700 outline-none text-sm">
                     <option>15 मिनट में</option>
                     <option>30 मिनट में</option>
@@ -270,23 +234,97 @@
     </div>
 </div>
 
-<!-- FAVOURITES MODAL -->
-<div id="favs-modal" class="hidden fixed inset-0 bg-black/50 z-[2000] flex items-end justify-center backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[80vh] flex flex-col">
-        <div class="flex justify-between items-center mb-5 flex-shrink-0">
-            <h3 class="font-black text-2xl text-gray-800"><i class="fa-solid fa-heart text-red-500 mr-2"></i>My Favourites</h3>
-            <button onclick="closeModal('favs-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
-        </div>
-        <div id="favs-list" class="overflow-y-auto scroll-hide space-y-3"></div>
-    </div>
-</div>
-
 <!-- FIREBASE & MAIN SYSTEM LOGIC -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, update, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set, update, push, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
       authDomain: "shri-shyam-fast-food.firebaseapp.com",
-      databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio
+      databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com",
+      projectId: "shri-shyam-fast-food",
+      storageBucket: "shri-shyam-fast-food.firebasestorage.app",
+      messagingSenderId: "828353855950",
+      appId: "1:828353855950:web:96d62828e8e410e8812b9f",
+      measurementId: "G-38J1Y2M8LD"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Global App States
+    window.menuData = {};
+    window.cart = {};
+    window.currentCategory = "All";
+    window.shopOpen = true;
+
+    // Categories Configuration
+    const categories = ["All", "Snacks", "Meals", "Drinks", "Sweets", "Other"];
+
+    // Initialize & Fetch Database
+    function initApp() {
+        // Listen Shop Status
+        onValue(ref(db, 'shop_status'), (snapshot) => {
+            window.shopOpen = snapshot.val() !== false;
+            const closedScreen = document.getElementById('closed-screen');
+            const toggleBtn = document.getElementById('toggle-shop-btn');
+            
+            if(!window.shopOpen) {
+                closedScreen.classList.remove('hidden');
+                toggleBtn.innerText = "Shop is CLOSED";
+                toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-red-600 text-white";
+            } else {
+                closedScreen.classList.add('hidden');
+                toggleBtn.innerText = "Shop is OPEN";
+                toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white";
+            }
+        });
+
+        // Listen Menu List
+        onValue(ref(db, 'menu'), (snapshot) => {
+            window.menuData = snapshot.val() || {};
+            renderCategories();
+            renderMenu();
+            renderAdminMenu();
+        });
+
+        // Listen Live Orders for Dashboard
+        onValue(ref(db, 'orders'), (snapshot) => {
+            const data = snapshot.val() || {};
+            renderAdminOrders(data);
+            calculateStats(data);
+        });
+    }
+
+    // Render category tabs
+    window.renderCategories = function() {
+        const catBox = document.getElementById('cat-tabs');
+        catBox.innerHTML = categories.map(cat => `
+            <button onclick="setCategory('${cat}')" class="px-5 py-2.5 rounded-full font-bold text-xs border bg-white text-gray-600 border-gray-200 whitespace-nowrap btn-press ${window.currentCategory === cat ? 'tab-active' : ''}">
+                ${cat}
+            </button>
+        `).join('');
+    };
+
+    window.setCategory = function(cat) {
+        window.currentCategory = cat;
+        renderCategories();
+        renderMenu();
+    };
+
+    // Render Menu Cards
+    window.renderMenu = function() {
+        const container = document.getElementById('menu-box');
+        const searchVal = document.getElementById('search-input').value.toLowerCase();
+        container.innerHTML = "";
+
+        Object.keys(window.menuData).forEach(id => {
+            const item = window.menuData[id];
+            if (window.currentCategory !== "All" && item.category !== window.currentCategory) return;
+            if (searchVal && !item.name.toLowerCase().includes(searchVal)) return;
+
+            const qty = window.cart[id] || 0;
+
+            const card = document.createElement('div');
+            card.className = "bg-white p-4 rounded-2xl border
