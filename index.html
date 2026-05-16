@@ -38,7 +38,7 @@
     <i class="fa-solid fa-store-slash text-7xl text-red-500 mb-5"></i>
     <h2 class="text-4xl font-black text-gray-800">Shop Closed</h2>
     <p class="text-gray-500 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
-    <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">Owner Login</button>
+    <button onclick="window.loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">Owner Login</button>
 </div>
 
 <!-- HEADER -->
@@ -56,9 +56,9 @@
         </div>
     </div>
     <div class="flex items-center gap-1.5">
-        <button onclick="openTracker()" title="Track Order" class="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 text-blue-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-location-dot"></i></button>
-        <button onclick="openHistory()" title="Order History" class="w-10 h-10 rounded-full bg-purple-50 border border-purple-200 text-purple-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-clock-rotate-left"></i></button>
-        <button onclick="loginAdmin()" title="Admin" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-sliders"></i></button>
+        <button onclick="window.openTracker()" title="Track Order" class="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 text-blue-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-location-dot"></i></button>
+        <button onclick="window.openHistory()" title="Order History" class="w-10 h-10 rounded-full bg-purple-50 border border-purple-200 text-purple-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-clock-rotate-left"></i></button>
+        <button onclick="window.loginAdmin()" title="Admin" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-sliders"></i></button>
     </div>
 </header>
 
@@ -71,7 +71,7 @@
             <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white">Shop is Open</button>
+        <button id="toggle-shop-btn" onclick="window.toggleShop()" class="w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white">Shop is Open</button>
 
         <div class="grid grid-cols-3 gap-2 mb-5">
             <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/10">
@@ -104,7 +104,7 @@
                     <option value="Sweets">🍮 Sweets</option>
                     <option value="Other">🍽️ Other</option>
                 </select>
-                <button onclick="addItem()" class="col-span-5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl btn-press text-sm">ADD +</button>
+                <button onclick="window.addItem()" class="col-span-5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl btn-press text-sm">ADD +</button>
             </div>
 
             <p class="font-bold text-gray-400 text-[10px] mt-5 mb-2 uppercase tracking-widest">Manage Menu & Prices</p>
@@ -142,7 +142,7 @@
 
 <!-- Floating Cart -->
 <div id="floating-cart" class="fixed bottom-6 left-4 right-4 max-w-2xl mx-auto z-40 transition-all duration-300 translate-y-36">
-    <div onclick="openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
+    <div onclick="window.openCheckout()" class="bg-gradient-to-r from-green-600 to-emerald-500 p-4 rounded-2xl shadow-xl flex justify-between items-center text-white cursor-pointer btn-press">
         <div>
             <p id="float-items" class="text-xs font-bold uppercase opacity-80">0 Items</p>
             <p id="float-total" class="text-xl font-black">₹0</p>
@@ -156,7 +156,7 @@
     <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[92vh]">
         <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-[2.5rem] flex-shrink-0">
             <h3 class="font-black text-2xl text-gray-800">Checkout</h3>
-            <button onclick="closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
+            <button onclick="window.closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
         </div>
         <div class="p-5 overflow-y-auto space-y-4 scroll-hide">
             <div class="bg-gray-50 p-4 rounded-2xl border">
@@ -184,7 +184,7 @@
             </div>
         </div>
         <div class="p-5 bg-white border-t flex-shrink-0">
-            <button onclick="processPayment()" class="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-black py-4 rounded-2xl shadow-xl btn-press text-base">CONFIRM ORDER 🚀</button>
+            <button onclick="window.processPayment()" class="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-black py-4 rounded-2xl shadow-xl btn-press text-base">CONFIRM ORDER 🚀</button>
         </div>
     </div>
 </div>
@@ -195,7 +195,7 @@
         <h3 class="font-black text-2xl mb-1 gradient-text">JAY SHREE SHYAM</h3>
         <p class="text-xs text-gray-400 font-bold mb-4">QR scan karke payment karein</p>
         <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl border-4 border-red-100 mb-6 shadow-lg" alt="QR Code">
-        <button onclick="confirmOrderAndSave('PAID')" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">✅ PAYMENT DONE</button>
+        <button onclick="window.confirmOrderAndSave('PAID')" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">✅ PAYMENT DONE</button>
         <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="text-gray-400 font-bold text-xs uppercase btn-press">CANCEL</button>
     </div>
 </div>
@@ -205,11 +205,11 @@
     <div class="bg-white w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
         <div class="flex justify-between items-center mb-5 flex-shrink-0">
             <h3 class="font-black text-2xl text-gray-800"><i class="fa-solid fa-location-dot text-blue-500 mr-2"></i>Track Order</h3>
-            <button onclick="closeModal('tracker-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
+            <button onclick="window.closeModal('tracker-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
         </div>
         <div class="flex gap-2 mb-5 flex-shrink-0">
             <input id="track-phone" type="tel" placeholder="Mobile number daalo" class="flex-1 p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
-            <button onclick="trackOrder()" class="px-5 bg-blue-500 text-white font-black rounded-xl btn-press text-sm">TRACK</button>
+            <button onclick="window.trackOrder()" class="px-5 bg-blue-500 text-white font-black rounded-xl btn-press text-sm">TRACK</button>
         </div>
         <div id="track-result" class="overflow-y-auto scroll-hide space-y-4"></div>
     </div>
@@ -220,11 +220,11 @@
     <div class="bg-white w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
         <div class="flex justify-between items-center mb-5 flex-shrink-0">
             <h3 class="font-black text-2xl text-gray-800"><i class="fa-solid fa-clock-rotate-left text-purple-500 mr-2"></i>Order History</h3>
-            <button onclick="closeModal('history-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
+            <button onclick="window.closeModal('history-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
         </div>
         <div class="flex gap-2 mb-5 flex-shrink-0">
             <input id="history-phone" type="tel" placeholder="Mobile number daalo" class="flex-1 p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
-            <button onclick="loadHistory()" class="px-5 bg-purple-500 text-white font-black rounded-xl btn-press text-sm">LOAD</button>
+            <button onclick="window.loadHistory()" class="px-5 bg-purple-500 text-white font-black rounded-xl btn-press text-sm">LOAD</button>
         </div>
         <div id="history-result" class="overflow-y-auto scroll-hide space-y-3"></div>
     </div>
@@ -296,7 +296,7 @@
         const catBox = document.getElementById('cat-tabs');
         if (!catBox) return;
         catBox.innerHTML = categories.map(cat => `
-            <button onclick="setCategory('${cat}')" class="px-5 py-2.5 rounded-full font-bold text-xs border bg-white text-gray-600 border-gray-200 whitespace-nowrap btn-press ${window.currentCategory === cat ? 'tab-active' : ''}">
+            <button onclick="window.setCategory('${cat}')" class="px-5 py-2.5 rounded-full font-bold text-xs border bg-white text-gray-600 border-gray-200 whitespace-nowrap btn-press ${window.currentCategory === cat ? 'tab-active' : ''}">
                 ${cat}
             </button>
         `).join('');
@@ -308,7 +308,6 @@
         window.renderMenu();
     };
 
-    // ----- सुधारे गए और पूरे किए गए फ़ंक्शन्स ----- //
     window.renderMenu = function() {
         const container = document.getElementById('menu-box');
         if (!container) return;
@@ -326,5 +325,4 @@
             <div class="bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-gray-100">
                 <div class="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-4xl border">${item.icon || '🍔'}</div>
                 <div class="flex-1 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-
+                  
