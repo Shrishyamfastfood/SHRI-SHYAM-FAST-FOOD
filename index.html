@@ -256,7 +256,6 @@
 
     const categories = ["All", "Snacks", "Meals", "Drinks", "Sweets", "Other"];
 
-    // App Initialization
     function initApp() {
         onValue(ref(db, 'shop_status'), (snapshot) => {
             window.shopOpen = snapshot.val() !== false;
@@ -264,13 +263,13 @@
             const toggleBtn = document.getElementById('toggle-shop-btn');
             
             if(!window.shopOpen) {
-                closedScreen.classList.remove('hidden');
+                if(closedScreen) closedScreen.classList.remove('hidden');
                 if(toggleBtn) {
                     toggleBtn.innerText = "Shop is CLOSED (Click to Open)";
                     toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-red-600 text-white";
                 }
             } else {
-                closedScreen.classList.add('hidden');
+                if(closedScreen) closedScreen.classList.add('hidden');
                 if(toggleBtn) {
                     toggleBtn.innerText = "Shop is OPEN (Click to Close)";
                     toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white";
@@ -311,7 +310,8 @@
     window.renderMenu = function() {
         const container = document.getElementById('menu-box');
         if (!container) return;
-        const searchVal = document.getElementById('search-input').value.toLowerCase();
+        const searchInput = document.getElementById('search-input');
+        const searchVal = searchInput ? searchInput.value.toLowerCase() : "";
         container.innerHTML = "";
 
         Object.keys(window.menuData).forEach(id => {
@@ -321,8 +321,7 @@
 
             const qty = window.cart[id] || 0;
 
-            const cardHtml = `
+            container.innerHTML += `
             <div class="bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-gray-100">
                 <div class="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-4xl border">${item.icon || '🍔'}</div>
-                <div class="flex-1 flex flex-col justify-between">
-                  
+           
