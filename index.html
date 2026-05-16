@@ -233,7 +233,7 @@
 <!-- FIREBASE & MAIN SYSTEM LOGIC -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, update, push, remove, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set, update, push, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
@@ -322,6 +322,6 @@
             const qty = window.cart[id] || 0;
 
             container.innerHTML += `
-            <div class="bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-gray-100">
-                <div class="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-4xl border">${item.icon || '🍔'}</div>
-           
+            <div class="bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-gray-100 items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-16 h-16 bg-gray-50 rounded-xl flex i
