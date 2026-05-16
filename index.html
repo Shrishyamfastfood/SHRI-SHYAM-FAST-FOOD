@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght=300;500;700;900&display=swap');
         body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; padding-bottom: 160px; }
         .glass-header { background: rgba(255,255,255,0.97); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(220,38,38,0.1); }
         .gradient-text { background: linear-gradient(90deg, #dc2626, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -191,7 +191,7 @@
                     <p class="text-xs text-yellow-600 font-bold">100 pts = ₹10 off</p>
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer select-none">
-                    <input type="checkbox" id="use-pts" onchange="updateCartUI()" class="w-5 h-5 accent-yellow-500 rounded">
+                    <input type="checkbox" id="use-pts" class="w-5 h-5 accent-yellow-500 rounded">
                     <span class="text-sm font-black text-yellow-700">USE</span>
                 </label>
             </div>
@@ -209,7 +209,7 @@
 
             <div class="space-y-3">
                 <input id="u-n" placeholder="Aapka Naam *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
-                <input id="u-p" type="tel" placeholder="Mobile Number *" oninput="onPhoneInput()" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
+                <input id="u-p" type="tel" placeholder="Mobile Number *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
                 <input id="u-a" placeholder="Address / Table No." class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
                 <select id="u-t" class="w-full p-4 bg-gray-50 border rounded-xl font-bold text-gray-700 outline-none text-sm">
                     <option>15 मिनट में</option>
@@ -281,12 +281,16 @@
     </div>
 </div>
 
-<!-- NEW FIREBASE MODULAR CODES -->
+<!-- FIREBASE & MAIN SYSTEM LOGIC -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue, push, set, update, remove, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref, onValue, push, set, update, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
+    // Firebase Config (FIXED URL EROR)
     const firebaseConfig = {
       apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
       authDomain: "shri-shyam-fast-food.firebaseapp.com",
-      databaseURL: "https://shri-shyam-fast-food-default-rtdb.fireb
+      databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com"
+    };
+
+    const app = in
