@@ -7,10 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Stable Firebase Core SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
         body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; padding-bottom: 160px; }
@@ -149,7 +145,7 @@
     <!-- Search Bar -->
     <div class="relative mb-4">
         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-        <input id="search-input" oninput="renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
+        <input id="search-input" oninput="window.renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
     </div>
 
     <!-- Category Tabs -->
@@ -285,11 +281,12 @@
     </div>
 </div>
 
-<script>
-    // Exact Config Credentials Provided
+<!-- NEW FIREBASE MODULAR CODES -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set, update, remove, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
       authDomain: "shri-shyam-fast-food.firebaseapp.com",
-      databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com",
-      projectId: "shri-shyam-fast-food",
-      sto
+      databaseURL: "https://shri-shyam-fast-food-default-rtdb.fireb
