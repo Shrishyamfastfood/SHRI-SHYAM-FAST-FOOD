@@ -83,7 +83,7 @@
                 <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">Total Orders</p>
             </div>
             <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/10">
-                <p id="stat-top" class="text-sm font-black text-orange-400 truncate leading-tight mt-1">-</p>
+                <p id="stat-top" class="text-xs font-black text-orange-400 truncate leading-tight mt-1">-</p>
                 <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">Top Item</p>
             </div>
         </div>
@@ -256,6 +256,7 @@
 
     const categories = ["All", "Snacks", "Meals", "Drinks", "Sweets", "Other"];
 
+    // App Initialization
     function initApp() {
         onValue(ref(db, 'shop_status'), (snapshot) => {
             window.shopOpen = snapshot.val() !== false;
@@ -277,13 +278,13 @@
             window.menuData = snapshot.val() || {};
             window.renderCategories();
             window.renderMenu();
-            if(typeof renderAdminMenu === 'function') renderAdminMenu();
+            window.renderAdminMenu();
         });
 
         onValue(ref(db, 'orders'), (snapshot) => {
             const data = snapshot.val() || {};
-            if(typeof renderAdminOrders === 'function') renderAdminOrders(data);
-            if(typeof calculateStats === 'function') calculateStats(data);
+            window.renderAdminOrders(data);
+            window.calculateStats(data);
         });
     }
 
@@ -303,7 +304,7 @@
         window.renderMenu();
     };
 
-    // ----- यहाँ अधूरा कोड ठीक और पूरा किया गया है ----- //
+    // ----- सुधारे गए और पूरे किए गए फ़ंक्शन्स ----- //
     window.renderMenu = function() {
         const container = document.getElementById('menu-box');
         if (!container) return;
@@ -322,4 +323,5 @@
                 <div class="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-4xl border">${item.icon || '🍔'}</div>
                 <div class="flex-1 flex flex-col justify-between">
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm leading-tigh
+                        <h3 class="font-bold text-gray-800 text-sm leading-tight">${item.name}</h3>
+                        <p class="text-red-600 font-black text-
