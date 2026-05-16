@@ -44,7 +44,7 @@
 <!-- HEADER -->
 <header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
     <div class="flex items-center gap-3">
-        <!-- Replace with your logo URL -->
+        <!-- Replace logo URL as needed -->
         <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full border-2 border-red-500 object-cover shadow" alt="Logo">
         <div>
             <h1 class="font-black text-lg gradient-text uppercase tracking-tight leading-tight">Shri Shyam Fast Food</h1>
@@ -199,7 +199,7 @@
     <div class="bg-white rounded-[2.5rem] p-8 max-w-xs w-full">
         <h3 class="font-black text-2xl mb-1 gradient-text">JAY SHREE SHYAM</h3>
         <p class="text-xs text-gray-400 font-bold mb-4">QR scan karke payment karein</p>
-        <!-- Replace QR image URL with your own -->
+        <!-- Replace your QR image URL -->
         <img src="https://i.ibb.co/chqR1YGg/IMG-20260513-WA0001.jpg" class="w-full rounded-2xl border-4 border-red-100 mb-6 shadow-lg" alt="QR Code">
         <button onclick="confirmOrderAndSave('PAID')" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg mb-3 btn-press">✅ PAYMENT DONE</button>
         <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="text-gray-400 font-bold text-xs uppercase btn-press">CANCEL</button>
@@ -241,91 +241,71 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getDatabase, ref, onValue, set, update, push, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
-        authDomain: "shri-shyam-fast-food.firebaseapp.com",
-        databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com",
-        projectId: "shri-shyam-fast-food",
-        storageBucket: "shri-shyam-fast-food.firebasestorage.app",
-        messagingSenderId: "828353855950",
-        appId: "1:828353855950:web:96d62828e8e410e8812b9f",
-        measurementId: "G-38J1Y2M8LD"
-    };
+    document.addEventListener("DOMContentLoaded", function () {
+        const firebaseConfig = {
+            apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
+            authDomain: "shri-shyam-fast-food.firebaseapp.com",
+            databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio.com",
+            projectId: "shri-shyam-fast-food",
+            storageBucket: "shri-shyam-fast-food.firebasestorage.app",
+            messagingSenderId: "828353855950",
+            appId: "1:828353855950:web:96d62828e8e410e8812b9f",
+            measurementId: "G-38J1Y2M8LD"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-    // Global App States
-    window.menuData = {};
-    window.cart = {};
-    window.currentCategory = "All";
-    window.shopOpen = true;
+        // Global app state
+        window.menuData = {};
+        window.cart = {};
+        window.currentCategory = "All";
+        window.shopOpen = true;
+        const categories = ["All", "Snacks", "Meals", "Drinks", "Sweets", "Other"];
 
-    // Categories
-    const categories = ["All", "Snacks", "Meals", "Drinks", "Sweets", "Other"];
+        // Categories tabs
+        window.renderCategories = function() {
+            const catBox = document.getElementById('cat-tabs');
+            catBox.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" class="px-5 py-2.5 rounded-full font-bold text-xs border bg-white text-gray-600 border-gray-200 whitespace-nowrap btn-press ${window.currentCategory === cat ? 'tab-active' : ''}">
+                    ${cat}
+                </button>
+            `).join('');
+        };
 
-    // Initialize app
-    function initApp() {
-        // Listen shop status
-        onValue(ref(db, 'shop_status'), (snapshot) => {
-            window.shopOpen = snapshot.val() !== false;
-            const closedScreen = document.getElementById('closed-screen');
-            const toggleBtn = document.getElementById('toggle-shop-btn');
-
-            if (!window.shopOpen) {
-                closedScreen.classList.remove('hidden');
-                toggleBtn.innerText = "Shop is CLOSED";
-                toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-red-600 text-white";
-            } else {
-                closedScreen.classList.add('hidden');
-                toggleBtn.innerText = "Shop is OPEN";
-                toggleBtn.className = "w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white";
-            }
-        });
-
-        // Listen menu
-        onValue(ref(db, 'menu'), (snapshot) => {
-            window.menuData = snapshot.val() || {};
+        window.setCategory = function(cat) {
+            window.currentCategory = cat;
             renderCategories();
             renderMenu();
-            renderAdminMenu();
-        });
+        };
 
-        // Listen orders for dashboard
-        onValue(ref(db, 'orders'), (snapshot) => {
-            const data = snapshot.val() || {};
-            renderAdminOrders(data);
-            calculateStats(data);
-        });
-    }
+        // Render menu cards
+        window.renderMenu = function() {
+            const container = document.getElementById('menu-box');
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            container.innerHTML = "";
 
-    window.renderCategories = function() {
-        const catBox = document.getElementById('cat-tabs');
-        catBox.innerHTML = categories.map(cat => `
-            <button onclick="setCategory('${cat}')" class="px-5 py-2.5 rounded-full font-bold text-xs border bg-white text-gray-600 border-gray-200 whitespace-nowrap btn-press ${window.currentCategory === cat ? 'tab-active' : ''}">
-                ${cat}
-            </button>
-        `).join('');
-    };
+            Object.keys(window.menuData).forEach(id => {
+                const item = window.menuData[id];
+                if (window.currentCategory !== "All" && item.category !== window.currentCategory) return;
+                if (searchVal && !item.name.toLowerCase().includes(searchVal)) return;
 
-    window.setCategory = function(cat) {
-        window.currentCategory = cat;
-        renderCategories();
-        renderMenu();
-    };
+                const qty = window.cart[id] || 0;
 
-    window.renderMenu = function() {
-        const container = document.getElementById('menu-box');
-        const searchVal = document.getElementById('search-input').value.toLowerCase();
-        container.innerHTML = "";
-
-        Object.keys(window.menuData).forEach(id => {
-            const item = window.menuData[id];
-            if (window.currentCategory !== "All" && item.category !== window.currentCategory) return;
-            if (searchVal && !item.name.toLowerCase().includes(searchVal)) return;
-
-            const qty = window.cart[id] || 0;
-
-            const card = `
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-  
+                const card = `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-3xl">${item.icon}</span>
+                            <div class="flex-1">
+                                <p class="font-black text-sm text-gray-700">${item.name}</p>
+                                <p class="text-xs text-gray-400 font-bold">${item.category}</p>
+                            </div>
+                            <p class="font-black text-green-600 text-lg">₹${item.price}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateCart('${id}', -1)" class="w-8 h-8 rounded-full bg-red-50 border border-red-200 text-red-500 text-sm btn-press">−</button>
+                            <span id="qty-${id}" class="px-3 text-sm font-bold">${qty}</span>
+                            <button onclick="updateCart('${id}', 1)" class="w-8 h-8 rounded-full bg-green-50 border border-green-200 text-green-500 text-sm btn-press">+</button>
+                        </div>
+                    </div>
+   
