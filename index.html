@@ -145,7 +145,7 @@
     <!-- Search Bar -->
     <div class="relative mb-4">
         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-        <input id="search-input" oninput="window.renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
+        <input id="search-input" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
     </div>
 
     <!-- Category Tabs -->
@@ -286,8 +286,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getDatabase, ref, onValue, set, update, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
       authDomain: "shri-shyam-fast-food.firebaseapp.com",
-      databaseURL: 
+      databaseURL: "https://shri-shyam-fast-food-default-rtdb.firebaseio
