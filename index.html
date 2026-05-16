@@ -7,10 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- UPDATED: Firebase Core SDKs (v8.10.1) -->
+    <!-- Firebase Legacy Core SDKs (v8.10.1) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
@@ -22,18 +21,25 @@
         .sheet.active { transform: translateY(0); }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .tab-active { background: linear-gradient(90deg, #dc2626, #ea580c); color: white !important; border-color: transparent !important; }
+        /* Tracking steps */
         .t-step { position: relative; }
         .t-step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 32px; width: 2px; height: calc(100% + 4px); background: #e5e7eb; z-index: 0; }
         .t-step.done:not(:last-child)::after { background: #22c55e; }
+        /* Star rating */
         .stars { display: flex; flex-direction: row-reverse; gap: 4px; }
         .stars input { display: none; }
         .stars label { cursor: pointer; font-size: 2rem; color: #d1d5db; line-height: 1; transition: color 0.2s; }
-        .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f59e0b; }
+        .stars input:checked ~ label,
+        .stars label:hover,
+        .stars label:hover ~ label { color: #f59e0b; }
+        /* Animations */
         @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         .fade-up { animation: fadeUp 0.3s ease forwards; }
         @keyframes ping2 { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.25); opacity: 0.7; } }
         .live-pulse { animation: ping2 1.4s infinite; }
+        /* Scrollbar hide */
         .scroll-hide::-webkit-scrollbar { display: none; }
+        /* Print */
         @media print {
             body > *:not(#print-slip) { display: none !important; }
             #print-slip { display: block !important; }
@@ -64,7 +70,7 @@
             <h1 class="font-black text-lg gradient-text uppercase tracking-tight leading-tight">Shri Shyam Fast Food</h1>
             <div class="flex items-center gap-2 mt-0.5">
                 <span id="shop-indicator" class="flex items-center gap-1.5 text-[10px] font-black uppercase text-gray-500">
-                    <span id="firebase-status-dot" class="status-dot bg-gray-400"></span> <span id="firebase-status-text">Connecting...</span>
+                    <span id="firebase-dot" class="status-dot bg-gray-400"></span> <span id="firebase-text">Checking...</span>
                 </span>
                 <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
             </div>
@@ -86,8 +92,10 @@
             <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 bg-green-600 rounded-xl font-black mb-5 uppercase btn-press text-sm">SHOP IS OPEN</button>
+        <!-- Shop Toggle -->
+        <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm bg-green-600 text-white">Shop is Open</button>
 
+        <!-- Analytics Cards -->
         <div class="grid grid-cols-3 gap-2 mb-5">
             <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/10">
                 <p id="stat-revenue" class="text-xl font-black text-green-400">₹0</p>
@@ -103,12 +111,14 @@
             </div>
         </div>
 
+        <!-- Weekly Chart -->
         <div class="bg-white/5 rounded-2xl p-4 mb-5 border border-white/10">
             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Weekly Revenue Chart</p>
             <div id="revenue-chart" class="flex items-end gap-1.5 h-20"></div>
             <div id="revenue-labels" class="flex gap-1.5 mt-1.5"></div>
         </div>
 
+        <!-- Add Item -->
         <div class="bg-white/5 p-4 rounded-2xl mb-5 border border-white/10">
             <p class="font-bold text-gray-400 text-[10px] mb-3 uppercase tracking-widest">Naya Item Add Karein</p>
             <div class="grid grid-cols-12 gap-2 mb-2">
@@ -132,6 +142,7 @@
             <div id="admin-menu-list" class="space-y-2 max-h-56 overflow-y-auto pr-1 scroll-hide"></div>
         </div>
 
+        <!-- Live Orders -->
         <div class="border-t border-white/10 pt-5">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-black text-orange-400"><i class="fa-solid fa-receipt mr-2"></i>Live Orders</h3>
@@ -142,6 +153,7 @@
             <div id="admin-orders-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1 scroll-hide"></div>
         </div>
 
+        <!-- Reviews Section -->
         <div class="border-t border-white/10 pt-5 mt-5">
             <h3 class="font-black text-purple-400 mb-4"><i class="fa-solid fa-star mr-2"></i>Customer Reviews</h3>
             <div id="admin-reviews" class="space-y-3 max-h-60 overflow-y-auto pr-1 scroll-hide"></div>
@@ -191,6 +203,7 @@
             <button onclick="closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
         </div>
         <div class="p-5 overflow-y-auto space-y-4 scroll-hide">
+            <!-- Points Redeem -->
             <div id="redeem-box" class="hidden bg-yellow-50 border border-yellow-200 rounded-2xl p-3 flex items-center justify-between">
                 <div>
                     <p class="font-black text-yellow-700 text-sm">🏆 Points se discount lo!</p>
@@ -202,6 +215,7 @@
                 </label>
             </div>
 
+            <!-- Cart Summary -->
             <div class="bg-gray-50 p-4 rounded-2xl border">
                 <div id="cart-summary" class="space-y-2 mb-3 max-h-40 overflow-y-auto scroll-hide"></div>
                 <div id="discount-row" class="hidden justify-between items-center text-sm font-black text-green-600 pb-2">
@@ -213,6 +227,7 @@
                 </div>
             </div>
 
+            <!-- Customer Details -->
             <div class="space-y-3">
                 <input id="u-n" placeholder="Aapka Naam *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
                 <input id="u-p" type="tel" placeholder="Mobile Number *" oninput="onPhoneInput()" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none focus:border-red-300 transition-colors text-sm">
@@ -281,14 +296,4 @@
     <div class="bg-white w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[80vh] flex flex-col">
         <div class="flex justify-between items-center mb-5 flex-shrink-0">
             <h3 class="font-black text-2xl text-gray-800"><i class="fa-solid fa-heart text-red-500 mr-2"></i>My Favourites</h3>
-            <button onclick="closeModal('favs-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
-        </div>
-        <div id="favs-list" class="overflow-y-auto scroll-hide space-y-3"></div>
-    </div>
-</div>
-
-<!-- JAVASCRIPT & FIREBASE INITIALIZATION -->
-<script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
-      authDomain: "shri-shyam-fast-food.fire
+            <button onclick="closeModal('favs-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xm
