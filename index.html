@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="hi" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shri Shyam Fast Food - Admin Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlNocmkgU2h5YW0gRmFzdCBGb29kIiwKICAic2hvcnxfbmFtZSI6ICJTaHlhbUZvb2QiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2Y4ZmFmYyIsCiAgInRoZW1lX2NvbG9yIjogIiNkYzI2MjYiLAogICJpY29ucyI6IFtsCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9pLmliYi5jby8xR0NOUnQwaC9JTUctMjAyNjA1MTMtV0EwMDAwLmpwZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvanBlZyIKICAgIH0KICBdCn0=">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; padding-bottom: 160px; }
-        .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,0,0,0.1); }
+        body { font-family: 'Outfit', sans-serif; padding-bottom: 160px; }
+        .glass-header { backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,0,0,0.1); }
         .gradient-text { background: linear-gradient(90deg, #dc2626, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-press:active { transform: scale(0.95); transition: 0.15s; }
         .sheet { transition: transform 0.4s cubic-bezier(0.32,0.72,0,1); transform: translateY(110%); }
@@ -24,26 +29,31 @@
         .t-step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 32px; width: 2px; height: calc(100% + 4px); background: #e5e7eb; z-index: 0; }
         .t-step.done:not(:last-child)::after { background: #22c55e; }
         .scroll-hide::-webkit-scrollbar { display: none; }
+        .scratch-card { background: linear-gradient(135deg, #cbd5e1 25%, #94a3b8 25%, #94a3b8 50%, #cbd5e1 50%, #cbd5e1 75%, #94a3b8 75%, #94a3b8 100%); background-size: 40px 40px; }
+
         @media print {
-            body > *:not(#print-slip) { display: none !important; }
-            #print-slip { display: block !important; }
+            body > *:not(#print-slip):not(#print-report) { display: none !important; }
+            #print-slip, #print-report { display: block !important; }
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-200">
 
-<div id="print-slip" style="display:none;" class="p-6 font-mono text-sm max-w-xs mx-auto bg-white">
+<div id="print-slip" style="display:none;" class="p-6 font-mono text-sm max-w-xs mx-auto bg-white text-black">
     <div id="print-content"></div>
 </div>
-
-<div id="closed-screen" class="hidden fixed inset-0 bg-white/[0.97] backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
-    <i class="fa-solid fa-store-slash text-7xl text-red-500 mb-5"></i>
-    <h2 class="text-4xl font-black text-gray-800">Shop Closed</h2>
-    <p class="text-gray-500 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
-    <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">Owner Login</button>
+<div id="print-report" style="display:none;" class="p-8 font-mono text-sm max-w-xl mx-auto bg-white text-black">
+    <div id="report-content"></div>
 </div>
 
-<header class="glass-header sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
+<div id="closed-screen" class="hidden fixed inset-0 bg-white/[0.97] dark:bg-slate-900/[0.97] backdrop-blur-md z-[2000] flex flex-col items-center justify-center text-center p-6">
+    <i class="fa-solid fa-store-slash text-7xl text-red-500 mb-5"></i>
+    <h2 class="text-4xl font-black text-gray-800 dark:text-white">Shop Closed</h2>
+    <p class="text-gray-500 dark:text-gray-400 font-bold mt-2">Kripya khulne ka intezaar karein.</p>
+    <button onclick="loginAdmin()" class="mt-10 px-8 py-3 bg-gray-100 dark:bg-slate-800 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border btn-press">Owner Login</button>
+</div>
+
+<header class="glass-header bg-white/95 dark:bg-slate-900/95 sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-sm">
     <div class="flex items-center gap-3">
         <img src="https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg" class="w-12 h-12 rounded-full border-2 border-red-500 object-cover shadow" alt="Logo">
         <div>
@@ -52,14 +62,15 @@
                 <span id="shop-indicator" class="flex items-center gap-1.5 text-[10px] font-black uppercase text-gray-500">
                     <span class="status-dot bg-gray-400"></span> <span id="shop-text">Checking...</span>
                 </span>
-                <span class="text-[10px] font-bold text-gray-400">| MOULASAR | <i class="fa-solid fa-phone"></i> 80587 33741</span>
+                <span class="text-[10px] font-bold text-gray-400">| MOULASAR</span>
             </div>
         </div>
     </div>
     <div class="flex items-center gap-1.5">
-        <button onclick="openTracker()" title="Track Order" class="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 text-blue-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-location-dot"></i></button>
-        <button onclick="openHistory()" title="Order History" class="w-10 h-10 rounded-full bg-purple-50 border border-purple-200 text-purple-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-clock-rotate-left"></i></button>
-        <button onclick="loginAdmin()" title="Admin" class="w-10 h-10 rounded-full bg-gray-50 border text-gray-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-sliders"></i></button>
+        <button onclick="toggleDarkMode()" title="Theme Badlein" class="w-10 h-10 rounded-full bg-amber-50 dark:bg-slate-800 border dark:border-slate-700 text-amber-500 dark:text-amber-400 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-moon dark:hidden"></i><i class="fa-solid fa-sun hidden dark:block"></i></button>
+        <button onclick="openTracker()" title="Track Order" class="w-10 h-10 rounded-full bg-blue-50 dark:bg-slate-800 border dark:border-slate-700 text-blue-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-location-dot"></i></button>
+        <button onclick="openHistory()" title="Order History" class="w-10 h-10 rounded-full bg-purple-50 dark:bg-slate-800 border dark:border-slate-700 text-purple-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-clock-rotate-left"></i></button>
+        <button onclick="loginAdmin()" title="Admin" class="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-800 border dark:border-slate-700 text-gray-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-sliders"></i></button>
     </div>
 </header>
 
@@ -68,7 +79,10 @@
     <div id="admin-panel" class="hidden bg-gray-900 rounded-[2rem] shadow-2xl p-5 mb-8 text-white">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-xl font-black text-yellow-400"><i class="fa-solid fa-crown mr-2"></i>Admin Dashboard</h2>
-            <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex items-center gap-2">
+                <button onclick="generateDailyReport()" title="Daily Report PDF" class="px-3 py-1.5 bg-emerald-600 rounded-xl text-xs font-black text-white btn-press"><i class="fa-solid fa-file-pdf mr-1"></i> REPORT</button>
+                <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark"></i></button>
+            </div>
         </div>
 
         <button id="toggle-shop-btn" onclick="toggleShop()" class="w-full py-4 rounded-xl font-black mb-5 uppercase btn-press text-sm">Checking...</button>
@@ -124,13 +138,14 @@
 
     <div class="relative mb-4">
         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-        <input id="search-input" oninput="renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-4 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
+        <input id="search-input" oninput="renderMenu()" placeholder="Menu search karein..." class="w-full py-3.5 pl-11 pr-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl font-bold shadow-sm text-sm outline-none focus:border-red-300 transition-colors">
+        <button onclick="startVoiceSearch()" title="Voice Search" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 btn-press"><i class="fa-solid fa-microphone"></i></button>
     </div>
 
     <div id="cat-tabs" class="flex gap-2 overflow-x-auto pb-3 mb-5 scroll-hide"></div>
 
-    <div class="flex justify-between items-center mb-4 border-b-2 border-red-100 pb-2 border-dashed">
-        <h2 class="text-xl font-black text-gray-800">Today's Menu</h2>
+    <div class="flex justify-between items-center mb-4 border-b-2 border-red-100 dark:border-slate-700 pb-2 border-dashed">
+        <h2 class="text-xl font-black text-gray-800 dark:text-white">Today's Menu</h2>
     </div>
     
     <div id="menu-box" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -147,37 +162,56 @@
 </div>
 
 <div id="checkout-sheet" class="sheet fixed inset-0 z-50 flex flex-col justify-end bg-black/50 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[92vh]">
-        <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-[2.5rem] flex-shrink-0">
-            <h3 class="font-black text-2xl text-gray-800">Checkout</h3>
+    <div class="bg-white dark:bg-slate-800 w-full max-w-2xl mx-auto rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[92vh]">
+        <div class="p-5 border-b dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-700 rounded-t-[2.5rem] flex-shrink-0">
+            <h3 class="font-black text-2xl text-gray-800 dark:text-white">Checkout</h3>
             <button onclick="closeCheckout()" class="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center btn-press text-gray-500"><i class="fa-solid fa-arrow-down"></i></button>
         </div>
-        <div class="p-5 overflow-y-auto space-y-4 scroll-hide">
-            <div class="bg-gray-50 p-4 rounded-2xl border">
-                <div id="cart-summary" class="space-y-2 mb-3 max-h-40 overflow-y-auto scroll-hide"></div>
-                <div class="flex justify-between items-center border-t pt-3 font-black text-lg">
-                    <span class="text-gray-700">Total Pay</span>
+        <div class="p-5 overflow-y-auto space-y-4 scroll-hide text-slate-800 dark:text-white">
+            <div class="bg-gray-50 dark:bg-slate-900 p-4 rounded-2xl border dark:border-slate-700">
+                <div id="cart-summary" class="space-y-3 mb-3 max-h-48 overflow-y-auto scroll-hide"></div>
+                
+                <div class="border-t dark:border-slate-700 pt-3 mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <label class="block">
+                        <span class="text-[10px] font-black text-gray-400 uppercase">🎁 Birthday Discount</span>
+                        <input id="u-dob" type="date" onchange="applyBirthdayDiscount()" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-xl font-bold outline-none">
+                    </label>
+                    <label class="block">
+                        <span class="text-[10px] font-black text-gray-400 uppercase">🪙 Refer points (Avail: 50)</span>
+                        <button id="redeem-btn" onclick="redeemPoints()" class="w-full mt-1 p-2 bg-amber-500 text-white rounded-xl font-black uppercase text-[10px] btn-press">Redeem 50 Pts</button>
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center border-t dark:border-slate-700 pt-3 mt-3 font-black text-lg">
+                    <span class="text-gray-700 dark:text-gray-300">Total Pay</span>
                     <span id="sheet-total" class="text-red-600 text-xl">₹0</span>
                 </div>
             </div>
 
             <div class="space-y-3">
-                <input id="u-n" placeholder="Aapka Naam *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
-                <input id="u-p" type="tel" placeholder="Mobile Number *" class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
-                <input id="u-a" placeholder="Address / Table No." class="w-full p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
-                <select id="u-t" class="w-full p-4 bg-gray-50 border rounded-xl font-bold text-gray-700 outline-none text-sm">
+                <input id="u-n" placeholder="Aapka Naam *" class="w-full p-4 bg-gray-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl font-bold outline-none text-sm">
+                <input id="u-p" type="tel" placeholder="Mobile Number *" class="w-full p-4 bg-gray-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl font-bold outline-none text-sm">
+                
+                <div class="bg-gray-50 dark:bg-slate-900 p-3 rounded-xl border dark:border-slate-700">
+                    <p class="text-[10px] font-black text-gray-400 uppercase mb-2">📍 Select Saved Address or Custom</p>
+                    <div id="address-slots" class="flex gap-2 mb-2 overflow-x-auto pb-1 scroll-hide"></div>
+                    <input id="u-a" placeholder="Address / Table No." class="w-full p-3 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-xl font-bold outline-none text-xs">
+                    <button onclick="saveCurrentAddress()" class="mt-2 text-[10px] bg-blue-600 text-white font-black px-3 py-1.5 rounded-lg btn-press uppercase"><i class="fa-solid fa-bookmark mr-1"></i> Save This Address</button>
+                </div>
+
+                <select id="u-t" class="w-full p-4 bg-gray-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl font-bold text-gray-700 dark:text-gray-300 outline-none text-sm">
                     <option>15 मिनट में</option>
                     <option>30 मिनट में</option>
                     <option>45 मिनट में</option>
                     <option>On The Shop</option>
                 </select>
-                <select id="u-pay" class="w-full p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl font-black outline-none text-sm">
+                <select id="u-pay" class="w-full p-4 bg-green-50 dark:bg-emerald-950/30 border border-green-200 dark:border-emerald-800 text-green-700 dark:text-emerald-400 rounded-xl font-black outline-none text-sm">
                     <option value="PAID">📱 QR Code (Online Pay)</option>
                     <option value="COD">💵 Cash on Delivery (COD)</option>
                 </select>
             </div>
         </div>
-        <div class="p-5 bg-white border-t flex-shrink-0">
+        <div class="p-5 bg-white dark:bg-slate-800 border-t dark:border-slate-700 flex-shrink-0">
             <button onclick="processPayment()" class="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-black py-4 rounded-2xl shadow-xl btn-press text-base">CONFIRM ORDER 🚀</button>
         </div>
     </div>
@@ -193,14 +227,26 @@
     </div>
 </div>
 
+<div id="scratch-modal" class="hidden fixed inset-0 bg-black/80 z-[4000] flex items-center justify-center p-6 text-center backdrop-blur-md">
+    <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative">
+        <h4 class="font-black text-xl text-amber-500 mb-1">🎉 Congratulations!</h4>
+        <p class="text-xs text-gray-400 mb-4 font-bold">Aapko mila ek Special Reward Card</p>
+        <div class="w-full h-40 rounded-xl relative overflow-hidden flex items-center justify-center bg-orange-50 dark:bg-slate-900 border-2 border-dashed border-orange-300">
+            <span class="text-2xl font-black text-orange-600 dark:text-orange-400">+25 Free Cash Points!</span>
+            <div id="scratch-layer" onclick="this.style.display='none'" class="scratch-card absolute inset-0 cursor-pointer flex items-center justify-center text-white font-black text-sm select-none">SCRATCH HERE 👋</div>
+        </div>
+        <button onclick="closeScratchModal()" class="w-full mt-5 bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider btn-press">Claim Reward & Exit</button>
+    </div>
+</div>
+
 <div id="tracker-modal" class="hidden fixed inset-0 bg-black/50 z-[2000] flex items-end justify-center backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
+    <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
         <div class="flex justify-between items-center mb-5 flex-shrink-0">
-            <h3 class="font-black text-2xl text-gray-800"><i class="fa-solid fa-location-dot text-blue-500 mr-2"></i>Track Order</h3>
-            <button onclick="closeModal('tracker-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
+            <h3 class="font-black text-2xl text-gray-800 dark:text-white"><i class="fa-solid fa-location-dot text-blue-500 mr-2"></i>Track Order</h3>
+            <button onclick="closeModal('tracker-modal')" class="w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500 dark:text-gray-300"></i></button>
         </div>
         <div class="flex gap-2 mb-5 flex-shrink-0">
-            <input id="track-phone" type="tel" placeholder="Mobile number daalo" class="flex-1 p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
+            <input id="track-phone" type="tel" placeholder="Mobile number daalo" class="flex-1 p-4 bg-gray-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl font-bold outline-none text-sm">
             <button onclick="trackOrder()" class="px-5 bg-blue-500 text-white font-black rounded-xl btn-press text-sm">TRACK</button>
         </div>
         <div id="track-result" class="overflow-y-auto scroll-hide space-y-4"></div>
@@ -208,13 +254,13 @@
 </div>
 
 <div id="history-modal" class="hidden fixed inset-0 bg-black/50 z-[2000] flex items-end justify-center backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
+<div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
         <div class="flex justify-between items-center mb-5 flex-shrink-0">
-            <h3 class="font-black text-2xl text-gray-800"><i class="fa-solid fa-clock-rotate-left text-purple-500 mr-2"></i>Order History</h3>
-            <button onclick="closeModal('history-modal')" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500"></i></button>
+            <h3 class="font-black text-2xl text-gray-800 dark:text-white"><i class="fa-solid fa-clock-rotate-left text-purple-500 mr-2"></i>Order History</h3>
+            <button onclick="closeModal('history-modal')" class="w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500 dark:text-gray-300"></i></button>
         </div>
         <div class="flex gap-2 mb-5 flex-shrink-0">
-            <input id="history-phone" type="tel" placeholder="Mobile number daalo" class="flex-1 p-4 bg-gray-50 border rounded-xl font-bold outline-none text-sm">
+            <input id="history-phone" type="tel" placeholder="Mobile number daalo" class="flex-1 p-4 bg-gray-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl font-bold outline-none text-sm">
             <button onclick="loadHistory()" class="px-5 bg-purple-500 text-white font-black rounded-xl btn-press text-sm">LOAD</button>
         </div>
         <div id="history-result" class="overflow-y-auto scroll-hide space-y-3"></div>
@@ -222,7 +268,6 @@
 </div>
 
 <script>
-    // Firebase Config (Legacy SDK 8.x format compatible with your script load)
     const firebaseConfig = {
       apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
       authDomain: "shri-shyam-fast-food.firebaseapp.com",
@@ -238,29 +283,33 @@
     const rdb = firebase.database();
 
     let menuData = {};
-    let cart = [];
+    let cart = {}; 
     let currentCategory = "All";
     let isShopOpen = true;
+    let birthdayDiscountApplied = false;
+    let pointRedemptionDeduction = 0;
 
     const categories = ["All", "Snacks", "Meals", "Drinks", "Sweets", "Other"];
 
-    // Force initialize if database is totally empty
+    window.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        initAddressSlots();
+        requestNotificationPermission();
+    });
+
     rdb.ref('shop_status').once('value', snap => {
         if (snap.val() === null) rdb.ref('shop_status').set(true);
     });
 
-    // Shop Status Sync
     rdb.ref('shop_status').on('value', snap => {
         isShopOpen = (snap.val() !== false);
         document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
         document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
-        
-        const btn = document.getElementById('toggle-shop-btn');
+const btn = document.getElementById('toggle-shop-btn');
         btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
         btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press text-sm" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press text-sm";
     });
 
-    // Menu Sync (Sorted: In-Stock First) & Categories Auto-Render
     rdb.ref('menu').on('value', snap => {
         menuData = snap.val() || {};
         renderCategories();
@@ -268,19 +317,153 @@
         renderAdminMenu();
     });
 
-    // Orders Sync & Stats Auto-Calculate
     rdb.ref('orders').on('value', snap => {
         const data = snap.val() || {};
         renderAdminOrders(data);
         calculateStats(data);
     });
 
-    // RENDER CATEGORIES
+    function initTheme() {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
+
+    function toggleDarkMode() {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    function startVoiceSearch() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Aapka browser Voice Search support nahi karta.");
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'hi-IN';
+        recognition.start();
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('search-input').value = transcript;
+            renderMenu();
+        };
+    }
+
+    function initAddressSlots() {
+        const slotBox = document.getElementById('address-slots');
+        if(!slotBox) return;
+        let addresses = JSON.parse(localStorage.getItem('saved_addresses')) || ["Table 1", "Home", "Office"];
+        slotBox.innerHTML = addresses.map(addr => `
+            <button type="button" onclick="document.getElementById('u-a').value='${addr}'" class="px-3 py-1 bg-white dark:bg-slate-700 border dark:border-slate-600 text-slate-700 dark:text-gray-200 rounded-lg text-xs font-bold btn-press whitespace-nowrap">${addr}</button>
+        `).join('');
+    }
+
+    function saveCurrentAddress() {
+        const currentAddr = document.getElementById('u-a').value.trim();
+        if(!currentAddr) return;
+        let addresses = JSON.parse(localStorage.getItem('saved_addresses')) || ["Table 1", "Home", "Office"];
+        if(!addresses.includes(currentAddr)) {
+            addresses.push(currentAddr);
+            localStorage.setItem('saved_addresses', JSON.stringify(addresses));
+            initAddressSlots();
+            alert("Address slot save ho gaya!");
+        }
+    }
+function applyBirthdayDiscount() {
+        const dobValue = document.getElementById('u-dob').value;
+        if(!dobValue) return;
+        
+        const today = new Date();
+        const birthDate = new Date(dobValue);
+        
+        if(today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth()) {
+            birthdayDiscountApplied = true;
+            alert("🎉 Happy Birthday! ₹50 ka Flat discount apply ho gaya hai.");
+        } else {
+            birthdayDiscountApplied = false;
+            alert("Aapka birthday aaj nahi hai.");
+        }
+        recalculateCartTotals();
+    }
+
+    function redeemPoints() {
+        if(pointRedemptionDeduction > 0) return;
+        pointRedemptionDeduction = 25; 
+        document.getElementById('redeem-btn').innerText = "POINTS APPLIED";
+        document.getElementById('redeem-btn').classList.replace('bg-amber-500', 'bg-slate-400');
+        recalculateCartTotals();
+    }
+
+    function requestNotificationPermission() {
+        if ('Notification' in window) {
+            Notification.requestPermission();
+        }
+    }
+
+    function triggerPushNotification(title, message) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(title, { body: message, icon: 'https://i.ibb.co/1GCNRt0h/IMG-20260513-WA0000.jpg' });
+        }
+    }
+
+    function generateDailyReport() {
+        rdb.ref('orders').once('value', snap => {
+            const orders = snap.val() || {};
+            let rev = 0, count = 0, itemCounts = {};
+            
+            Object.keys(orders).forEach(id => {
+                const o = orders[id];
+                count++;
+                if (o.status === "Completed") rev += (o.total || 0);
+                if (o.items) {
+                    const lines = o.items.split('%0A');
+                    lines.forEach(l => {
+                        let cleaned = l.replace(/[▫️\-\s]/g, '').split('₹')[0];
+                        if(cleaned) itemCounts[cleaned] = (itemCounts[cleaned] || 0) + 1;
+                    });
+                }
+            });
+let topItem = "-";
+            let maxFreq = 0;
+            Object.keys(itemCounts).forEach(n => {
+                if (itemCounts[n] > maxFreq) { maxFreq = itemCounts[n]; topItem = n; }
+            });
+
+            const dateStr = new Date().toLocaleDateString();
+            const reportHTML = `
+                <div class="text-center text-black">
+                    <h2 class="text-xl font-bold uppercase">SHRI SHYAM FAST FOOD</h2>
+                    <p class="text-xs">DAILY TRANSACTION REPORT | Date: ${dateStr}</p>
+                </div>
+                <hr class="border-dashed my-4 border-black">
+                <table class="w-full text-left text-xs space-y-2 text-black">
+                    <tr class="border-b font-bold border-black"><td class="py-1">Metric Status</td><td>Value Output</td></tr>
+                    <tr><td class="py-1">Total Orders Logged:</td><td>${count} Orders</td></tr>
+                    <tr class="font-bold text-green-600"><td class="py-1">Total Day Revenue:</td><td>₹${rev}</td></tr>
+                    <tr class="text-orange-600"><td class="py-1">Top Selling Product:</td><td>${topItem}</td></tr>
+                </table>
+                <hr class="border-dashed my-4 border-black">
+                <p class="text-[10px] text-center text-gray-400">Report verified automatically via System Admin Pro Engine</p>
+            `;
+            document.getElementById('report-content').innerHTML = reportHTML;
+            window.print();
+        });
+    }
+
     function renderCategories() {
         const catBox = document.getElementById('cat-tabs');
         if (!catBox) return;
         catBox.innerHTML = categories.map(cat => `
-            <button onclick="setCategory('${cat}')" class="px-5 py-2.5 rounded-full font-bold text-xs border bg-white text-gray-600 border-gray-200 whitespace-nowrap btn-press ${currentCategory === cat ? 'tab-active' : ''}">
+            <button onclick="setCategory('${cat}')" class="px-5 py-2.5 rounded-full font-bold text-xs border bg-white text-gray-600 border-gray-200 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-300 whitespace-nowrap btn-press ${currentCategory === cat ? 'tab-active' : ''}">
                 ${cat}
             </button>
         `).join('');
@@ -292,7 +475,6 @@
         renderMenu();
     }
 
-    // USER SIDE MENU DISPLAY (Includes In/Out Filter & Search)
     function renderMenu() {
         const box = document.getElementById('menu-box');
         if (!box) return;
@@ -301,15 +483,12 @@
         box.innerHTML = '';
 
         const items = Object.keys(menuData).map(id => ({ id, ...menuData[id] }));
-        
-        // Filter by category & search query
         const filteredItems = items.filter(i => {
             if (currentCategory !== "All" && i.category !== currentCategory) return false;
             if (searchVal && !i.name.toLowerCase().includes(searchVal)) return false;
             return true;
         });
 
-        // Sort: In Stock (true) first
         filteredItems.sort((a, b) => (b.available !== false ? 1 : 0) - (a.available !== false ? 1 : 0));
 
         if (filteredItems.length === 0) {
@@ -319,24 +498,20 @@
 
         filteredItems.forEach(i => {
             const isAvail = i.available !== false;
-            
             box.innerHTML += `
-            <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 ${isAvail ? '' : 'opacity-60 grayscale'}">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-100 dark:border-slate-700 ${isAvail ? '' : 'opacity-60 grayscale'}">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-gray-50
-rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️'}</div>
+                    <div class="w-12 h-12 bg-gray-50 dark:bg-slate-700 rounded-xl flex items-center justify-center text-xl border dark:border-slate-600">${i.icon || '🍽️'}</div>
                     <div>
-                        <p class="font-black text-gray-800">${i.name}</p>
+                        <p class="font-black text-gray-800 dark:text-white">${i.name}</p>
                         <p class="text-red-500 font-black text-sm">₹${i.price}</p>
                     </div>
                 </div>
-                ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 text-red-500 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 px-2 py-1 rounded">OUT</span>`}
+                ${isAvail ? `<button onclick="addToCart('${i.name.replace(/'/g, "")}', ${i.price})" class="border-2 border-red-100 dark:border-red-900/30 text-red-500 dark:text-red-400 px-5 py-2 rounded-xl text-xs font-black hover:bg-red-50 dark:hover:bg-red-950/30 btn-press">ADD</button>` : `<span class="text-[10px] text-gray-400 font-black uppercase bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">OUT</span>`}
             </div>`;
         });
     }
-
-    // ADMIN MENU MANAGER (WITH LIVE EDIT PRICE AND STOCK IN/OUT BUTTON)
-    function renderAdminMenu() {
+function renderAdminMenu() {
         const adminBox = document.getElementById('admin-menu-list');
         if (!adminBox) return;
         adminBox.innerHTML = '';
@@ -359,7 +534,6 @@ rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️
         });
     }
 
-    // ADMIN ORDERS LIST DISPLAY WITH WHATSAPP TRIGGERS
     function renderAdminOrders(orders) {
         const orderList = document.getElementById('admin-orders-list');
         const badge = document.getElementById('pending-badge');
@@ -368,12 +542,6 @@ rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️
         
         const keys = Object.keys(orders).reverse();
         let pendingCount = 0;
-
-        if (keys.length === 0) {
-            orderList.innerHTML = '<p class="text-gray-500 text-center text-sm font-bold">No orders.</p>';
-            if(badge) badge.innerText = "0 Pending";
-            return;
-        }
 
         keys.forEach(id => {
             const o = orders[id];
@@ -401,7 +569,7 @@ rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️
                         <option value="Ready">Ready</option>
                         <option value="Completed">Done</option>
                         <option value="Cancelled">Cancel</option>
-</select>
+                    </select>
                     <button onclick="printSlip('${id}')" class="bg-blue-600 text-white px-3 rounded-lg"><i class="fa-solid fa-print"></i></button>
                     <button onclick="window.location.href='https://wa.me/91${o.customerPhone}'" class="bg-green-600 px-3 rounded-lg text-white"><i class="fa-brands fa-whatsapp"></i></button>
                 </div>
@@ -409,19 +577,12 @@ rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️
         });
         if(badge) badge.innerText = `${pendingCount} Pending`;
     }
-
-    // STATS GENERATION
-    function calculateStats(orders) {
-        let rev = 0;
-        let count = 0;
-        let counts = {};
-
+function calculateStats(orders) {
+        let rev = 0, count = 0, counts = {};
         Object.keys(orders).forEach(id => {
             const o = orders[id];
             count++;
             if (o.status === "Completed") rev += (o.total || 0);
-            
-            // Track item frequency if array or format exists
             if (o.items) {
                 const lines = o.items.split('%0A');
                 lines.forEach(l => {
@@ -442,29 +603,61 @@ rounded-xl flex items-center justify-center text-xl border">${i.icon || '🍽️
         if(document.getElementById('stat-top')) document.getElementById('stat-top').innerText = top;
     }
 
-    // CART FUNCTIONALITIES
     function addToCart(n, p) { 
-        cart.push({name: n, price: p}); 
+        if(cart[n]) {
+            cart[n].qty += 1;
+        } else {
+            cart[n] = { price: p, qty: 1 };
+        }
         updateCartUI(); 
     }
 
+    function modifyQty(name, amount) {
+        if(!cart[name]) return;
+        cart[name].qty += amount;
+        if(cart[name].qty <= 0) {
+            delete cart[name];
+        }
+        updateCartUI();
+    }
+
     function updateCartUI() {
-        let total = cart.reduce((sum, i) => sum + i.price, 0);
+        let totalItemsCount = 0;
+        Object.keys(cart).forEach(name => {
+            totalItemsCount += cart[name].qty;
+        });
+
         const floatBar = document.getElementById('floating-cart');
-        
-        if (cart.length > 0) floatBar.classList.remove('translate-y-36'); 
+        if (totalItemsCount > 0) floatBar.classList.remove('translate-y-36'); 
         else floatBar.classList.add('translate-y-36');
         
-        document.getElementById('float-items').innerText = `${cart.length} ITEMS`;
-        document.getElementById('float-total').innerText = `₹${total}`;
+        document.getElementById('float-items').innerText = `${totalItemsCount} ITEMS`;
         
-        document.getElementById('cart-summary').innerHTML = cart.map((i, idx) => `
-            <div class="flex justify-between text-sm font-bold text-gray-700">
-                <span>${i.name}</span>
-                <span>₹${i.price} <i onclick="cart.splice(${idx},1); updateCartUI();" class="fa-solid fa-circle-minus text-red-400 ml-2 cursor-pointer"></i></span>
+        document.getElementById('cart-summary').innerHTML = Object.keys(cart).map(name => `
+            <div class="flex justify-between items-center text-sm font-bold text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-800 p-2 rounded-xl shadow-sm border dark:border-slate-700">
+                <span>${name} (₹${cart[name].price})</span>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="modifyQty('${name}', -1)" class="w-6 h-6 bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400 rounded-full flex items-center justify-center font-black text-sm btn-press">-</button>
+                    <span class="text-xs font-black">${cart[name].qty}</span>
+                    <button type="button" onclick="modifyQty('${name}', 1)" class="w-6 h-6 bg-green-100 text-green-600 dark:bg-emerald-950/40 dark:text-emerald-400 rounded-full flex items-center justify-center font-black text-sm btn-press">+</button>
+                </div>
             </div>
         `).join('');
-document.getElementById('sheet-total').innerText = `₹${total}`;
+
+        recalculateCartTotals();
+    }
+
+    function recalculateCartTotals() {
+        let baseTotalCost = 0;
+        Object.keys(cart).forEach(name => {
+            baseTotalCost += (cart[name].price * cart[name].qty);
+        });
+let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
+        if(birthdayDiscountApplied) computedFinalCost = computedFinalCost - 50;
+        if(computedFinalCost < 0) computedFinalCost = 0;
+
+        document.getElementById('float-total').innerText = `₹${computedFinalCost}`;
+        document.getElementById('sheet-total').innerText = `₹${computedFinalCost}`;
     }
 
     function openCheckout() { document.getElementById('checkout-sheet').classList.add('active'); }
@@ -479,14 +672,16 @@ document.getElementById('sheet-total').innerText = `₹${total}`;
         else confirmOrderAndSave("COD");
     }
 
-    // CHECKOUT SAVE WITH AUTOMATIC WHATSAPP MSG FOR OWNER
     function confirmOrderAndSave(type) {
         const name = document.getElementById('u-n').value, phone = document.getElementById('u-p').value;
         const address = document.getElementById('u-a').value || "Shop/Takeaway";
         const timeChoice = document.getElementById('u-t').value;
 
-        let itemsMsg = cart.map(i => `▫️ ${i.name} - ₹${i.price}`).join('%0A');
-        let total = cart.reduce((sum, i) => sum + i.price, 0);
+        let itemsMsg = Object.keys(cart).map(name => `▫️ ${name} [x${cart[name].qty}] - ₹${cart[name].price * cart[name].qty}`).join('%0A');
+        
+        let total = Object.keys(cart).reduce((sum, name) => sum + (cart[name].price * cart[name].qty), 0) - pointRedemptionDeduction;
+        if(birthdayDiscountApplied) total = total - 50;
+        if(total < 0) total = 0;
         
         rdb.ref('orders').push({ 
             customerName: name, 
@@ -500,26 +695,36 @@ document.getElementById('sheet-total').innerText = `₹${total}`;
             timestamp: Date.now() 
         })
         .then(() => {
-            // Auto open WhatsApp with order layout to Owner
+            triggerPushNotification("Order Placed! 🚀", `Thank you ${name}, aapka order queue me add ho gaya hai.`);
+            document.getElementById('scratch-modal').classList.remove('hidden');
+            
             window.location.href = `https://wa.me/918058733741?text=*नया ऑर्डर (${type})*%0A*नाम:* ${name}%0A*मोबाइल:* ${phone}%0A*पता/टेबल:* ${address}%0A*समय:* ${timeChoice}%0A*आइटम्स:*%0A${itemsMsg}%0A*टोटल:* ₹${total}`;
-            cart = []; 
+            cart = {}; 
+            birthdayDiscountApplied = false;
+            pointRedemptionDeduction = 0;
+            document.getElementById('redeem-btn').innerText = "Redeem 50 Pts";
+            document.getElementById('redeem-btn').classList.replace('bg-slate-400', 'bg-amber-500');
             updateCartUI(); 
             closeCheckout(); 
             document.getElementById('qr-modal').classList.add('hidden');
         });
     }
 
-    // STATUS UPDATE WITH ALERT FOR USERS ON WHATSAPP
+    function closeScratchModal() {
+        document.getElementById('scratch-modal').classList.add('hidden');
+        document.getElementById('scratch-layer').style.display = 'flex';
+    }
+
     function updateOrderStatus(id, status, phone, name) {
         if (!status) return;
         rdb.ref(`orders/${id}/status`).set(status).then(() => {
+            triggerPushNotification("Order Status Update! 🚚", `Hello ${name}, aapka order ab ${status} hai.`);
             if (confirm("WhatsApp alert bhejein?")) {
                 window.open(`https://wa.me/91${phone}?text=Hello ${name}, aapka order ab ${status} hai.`, '_blank');
             }
         });
     }
 
-    // NEW ADMIN PIN ACCORDING TO YOUR REQUEST
     function loginAdmin() { 
         if (prompt("PIN:") === "8087jitu") { 
             document.getElementById('admin-panel').classList.remove('hidden'); 
@@ -527,54 +732,37 @@ document.getElementById('sheet-total').innerText = `₹${total}`;
         } else {
             alert("Galat PIN!");
         }
-    }
-function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
+}
 
-    function addItem() {
-        const n = document.getElementById('new-n').value;
-        const p = document.getElementById('new-p').value;
-        const i = document.getElementById('new-i').value || "🍔";
-        const category = document.getElementById('new-cat').value;
-
-        if (n && p && category !== "All") { 
-            rdb.ref('menu').push({name: n, price: parseInt(p), icon: i, category: category, available: true}); 
-            document.getElementById('new-n').value = ''; 
-            document.getElementById('new-p').value = ''; 
-        } else {
-            alert("Details aur category sahi se chunein!");
-        }
-    }
-
-    // PRINT SLIP LOGIC
     function printSlip(id) {
         rdb.ref(`orders/${id}`).once('value', (snap) => {
             const o = snap.val();
             if(!o) return;
             const content = `
-                <div class="text-center font-bold mb-4">
+                <div class="text-center font-bold mb-4 text-black">
                     <h2 class="text-base uppercase">Shri Shyam Fast Food</h2>
                     <p class="text-xs">Moulasar | 80587 33741</p>
                 </div>
-                <hr class="border-dashed my-2">
-                <p><b>Cust:</b> ${o.customerName}</p>
-                <p><b>Mob:</b> ${o.customerPhone}</p>
-                <p><b>Loc:</b> ${o.address || 'N/A'}</p>
-                <hr class="border-dashed my-2">
-                <div>${o.items ? o.items.replace(/%0A/g, '<br>') : ''}</div>
-                <hr class="border-dashed my-2">
-                <div class="flex justify-between font-bold text-base"><span>TOTAL:</span><span>₹${o.total}</span></div>
-                <p class="text-center font-bold mt-4 uppercase text-xs">Jay Shree Shyam</p>
+                <hr class="border-dashed my-2 border-black">
+                <p class="text-black"><b>Cust:</b> ${o.customerName}</p>
+                <p class="text-black"><b>Mob:</b> ${o.customerPhone}</p>
+                <p class="text-black"><b>Loc:</b> ${o.address || 'N/A'}</p>
+                <hr class="border-dashed my-2 border-black">
+                <div class="text-black">${o.items ? o.items.replace(/%0A/g, '<br>') : ''}</div>
+                <hr class="border-dashed my-2 border-black">
+                <div class="flex justify-between font-bold text-base text-black"><span>TOTAL:</span><span>₹${o.total}</span></div>
+                <p class="text-center font-bold mt-4 uppercase text-xs text-black">Jay Shree Shyam</p>
             `;
             document.getElementById('print-content').innerHTML = content;
             window.print();
         });
     }
 
-    // EXTRA PANELS TRIGGERS
     function openTracker() { document.getElementById('tracker-modal').classList.remove('hidden'); }
     function openHistory() { document.getElementById('history-modal').classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
+    // Direct Tracking bina kisi customer OTP lock ke
     function trackOrder() {
         const ph = document.getElementById('track-phone').value.trim();
         const res = document.getElementById('track-result');
@@ -586,30 +774,43 @@ function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
             Object.keys(data).reverse().forEach(id => {
                 const o = data[id];
                 if (o.customerPhone === ph) {
-                    const activeStep = o.status === 'Pending' ? 1 : 2;
+                    let activeStep = 1;
+                    if(o.status === "Preparing") activeStep = 2;
+                    if(o.status === "Ready" || o.status === "Completed") activeStep = 3;
+                    
                     html += `
-                    <div class="p-4 bg-gray-50 rounded-2xl border mb-3 text-xs font-bold text-gray-700">
+                    <div class="p-4 bg-gray-50 dark:bg-slate-900 border dark:border-slate-700 rounded-2xl mb-3 text-xs font-bold text-gray-700 dark:text-gray-300">
                         <div class="flex justify-between font-black mb-3 text-xs text-gray-500">
                             <span>Status: ${o.status}</span>
                             <span>Total: ₹${o.total}</span>
                         </div>
-<div class="space-y-4">
+                        
+                        <div class="relative w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full mb-4 overflow-hidden">
+                            <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 to-green-500 transition-all duration-1000 rounded-full" style="width: ${activeStep === 1 ? '15%' : (activeStep === 2 ? '60%' : '100%')}"></div>
+                        </div>
+
+                        <div class="space-y-4">
                             <div class="t-step flex gap-3 text-xs font-bold ${activeStep >= 1 ? 'done text-green-600' : 'text-gray-400'}">
-                                <i class="fa-solid ${activeStep >= 1 ? 'fa-circle-check text-green-500' : 'fa-circle text-gray-300'} text-base z-10 bg-white"></i>
-                                <div><p>Order Placed</p></div>
+                                <i class="fa-solid ${activeStep >= 1 ? 'fa-circle-check text-green-500' : 'fa-circle text-gray-300'} text-base z-10 bg-white dark:bg-slate-900"></i>
+                                <div><p>Order Received</p></div>
                             </div>
-                            <div class="t-step flex gap-3 text-xs font-bold ${activeStep >= 2 ? 'done text-green-600' : 'text-gray-400'}">
-                                <i class="fa-solid ${activeStep >= 2 ? 'fa-circle-check text-green-500' : 'fa-circle text-gray-300'} text-base z-10 bg-white"></i>
-                                <div><p>Ready / Delivered</p></div>
+                            <div class="t-step flex gap-3 text-xs font-bold ${activeStep >= 2 ? 'done text-blue-600' : 'text-gray-400'}">
+                                <i class="fa-solid ${activeStep >= 2 ? 'fa-kitchen-set text-blue-500' : 'fa-circle text-gray-300'} text-base z-10 bg-white dark:bg-slate-900"></i>
+                                <div><p>Kitchen Preparing</p></div>
+                            </div>
+                            <div class="t-step flex gap-3 text-xs font-bold ${activeStep >= 3 ? 'done text-green-600' : 'text-gray-400'}">
+                                <i class="fa-solid ${activeStep >= 3 ? 'fa-circle-check text-green-500' : 'fa-circle text-gray-300'} text-base z-10 bg-white dark:bg-slate-900"></i>
+                                <div><p>Ready / Delivered 🚚</p></div>
                             </div>
                         </div>
                     </div>`;
-                }
+}
             });
             res.innerHTML = html || `<p class="text-center font-bold text-gray-400 text-xs">Koi active order nahi mila.</p>`;
         });
     }
 
+    // Direct History bina kisi customer OTP lock ke
     function loadHistory() {
         const ph = document.getElementById('history-phone').value.trim();
         const res = document.getElementById('history-result');
@@ -622,16 +823,25 @@ function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
                 const o = data[id];
                 if (o.customerPhone === ph && o.status === "Completed") {
                     html += `
-                    <div class="bg-gray-50 p-3 rounded-xl text-xs font-bold border flex justify-between items-center">
+                    <div class="bg-gray-50 dark:bg-slate-900 p-3 rounded-xl text-xs font-bold border dark:border-slate-700 flex justify-between items-center">
                         <div>
-                            <p class="text-gray-800">${o.items ? o.items.replace(/%0A/g, ', ') : ''}</p>
+                            <p class="text-gray-800 dark:text-gray-200">${o.items ? o.items.replace(/%0A/g, ', ') : ''}</p>
                             <p class="text-[10px] text-gray-400 font-medium mt-0.5">${new Date(o.timestamp).toLocaleDateString()}</p>
                         </div>
-                        <span class="text-green-600">₹${o.total}</span>
+                        <span class="text-green-600 font-black">₹${o.total}</span>
                     </div>`;
                 }
             });
-            res.innerHTML = html || `<p class="text-center font-bold text-gray-400 text-xs">Purana koi order nahi mila.</p>`;
+            res.innerHTML = html || `<p class="text-center font-bold text-gray-400 text-xs">Purana koi completed order nahi mila.</p>`;
+        });
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            const swCode = `self.addEventListener('fetch', function(e) { });`;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration skipped', err));
         });
     }
 </script>
