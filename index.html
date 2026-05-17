@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+    <!-- Upgraded PWA Config Setup for Standalone App Experience -->
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlNocmkgU2h5YW0gRmFzdCBGb29kIiwKICAic2hvcnxfbmFtZSI6ICJTaHlhbUZvb2QiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2Y4ZmFmYyIsCiAgInRoZW1lX2NvbG9yIjogIiNkYzI2MjYiLAogICJpY29ucyI6IFtsCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9pLmliYi5jby8xR0NOUnQwaC9JTUctMjAyNjA1MTMtV0EwMDAwLmpwZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvanBlZyIKICAgIH0KICBdCn0=">
 
     <style>
@@ -29,7 +30,6 @@
         .t-step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 32px; width: 2px; height: calc(100% + 4px); background: #e5e7eb; z-index: 0; }
         .t-step.done:not(:last-child)::after { background: #22c55e; }
         .scroll-hide::-webkit-scrollbar { display: none; }
-        .scratch-card { background: linear-gradient(135deg, #cbd5e1 25%, #94a3b8 25%, #94a3b8 50%, #cbd5e1 50%, #cbd5e1 75%, #94a3b8 75%, #94a3b8 100%); background-size: 40px 40px; }
 
         @media print {
             body > *:not(#print-slip):not(#print-report) { display: none !important; }
@@ -67,13 +67,14 @@
         </div>
     </div>
     <div class="flex items-center gap-1.5">
+        <button id="pwa-install-btn" onclick="triggerPWAInstallationPrompt()" class="hidden px-2.5 py-2 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-xl text-[10px] font-black uppercase tracking-wider btn-press flex items-center gap-1"><i class="fa-solid fa-cloud-arrow-down"></i> App Download</button>
+        
         <button onclick="toggleDarkMode()" title="Theme Badlein" class="w-10 h-10 rounded-full bg-amber-50 dark:bg-slate-800 border dark:border-slate-700 text-amber-500 dark:text-amber-400 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-moon dark:hidden"></i><i class="fa-solid fa-sun hidden dark:block"></i></button>
         <button onclick="openTracker()" title="Track Order" class="w-10 h-10 rounded-full bg-blue-50 dark:bg-slate-800 border dark:border-slate-700 text-blue-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-location-dot"></i></button>
         <button onclick="openHistory()" title="Order History" class="w-10 h-10 rounded-full bg-purple-50 dark:bg-slate-800 border dark:border-slate-700 text-purple-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-clock-rotate-left"></i></button>
         <button onclick="loginAdmin()" title="Admin" class="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-800 border dark:border-slate-700 text-gray-500 flex items-center justify-center btn-press text-sm"><i class="fa-solid fa-sliders"></i></button>
     </div>
 </header>
-
 <div class="max-w-2xl mx-auto px-4 py-5">
 
     <div id="admin-panel" class="hidden bg-gray-900 rounded-[2rem] shadow-2xl p-5 mb-8 text-white">
@@ -171,14 +172,10 @@
             <div class="bg-gray-50 dark:bg-slate-900 p-4 rounded-2xl border dark:border-slate-700">
                 <div id="cart-summary" class="space-y-3 mb-3 max-h-48 overflow-y-auto scroll-hide"></div>
                 
-                <div class="border-t dark:border-slate-700 pt-3 mt-2 grid grid-cols-2 gap-2 text-xs">
+                <div class="border-t dark:border-slate-700 pt-3 mt-2 grid grid-cols-1 gap-2 text-xs">
                     <label class="block">
                         <span class="text-[10px] font-black text-gray-400 uppercase">🎁 Birthday Discount</span>
                         <input id="u-dob" type="date" onchange="applyBirthdayDiscount()" class="w-full mt-1 p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-xl font-bold outline-none">
-                    </label>
-                    <label class="block">
-                        <span class="text-[10px] font-black text-gray-400 uppercase">🪙 Refer points (Avail: 50)</span>
-                        <button id="redeem-btn" onclick="redeemPoints()" class="w-full mt-1 p-2 bg-amber-500 text-white rounded-xl font-black uppercase text-[10px] btn-press">Redeem 50 Pts</button>
                     </label>
                 </div>
 
@@ -193,7 +190,7 @@
                 <input id="u-p" type="tel" placeholder="Mobile Number *" class="w-full p-4 bg-gray-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl font-bold outline-none text-sm">
                 
                 <div class="bg-gray-50 dark:bg-slate-900 p-3 rounded-xl border dark:border-slate-700">
-                    <p class="text-[10px] font-black text-gray-400 uppercase mb-2">📍 Select Saved Address or Custom</p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase mb-2">📍 Saved Address Select Karein</p>
                     <div id="address-slots" class="flex gap-2 mb-2 overflow-x-auto pb-1 scroll-hide"></div>
                     <input id="u-a" placeholder="Address / Table No." class="w-full p-3 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-xl font-bold outline-none text-xs">
                     <button onclick="saveCurrentAddress()" class="mt-2 text-[10px] bg-blue-600 text-white font-black px-3 py-1.5 rounded-lg btn-press uppercase"><i class="fa-solid fa-bookmark mr-1"></i> Save This Address</button>
@@ -227,18 +224,6 @@
     </div>
 </div>
 
-<div id="scratch-modal" class="hidden fixed inset-0 bg-black/80 z-[4000] flex items-center justify-center p-6 text-center backdrop-blur-md">
-    <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative">
-        <h4 class="font-black text-xl text-amber-500 mb-1">🎉 Congratulations!</h4>
-        <p class="text-xs text-gray-400 mb-4 font-bold">Aapko mila ek Special Reward Card</p>
-        <div class="w-full h-40 rounded-xl relative overflow-hidden flex items-center justify-center bg-orange-50 dark:bg-slate-900 border-2 border-dashed border-orange-300">
-            <span class="text-2xl font-black text-orange-600 dark:text-orange-400">+25 Free Cash Points!</span>
-            <div id="scratch-layer" onclick="this.style.display='none'" class="scratch-card absolute inset-0 cursor-pointer flex items-center justify-center text-white font-black text-sm select-none">SCRATCH HERE 👋</div>
-        </div>
-        <button onclick="closeScratchModal()" class="w-full mt-5 bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider btn-press">Claim Reward & Exit</button>
-    </div>
-</div>
-
 <div id="tracker-modal" class="hidden fixed inset-0 bg-black/50 z-[2000] flex items-end justify-center backdrop-blur-sm">
     <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
         <div class="flex justify-between items-center mb-5 flex-shrink-0">
@@ -254,7 +239,7 @@
 </div>
 
 <div id="history-modal" class="hidden fixed inset-0 bg-black/50 z-[2000] flex items-end justify-center backdrop-blur-sm">
-<div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
+    <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-t-[2.5rem] p-5 max-h-[88vh] flex flex-col">
         <div class="flex justify-between items-center mb-5 flex-shrink-0">
             <h3 class="font-black text-2xl text-gray-800 dark:text-white"><i class="fa-solid fa-clock-rotate-left text-purple-500 mr-2"></i>Order History</h3>
             <button onclick="closeModal('history-modal')" class="w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center btn-press"><i class="fa-solid fa-xmark text-gray-500 dark:text-gray-300"></i></button>
@@ -266,7 +251,6 @@
         <div id="history-result" class="overflow-y-auto scroll-hide space-y-3"></div>
     </div>
 </div>
-
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAD6rZ9pbMfkCsYs3ItGoIe89H38mod504",
@@ -287,7 +271,9 @@
     let currentCategory = "All";
     let isShopOpen = true;
     let birthdayDiscountApplied = false;
-    let pointRedemptionDeduction = 0;
+    let totalOrdersCountLocal = null; 
+
+    let deferredPWAInstallationPromptObj = null;
 
     const categories = ["All", "Snacks", "Meals", "Drinks", "Sweets", "Other"];
 
@@ -297,6 +283,28 @@
         requestNotificationPermission();
     });
 
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPWAInstallationPromptObj = e;
+        const targetBtn = document.getElementById('pwa-install-btn');
+        if(targetBtn) targetBtn.classList.remove('hidden');
+    });
+
+    function triggerPWAInstallationPrompt() {
+        if (deferredPWAInstallationPromptObj) {
+            deferredPWAInstallationPromptObj.prompt();
+            deferredPWAInstallationPromptObj.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User installed the web application');
+                }
+                deferredPWAInstallationPromptObj = null;
+                document.getElementById('pwa-install-btn').classList.add('hidden');
+            });
+        } else {
+            alert("App download link ready ho rhi h, ya fir ye app aapke phone me pehle se installed h. Chrome options me jaakar 'Add to Home Screen' bhi dabayein!");
+        }
+    }
+
     rdb.ref('shop_status').once('value', snap => {
         if (snap.val() === null) rdb.ref('shop_status').set(true);
     });
@@ -305,7 +313,8 @@
         isShopOpen = (snap.val() !== false);
         document.getElementById('closed-screen').style.display = isShopOpen ? 'none' : 'flex';
         document.getElementById('shop-indicator').innerHTML = `<span class="status-dot ${isShopOpen ? 'bg-green-500' : 'bg-red-500'}"></span> <span id="shop-text">${isShopOpen ? 'SHOP OPEN' : 'SHOP CLOSED'}</span>`;
-const btn = document.getElementById('toggle-shop-btn');
+        
+        const btn = document.getElementById('toggle-shop-btn');
         btn.innerText = isShopOpen ? "🔴 TURN OFF SHOP" : "🟢 TURN ON SHOP";
         btn.className = isShopOpen ? "w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg btn-press text-sm" : "w-full py-4 rounded-xl font-black bg-green-500 text-white shadow-lg btn-press text-sm";
     });
@@ -319,9 +328,38 @@ const btn = document.getElementById('toggle-shop-btn');
 
     rdb.ref('orders').on('value', snap => {
         const data = snap.val() || {};
+        const keys = Object.keys(data);
+        
+        if (totalOrdersCountLocal !== null && keys.length > totalOrdersCountLocal) {
+            playIncomingOrderSound();
+            triggerPushNotification("Naya Order Aaya! 🍔", "Kripya dashboard kholkar live orders check karein.");
+        }
+        totalOrdersCountLocal = keys.length;
+        
         renderAdminOrders(data);
         calculateStats(data);
     });
+
+    function playIncomingOrderSound() {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        if(!context) return;
+        
+        const playTone = (freq, start, duration) => {
+            let osc = context.createOscillator();
+            let gain = context.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.5, start);
+            gain.gain.exponentialRampToValueAtTime(0.01, start + duration);
+            osc.connect(gain);
+            gain.connect(context.destination);
+            osc.start(start);
+            osc.stop(start + duration);
+        };
+        
+        playTone(587.33, context.currentTime, 0.15); 
+        playTone(880, context.currentTime + 0.15, 0.4);  
+    }
 
     function initTheme() {
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -378,7 +416,8 @@ const btn = document.getElementById('toggle-shop-btn');
             alert("Address slot save ho gaya!");
         }
     }
-function applyBirthdayDiscount() {
+
+    function applyBirthdayDiscount() {
         const dobValue = document.getElementById('u-dob').value;
         if(!dobValue) return;
         
@@ -392,14 +431,6 @@ function applyBirthdayDiscount() {
             birthdayDiscountApplied = false;
             alert("Aapka birthday aaj nahi hai.");
         }
-        recalculateCartTotals();
-    }
-
-    function redeemPoints() {
-        if(pointRedemptionDeduction > 0) return;
-        pointRedemptionDeduction = 25; 
-        document.getElementById('redeem-btn').innerText = "POINTS APPLIED";
-        document.getElementById('redeem-btn').classList.replace('bg-amber-500', 'bg-slate-400');
         recalculateCartTotals();
     }
 
@@ -432,7 +463,8 @@ function applyBirthdayDiscount() {
                     });
                 }
             });
-let topItem = "-";
+
+            let topItem = "-";
             let maxFreq = 0;
             Object.keys(itemCounts).forEach(n => {
                 if (itemCounts[n] > maxFreq) { maxFreq = itemCounts[n]; topItem = n; }
@@ -511,7 +543,8 @@ let topItem = "-";
             </div>`;
         });
     }
-function renderAdminMenu() {
+
+    function renderAdminMenu() {
         const adminBox = document.getElementById('admin-menu-list');
         if (!adminBox) return;
         adminBox.innerHTML = '';
@@ -577,7 +610,8 @@ function renderAdminMenu() {
         });
         if(badge) badge.innerText = `${pendingCount} Pending`;
     }
-function calculateStats(orders) {
+
+    function calculateStats(orders) {
         let rev = 0, count = 0, counts = {};
         Object.keys(orders).forEach(id => {
             const o = orders[id];
@@ -647,12 +681,13 @@ function calculateStats(orders) {
         recalculateCartTotals();
     }
 
-    function recalculateCartTotals() {
+        function recalculateCartTotals() {
         let baseTotalCost = 0;
         Object.keys(cart).forEach(name => {
             baseTotalCost += (cart[name].price * cart[name].qty);
         });
-let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
+
+        let computedFinalCost = baseTotalCost;
         if(birthdayDiscountApplied) computedFinalCost = computedFinalCost - 50;
         if(computedFinalCost < 0) computedFinalCost = 0;
 
@@ -679,7 +714,7 @@ let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
 
         let itemsMsg = Object.keys(cart).map(name => `▫️ ${name} [x${cart[name].qty}] - ₹${cart[name].price * cart[name].qty}`).join('%0A');
         
-        let total = Object.keys(cart).reduce((sum, name) => sum + (cart[name].price * cart[name].qty), 0) - pointRedemptionDeduction;
+        let total = Object.keys(cart).reduce((sum, name) => sum + (cart[name].price * cart[name].qty), 0);
         if(birthdayDiscountApplied) total = total - 50;
         if(total < 0) total = 0;
         
@@ -695,36 +730,14 @@ let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
             timestamp: Date.now() 
         })
         .then(() => {
-            triggerPushNotification("Order Placed! 🚀", `Thank you ${name}, aapka order queue me add ho gaya hai.`);
-            document.getElementById('scratch-modal').classList.remove('hidden');
-            
             window.location.href = `https://wa.me/918058733741?text=*नया ऑर्डर (${type})*%0A*नाम:* ${name}%0A*मोबाइल:* ${phone}%0A*पता/टेबल:* ${address}%0A*समय:* ${timeChoice}%0A*आइटम्स:*%0A${itemsMsg}%0A*टोटल:* ₹${total}`;
             cart = {}; 
             birthdayDiscountApplied = false;
-            pointRedemptionDeduction = 0;
-            document.getElementById('redeem-btn').innerText = "Redeem 50 Pts";
-            document.getElementById('redeem-btn').classList.replace('bg-slate-400', 'bg-amber-500');
             updateCartUI(); 
             closeCheckout(); 
             document.getElementById('qr-modal').classList.add('hidden');
         });
     }
-
-    function closeScratchModal() {
-        document.getElementById('scratch-modal').classList.add('hidden');
-        document.getElementById('scratch-layer').style.display = 'flex';
-    }
-
-    function updateOrderStatus(id, status, phone, name) {
-        if (!status) return;
-        rdb.ref(`orders/${id}/status`).set(status).then(() => {
-            triggerPushNotification("Order Status Update! 🚚", `Hello ${name}, aapka order ab ${status} hai.`);
-            if (confirm("WhatsApp alert bhejein?")) {
-                window.open(`https://wa.me/91${phone}?text=Hello ${name}, aapka order ab ${status} hai.`, '_blank');
-            }
-        });
-    }
-
     function loginAdmin() { 
         if (prompt("PIN:") === "8087jitu") { 
             document.getElementById('admin-panel').classList.remove('hidden'); 
@@ -732,7 +745,23 @@ let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
         } else {
             alert("Galat PIN!");
         }
-}
+    }
+    function toggleShop() { rdb.ref('shop_status').set(!isShopOpen); }
+
+    function addItem() {
+        const n = document.getElementById('new-n').value;
+        const p = document.getElementById('new-p').value;
+        const i = document.getElementById('new-i').value || "🍔";
+        const category = document.getElementById('new-cat').value;
+
+        if (n && p && category !== "All") { 
+            rdb.ref('menu').push({name: n, price: parseInt(p), icon: i, category: category, available: true}); 
+            document.getElementById('new-n').value = ''; 
+            document.getElementById('new-p').value = ''; 
+        } else {
+            alert("Details aur category sahi se chunein!");
+        }
+    }
 
     function printSlip(id) {
         rdb.ref(`orders/${id}`).once('value', (snap) => {
@@ -762,7 +791,6 @@ let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
     function openHistory() { document.getElementById('history-modal').classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-    // Direct Tracking bina kisi customer OTP lock ke
     function trackOrder() {
         const ph = document.getElementById('track-phone').value.trim();
         const res = document.getElementById('track-result');
@@ -804,13 +832,12 @@ let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
                             </div>
                         </div>
                     </div>`;
-}
+                }
             });
             res.innerHTML = html || `<p class="text-center font-bold text-gray-400 text-xs">Koi active order nahi mila.</p>`;
         });
     }
 
-    // Direct History bina kisi customer OTP lock ke
     function loadHistory() {
         const ph = document.getElementById('history-phone').value.trim();
         const res = document.getElementById('history-result');
@@ -847,3 +874,14 @@ let computedFinalCost = baseTotalCost - pointRedemptionDeduction;
 </script>
 </body>
 </html>
+
+    function updateOrderStatus(id, status, phone, name) {
+        if (!status) return;
+        rdb.ref(`orders/${id}/status`).set(status).then(() => {
+            if (confirm("WhatsApp alert bhejein?")) {
+                window.open(`https://wa.me/91${phone}?text=Hello ${name}, aapka order ab ${status} hai.`, '_blank');
+            }
+        });
+    }
+
+   
